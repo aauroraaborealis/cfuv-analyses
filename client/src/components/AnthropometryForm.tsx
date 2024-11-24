@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 
 const AnthropometryForm: React.FC = () => {
-    const [userId, setUserId] = useState<number>(1); // Установите значение user_id по умолчанию
+    const [userId, setUserId] = useState<number>(1);
     const [height, setHeight] = useState<number | ''>('');
     const [weight, setWeight] = useState<number | ''>('');
     const [waistCircumference, setWaistCircumference] = useState<number | ''>('');
@@ -44,7 +44,7 @@ const AnthropometryForm: React.FC = () => {
         <div>
             <h3>Форма Антропометрии</h3>
             <form onSubmit={handleSubmit}>
-                <div>
+                <div className='column'>
                     <label>Рост (см):</label>
                     <input 
                         type="number" 
@@ -53,7 +53,7 @@ const AnthropometryForm: React.FC = () => {
                         required 
                     />
                 </div>
-                <div>
+                <div className='column'>
                     <label>Вес (кг):</label>
                     <input 
                         type="number" 
@@ -62,16 +62,16 @@ const AnthropometryForm: React.FC = () => {
                         required 
                     />
                 </div>
-                <div>
-                    <label>Окружность талии (см):</label>
+                <div className='column'>
+                    <label>Обхват талии (см):</label>
                     <input 
                         type="number" 
                         value={waistCircumference} 
                         onChange={(e) => setWaistCircumference(Number(e.target.value) || '')} 
                     />
                 </div>
-                <div>
-                    <label>Окружность бедер (см):</label>
+                <div className='column'>
+                    <label>Обхват бедер (см):</label>
                     <input 
                         type="number" 
                         value={hipCircumference} 

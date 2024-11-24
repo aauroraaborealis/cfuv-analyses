@@ -1,0 +1,82 @@
+.register-form, .reg-form {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    min-width: 40vw;
+}
+
+.submit-button{
+    align-self: center;
+    justify-self: start;
+}
+
+.reg-form .column {
+    width: 100%;
+    gap: 10px;
+}
+
+/* Контейнер для select */
+.custom-select-container {
+    width: 100%;
+  }
+  
+  /* Стили для самого select */
+  .custom-select__control {
+    border: 1px solid green;
+    border-radius: 5px;
+    box-shadow: none;
+    font-size: 14px;
+    padding: 5px;
+    &:hover {
+      border-color: darkgreen;
+    }
+  }
+  
+  /* Стили для выпадающего списка */
+  .custom-select__menu {
+    border: 1px solid green;
+    border-radius: 5px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+  
+  /* Стили для опций */
+  .custom-select__option {
+    background-color: white;
+    color: black;
+    font-size: 14px;
+    padding: 10px;
+  
+    &:hover {
+      background-color: #e6ffe6;
+      color: black;
+    }
+  
+    &--is-selected {
+      background-color: green;
+      color: white;
+    }
+  }
+  
+  /* Кнопка */
+  .custom-button {
+    background-color: green;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    padding: 5px 10px;
+    cursor: pointer;
+  }
+  
+  .custom-button:hover {
+    background-color: darkgreen;
+  }
+  
+  /* Инпут */
+  .custom-input {
+    border: 1px solid green;
+    border-radius: 5px;
+    padding: 5px;
+    margin-right: 10px;
+  }
+  

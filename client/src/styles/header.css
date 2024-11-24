@@ -1,0 +1,16 @@
+.headerStyle {
+    display: flex;
+    justify-content: space-between; 
+    align-items: center;
+    background-color: #2D6C30;
+    color: white;
+}
+
+.buttonStyle {
+    background-color: #2D6C30;
+    border: none;
+    color: #ffffff;
+    padding: 10px 15px;
+    border-radius: 5px;
+    cursor: pointer
+};

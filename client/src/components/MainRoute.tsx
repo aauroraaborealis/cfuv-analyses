@@ -1,5 +1,8 @@
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Route, Routes, useNavigate } from 'react-router-dom';
+import AnalysisSelector from './AnalysisSelector';
+import AnthropometryForm from './AnthropometryForm';
+import Register from './Register';
 
 const MainRoute: React.FC = () => {
   const navigate = useNavigate();
@@ -14,3 +17,4 @@ const MainRoute: React.FC = () => {
 };
 
 export default MainRoute;
+

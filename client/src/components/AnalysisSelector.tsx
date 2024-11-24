@@ -1,16 +1,13 @@
+
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import AnthropometryForm from './AnthropometryForm';
 
 const AnalysisSelector: React.FC = () => {
     const [selectedAnalysis, setSelectedAnalysis] = useState<string>('');
-    const navigate = useNavigate();
 
     const handleAnalysisChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
         const analysisType = event.target.value;
         setSelectedAnalysis(analysisType);
-        if (analysisType) {
-            navigate(`/analysis/${analysisType}`);
-        }
     };
 
     return (
@@ -19,9 +16,10 @@ const AnalysisSelector: React.FC = () => {
             <select value={selectedAnalysis} onChange={handleAnalysisChange}>
                 <option value="">-- Выберите анализ --</option>
                 <option value="anthropometry">Антропометрия</option>
-                {/* Добавьте другие анализы */}
-                {/* <option value="blood">Анализ крови</option> */}
             </select>
+
+            {selectedAnalysis === 'anthropometry' && <AnthropometryForm />}
+
         </div>
     );
 };

@@ -4,20 +4,58 @@ const jwt = require('jsonwebtoken');
 
 class UserController {
   async createUser(req, res) {
-    const { name, surname, middlename, email, birth_date, password } = req.body;
+    const {
+      name,
+      surname,
+      middlename,
+      email,
+      birth_date,
+      password,
+      sport_id,   // ID вида спорта из таблицы sports
+      team_name,  // Название команды, если командный спорт
+    } = req.body;
+  
+    const client = await db.connect(); // Подключаем клиент для транзакции
+  
     try {
+      await client.query('BEGIN'); // Начинаем транзакцию
+  
+      // Хэшируем пароль
       const hashedPassword = await bcrypt.hash(password, 10);
-      const newUser = await db.query(
+  
+      // Создаём пользователя
+      const newUser = await client.query(
         `INSERT INTO users (name, surname, middlename, email, birth_date, password) 
-                 VALUES ($1, $2, $3, $4, $5, $6) 
-                 RETURNING *`,
+         VALUES ($1, $2, $3, $4, $5, $6) 
+         RETURNING id, name, surname`,
         [name, surname, middlename, email, birth_date, hashedPassword]
       );
-      res.json(newUser.rows[0]);
+  
+      const userId = newUser.rows[0].id;
+  
+      // Если передан sport_id, добавляем запись в user_sports
+      if (sport_id) {
+        await client.query(
+          `INSERT INTO user_sports (user_id, sport_id, team_name)
+           VALUES ($1, $2, $3)`,
+          [userId, sport_id, team_name || null]
+        );
+      }
+  
+      await client.query('COMMIT');
+  
+      res.json({
+        message: 'Регистрация успешна',
+        user: newUser.rows[0],
+      });
     } catch (err) {
+      await client.query('ROLLBACK'); 
       res.status(500).json({ error: err.message });
+    } finally {
+      client.release(); 
     }
   }
+  
 
   async loginUser(req, res) {
     const { email, password } = req.body;
