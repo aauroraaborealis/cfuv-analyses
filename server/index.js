@@ -4,6 +4,7 @@ const userRouter = require('./routes/user.routes');
 const anthropometryRouter = require('./routes/anthropometry.routes');
 const sportsRouter = require('./routes/sports.routes');
 const teamRouter = require("./routes/team.routes"); // Новый роутер
+const analysisRouter = require("./routes/analysis.routes");
 
 const db = require('./db'); // Подключаем вашу конфигурацию для базы данных
 
@@ -26,5 +27,6 @@ app.use('/api', userRouter);
 app.use('/api', anthropometryRouter);
 app.use('/api', sportsRouter);
 app.use("/api", teamRouter); // Подключаем роутер для команд
+app.use("/api", analysisRouter);
 
 app.listen(PORT, () => console.log(`server started on ${PORT}`));

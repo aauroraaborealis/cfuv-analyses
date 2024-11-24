@@ -1,21 +1,31 @@
-import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import '../styles/header.css'
+
+
 const Header: React.FC = () => {
-    const navigate = useNavigate();
+  const [isCoachMode, setIsCoachMode] = useState(false); // Состояние для режима тренера
+  const navigate = useNavigate();
 
-    const goToMain = () => {
-        navigate('/'); 
-    };
+  const handleToggleCoachMode = () => {
+    setIsCoachMode(!isCoachMode); // Переключение режима
+  };
 
-    return (
-        <header className='headerStyle'>
-            <button onClick={goToMain} className='buttonStyle'>
-                На главную
-            </button>
-        </header>
-    );
+  return (
+    <header className="headerStyle">
+      <nav>
+        <Link to="/">Главная</Link>
+        {!isCoachMode ? (
+          <button onClick={handleToggleCoachMode}>Зайти как тренер</button>
+        ) : (
+          <>
+            <button onClick={handleToggleCoachMode}>Выйти из режима тренера</button>
+            <Link to="/coach-panel">Управление анализами</Link>
+          </>
+        )}
+      </nav>
+    </header>
+  );
 };
-
 
 export default Header;
