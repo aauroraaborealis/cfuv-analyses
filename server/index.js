@@ -3,6 +3,9 @@ const cors = require('cors');
 const userRouter = require('./routes/user.routes');
 const teamRouter = require('./routes/team.routes');
 const sportRouter = require('./routes/sport.routes');
+const analysisRouter = require('./routes/analysis.routes');
+
+
 const db = require('./db'); // Подключаем вашу конфигурацию для базы данных
 
 (async () => {
@@ -23,5 +26,6 @@ app.use(express.json());
 app.use('/api', userRouter);
 app.use('/api/team', teamRouter);
 app.use('/api/sport', sportRouter);
+app.use('/api/analysis', analysisRouter);
 
 app.listen(PORT, () => console.log(`server started on ${PORT}`));

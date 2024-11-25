@@ -6,6 +6,8 @@ import MainRoute from './components/MainRoute';
 import AnalysisSelector from './components/AnalysisSelector';
 import CoachPanel from './components/CoachPanel';
 import Login from './components/Login';
+import AssignAnalysis from './components/AssignAnalysis';
+
 
 const App: React.FC = () => {
     return (
@@ -18,6 +20,7 @@ const App: React.FC = () => {
                     <Route path="/analysis" element={<AnalysisSelector />} />
                     <Route path="/coach-panel" element={<CoachPanel />} />
                     <Route path="/login" element={<Login />} />
+                    <Route path="/assign-analysis" element={<AssignAnalysis />} />
                 </Routes>
             </div>
         </Router>
