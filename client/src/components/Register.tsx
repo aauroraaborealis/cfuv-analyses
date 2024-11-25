@@ -76,7 +76,7 @@ const Register: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
+  
     const user = {
       email,
       password,
@@ -89,7 +89,7 @@ const Register: React.FC = () => {
       in_team: isTeamSport,
       team_id: isTeamSport && team ? team.value : null,
     };
-
+  
     try {
       const response = await fetch("http://localhost:8080/api/register", {
         method: "POST",
@@ -98,21 +98,24 @@ const Register: React.FC = () => {
         },
         body: JSON.stringify(user),
       });
-
+  
       if (!response.ok) {
         const error = await response.json();
         alert(`Ошибка регистрации: ${error.message}`);
         return;
       }
-
-      const result = await response.json();
+  
+      const result = await response.json(); // Получаем токен из ответа
+      localStorage.setItem("token", result.token); // Сохраняем токен
+  
       alert("Регистрация успешна!");
-      navigate("/");
+      navigate("/"); // Перенаправляем пользователя после регистрации
     } catch (error) {
       console.error("Ошибка регистрации:", error);
       alert("Ошибка регистрации");
     }
   };
+  
 
   const handleAddNewTeam = async () => {
     if (!newTeamName.trim() || !sport) {
