@@ -1,11 +1,8 @@
 const express = require('express');
 const cors = require('cors');
 const userRouter = require('./routes/user.routes');
-const anthropometryRouter = require('./routes/anthropometry.routes');
-const sportsRouter = require('./routes/sports.routes');
-const teamRouter = require("./routes/team.routes"); // Новый роутер
-const analysisRouter = require("./routes/analysis.routes");
-
+const teamRouter = require('./routes/team.routes');
+const sportRouter = require('./routes/sport.routes');
 const db = require('./db'); // Подключаем вашу конфигурацию для базы данных
 
 (async () => {
@@ -24,9 +21,7 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 app.use('/api', userRouter);
-app.use('/api', anthropometryRouter);
-app.use('/api', sportsRouter);
-app.use("/api", teamRouter); // Подключаем роутер для команд
-app.use("/api", analysisRouter);
+app.use('/api/team', teamRouter);
+app.use('/api/sport', sportRouter);
 
 app.listen(PORT, () => console.log(`server started on ${PORT}`));

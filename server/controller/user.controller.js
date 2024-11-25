@@ -3,57 +3,38 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 
 class UserController {
-  async createUser(req, res) {
-    const {
-      name,
-      surname,
-      middlename,
-      email,
-      birth_date,
-      password,
-      sport_id,   // ID вида спорта из таблицы sports
-      team_name,  // Название команды, если командный спорт
-    } = req.body;
-  
-    const client = await db.connect(); // Подключаем клиент для транзакции
-  
-    try {
-      await client.query('BEGIN'); // Начинаем транзакцию
-  
-      // Хэшируем пароль
-      const hashedPassword = await bcrypt.hash(password, 10);
-  
-      // Создаём пользователя
-      const newUser = await client.query(
-        `INSERT INTO users (name, surname, middlename, email, birth_date, password) 
-         VALUES ($1, $2, $3, $4, $5, $6) 
-         RETURNING id, name, surname`,
-        [name, surname, middlename, email, birth_date, hashedPassword]
-      );
-  
-      const userId = newUser.rows[0].id;
-  
-      // Если передан sport_id, добавляем запись в user_sports
-      if (sport_id) {
-        await client.query(
-          `INSERT INTO user_sports (user_id, sport_id, team_name)
-           VALUES ($1, $2, $3)`,
-          [userId, sport_id, team_name || null]
-        );
-      }
-  
-      await client.query('COMMIT');
-  
-      res.json({
-        message: 'Регистрация успешна',
-        user: newUser.rows[0],
-      });
-    } catch (err) {
-      await client.query('ROLLBACK'); 
-      res.status(500).json({ error: err.message });
-    } finally {
-      client.release(); 
+  const { first_name, last_name, email, password, birth_date, gender, sport, in_team, team_id } = req.body;
+
+  // Проверка обязательных полей
+  if (!first_name || !last_name || !email || !password || !birth_date || !gender || !sport) {
+    return res.status(400).json({ message: 'All fields are required.' });
+  }
+
+  try {
+    // Хэширование пароля
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    // Вставка данных в таблицу students
+    const query = `
+      INSERT INTO students (first_name, last_name, email, password_hash, birth_date, gender, sport, in_team, team_id)
+      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+      RETURNING student_id;
+    `;
+    const values = [first_name, last_name, email, hashedPassword, birth_date, gender, sport, in_team || false, team_id || null];
+
+    const result = await pool.query(query, values);
+
+    res.status(201).json({
+      message: 'User registered successfully.',
+      student_id: result.rows[0].student_id,
+    });
+  } catch (error) {
+    if (error.code === '23505') {
+      // Код ошибки 23505 означает дублирующее значение уникального поля
+      return res.status(409).json({ message: 'Email already exists.' });
     }
+    console.error(error);
+    res.status(500).json({ message: 'An error occurred during registration.' });
   }
   
 

@@ -4,7 +4,7 @@ import Select from "react-select";
 import "../styles/Register.css";
 
 interface SportOption {
-  value: number;
+  value: string; // UUID
   label: string;
 }
 
@@ -20,23 +20,25 @@ const Register: React.FC = () => {
   const [surname, setSurname] = useState("");
   const [middlename, setMiddlename] = useState("");
   const [birthDate, setBirthDate] = useState("");
-  const [sports, setSports] = useState<SportOption[]>([]); // Список видов спорта
-  const [teams, setTeams] = useState<TeamOption[]>([]); // Список команд из БД
-  const [sport, setSport] = useState<SportOption | null>(null); // Выбранный спорт
-  const [isTeamSport, setIsTeamSport] = useState(false); // Чекбокс для командного спорта
-  const [team, setTeam] = useState<TeamOption | null>(null); // Выбранная команда
-  const [newTeamName, setNewTeamName] = useState(""); // Ввод новой команды
+  const [sports, setSports] = useState<SportOption[]>([]);
+  const [teams, setTeams] = useState<TeamOption[]>([]);
+  const [sport, setSport] = useState<SportOption | null>(null);
+  const [isTeamSport, setIsTeamSport] = useState(false);
+  const [team, setTeam] = useState<TeamOption | null>(null);
+  const [newTeamName, setNewTeamName] = useState("");
+  const [gender, setGender] = useState(""); // Пол
+
   const navigate = useNavigate();
 
+  // Fetch sports on component mount
   useEffect(() => {
-    // Загружаем список видов спорта
     const fetchSports = async () => {
       try {
-        const response = await fetch("http://localhost:8080/api/sports");
+        const response = await fetch("http://localhost:8080/api/sport/list");
         const data = await response.json();
         const formattedSports = data.map((sport: any) => ({
-          value: sport.id,
-          label: sport.name,
+          value: sport.sport_id,
+          label: sport.sport_name,
         }));
         setSports(formattedSports);
       } catch (error) {
@@ -47,17 +49,17 @@ const Register: React.FC = () => {
     fetchSports();
   }, []);
 
+  // Fetch teams when a sport is selected
   useEffect(() => {
     if (sport) {
-      // Загружаем список команд для выбранного вида спорта
       const fetchTeams = async () => {
         try {
           const response = await fetch(
-            `http://localhost:8080/api/teams?sport_id=${sport.value}`
+            `http://localhost:8080/api/team/list?sport_id=${sport.value}`
           );
           const data = await response.json();
           const formattedTeams = data.map((team: any) => ({
-            value: team.team_name,
+            value: team.team_id,
             label: team.team_name,
           }));
           setTeams(formattedTeams);
@@ -68,7 +70,7 @@ const Register: React.FC = () => {
 
       fetchTeams();
     } else {
-      setTeams([]); // Очищаем список команд, если вид спорта не выбран
+      setTeams([]);
     }
   }, [sport]);
 
@@ -78,13 +80,14 @@ const Register: React.FC = () => {
     const user = {
       email,
       password,
-      name,
-      surname,
-      middlename,
+      first_name: name,
+      middle_name: middlename || null,
+      last_name: surname,
       birth_date: birthDate,
+      gender, // Добавляем пол
       sport_id: sport?.value || null,
-      is_team_sport: isTeamSport,
-      team_name: isTeamSport && team ? team.value : null,
+      in_team: isTeamSport,
+      team_id: isTeamSport && team ? team.value : null,
     };
 
     try {
@@ -96,8 +99,13 @@ const Register: React.FC = () => {
         body: JSON.stringify(user),
       });
 
+      if (!response.ok) {
+        const error = await response.json();
+        alert(`Ошибка регистрации: ${error.message}`);
+        return;
+      }
+
       const result = await response.json();
-      localStorage.setItem("userData", JSON.stringify(result.user));
       alert("Регистрация успешна!");
       navigate("/");
     } catch (error) {
@@ -112,27 +120,38 @@ const Register: React.FC = () => {
       return;
     }
 
+    console.log("Sport ID:", sport.value);
+    console.log("New Team Name:", newTeamName);
+
     try {
-      const response = await fetch("http://localhost:8080/api/teams", {
+      const response = await fetch("http://localhost:8080/api/team/create", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          sport_id: sport.value,
-          team_name: newTeamName.trim(),
+          sport_id: sport.value, // Проверяем, чтобы значение передавалось
+          team_name: newTeamName.trim(), // Убедимся, что строка не пустая
         }),
       });
 
-      const result = await response.json();
+      if (!response.ok) {
+        const error = await response.json();
+        alert(`Ошибка добавления команды: ${error.message}`);
+        return;
+      }
 
-      // Добавляем новую команду в список
+      const result = await response.json();
+      console.log("Добавленная команда:", result);
+
+      // Добавляем команду в список
       setTeams((prevTeams) => [
         ...prevTeams,
-        { value: result.team_name, label: result.team_name },
+        { value: result.team_id, label: result.team_name },
       ]);
-      setTeam({ value: result.team_name, label: result.team_name });
+      setTeam({ value: result.team_id, label: result.team_name });
       setNewTeamName("");
+      alert("Команда успешно добавлена!");
     } catch (error) {
       console.error("Ошибка добавления команды:", error);
     }
@@ -142,6 +161,7 @@ const Register: React.FC = () => {
     <div className="register-form">
       <h2>Регистрация</h2>
       <form onSubmit={handleSubmit} className="reg-form">
+        {/* Email and Password */}
         <div className="column">
           <label>Email:</label>
           <input
@@ -151,7 +171,6 @@ const Register: React.FC = () => {
             required
           />
         </div>
-
         <div className="column">
           <label>Пароль:</label>
           <input
@@ -162,6 +181,7 @@ const Register: React.FC = () => {
           />
         </div>
 
+        {/* Personal Information */}
         <div className="column">
           <label>Имя:</label>
           <input
@@ -171,7 +191,14 @@ const Register: React.FC = () => {
             required
           />
         </div>
-
+        <div className="column">
+          <label>Отчество:</label>
+          <input
+            type="text"
+            value={middlename}
+            onChange={(e) => setMiddlename(e.target.value)}
+          />
+        </div>
         <div className="column">
           <label>Фамилия:</label>
           <input
@@ -181,16 +208,6 @@ const Register: React.FC = () => {
             required
           />
         </div>
-
-        <div className="column">
-          <label>Отчество (необязательно):</label>
-          <input
-            type="text"
-            value={middlename}
-            onChange={(e) => setMiddlename(e.target.value)}
-          />
-        </div>
-
         <div className="column">
           <label>Дата рождения:</label>
           <input
@@ -200,7 +217,22 @@ const Register: React.FC = () => {
             required
           />
         </div>
+        <div className="column">
+          <label>Пол:</label>
+          <select
+            value={gender}
+            onChange={(e) => setGender(e.target.value)}
+            required
+          >
+            <option value="" disabled>
+              Выберите пол
+            </option>
+            <option value="M">Мужской</option>
+            <option value="F">Женский</option>
+          </select>
+        </div>
 
+        {/* Sport and Team Selection */}
         <div className="column">
           <label>Вид спорта:</label>
           <Select
@@ -216,7 +248,6 @@ const Register: React.FC = () => {
             isSearchable
           />
         </div>
-
         {sport && (
           <>
             <div className="column">
@@ -229,31 +260,49 @@ const Register: React.FC = () => {
                 Командный спорт
               </label>
             </div>
-
             {isTeamSport && (
-              <>
-                <div className="column">
-                  <label>Название команды:</label>
-                  <Select
-                    options={teams}
-                    value={team}
-                    onChange={(selectedOption) => setTeam(selectedOption)}
-                    placeholder="Выберите команду"
-                    isClearable
-                    isSearchable
-                    noOptionsMessage={() => (
+              <div className="column">
+                <label>Название команды:</label>
+                <Select
+                  options={teams}
+                  value={team}
+                  onChange={(selectedOption) => setTeam(selectedOption)}
+                  placeholder="Выберите команду"
+                  isClearable
+                  isSearchable
+                  noOptionsMessage={() => (
+                    <div
+                      style={{
+                        display: "flex",
+                        flexDirection: "column",
+                        alignItems: "center",
+                      }}
+                    >
+                      <span>Такой команды нет в списках</span>
                       <button
                         type="button"
-                        className="add-button"
+                        style={{
+                          marginTop: "10px",
+                          padding: "5px 10px",
+                          backgroundColor: "#28a745",
+                          color: "#fff",
+                          border: "none",
+                          borderRadius: "4px",
+                          cursor: "pointer",
+                        }}
                         onClick={handleAddNewTeam}
                       >
-                        Добавить "{newTeamName}"
+                        Создать команду "
+                        {newTeamName.trim() &&
+                          newTeamName.charAt(0).toUpperCase() +
+                            newTeamName.slice(1)}
+                        "
                       </button>
-                    )}
-                    onInputChange={(value) => setNewTeamName(value)}
-                  />
-                </div>
-              </>
+                    </div>
+                  )}
+                  onInputChange={(value) => setNewTeamName(value)}
+                />
+              </div>
             )}
           </>
         )}
