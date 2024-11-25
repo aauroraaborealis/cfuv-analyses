@@ -97,6 +97,7 @@ const Register: React.FC = () => {
       });
 
       const result = await response.json();
+      localStorage.setItem("userData", JSON.stringify(result.user));
       alert("Регистрация успешна!");
       navigate("/");
     } catch (error) {

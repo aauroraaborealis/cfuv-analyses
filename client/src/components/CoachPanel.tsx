@@ -12,7 +12,7 @@ interface Team {
 
 interface Analysis {
   id: number;
-  name: string; // Название анализа
+  name: string;
 }
 
 const CoachPanel: React.FC = () => {
@@ -46,7 +46,7 @@ const CoachPanel: React.FC = () => {
         const data = await response.json();
         setAnalyses(data);
       } catch (error) {
-        console.error("Ошибка загрузки видов анализов:", error);
+        console.error("Ошибка загрузки анализов:", error);
       }
     };
     fetchAnalyses();
@@ -56,6 +56,7 @@ const CoachPanel: React.FC = () => {
   const handleSportChange = async (sportId: number) => {
     setSelectedSport(sportId);
     setSelectedTeam(null); // Сброс команды при смене спорта
+    setTeams([]); // Очистка команд, пока они не загрузятся
 
     try {
       const response = await fetch(
@@ -68,9 +69,10 @@ const CoachPanel: React.FC = () => {
     }
   };
 
+  // Назначение анализа
   const handleAssignAnalysis = async () => {
     if (!selectedSport || !selectedTeam || !selectedAnalysis || !analysisDate) {
-      alert("Пожалуйста, выберите все параметры и дату анализа.");
+      alert("Пожалуйста, выберите вид спорта, команду, анализ и дату анализа.");
       return;
     }
 
@@ -86,25 +88,21 @@ const CoachPanel: React.FC = () => {
             analysis_id: selectedAnalysis,
             sport_id: selectedSport,
             team_id: selectedTeam,
-            due_date: analysisDate, // Передаём в due_date
+            due_date: analysisDate,
           }),
         }
       );
 
-      let a = JSON.stringify({
-        analysis_id: selectedAnalysis,
-        sport_id: selectedSport,
-        team_id: selectedTeam,
-        due_date: analysisDate, // Передаём в due_date
-      });
-
-      console.log(a);
-
       if (response.ok) {
         alert("Анализ успешно назначен!");
+        // Сбрасываем выбранные поля
+        setSelectedSport(null);
+        setSelectedTeam(null);
+        setSelectedAnalysis(null);
+        setAnalysisDate("");
+        setTeams([]); // Очистка списка команд
       } else {
-        const errorData = await response.json();
-        alert(`Ошибка: ${errorData.error || "Неизвестная ошибка"}`);
+        alert("Ошибка при назначении анализа.");
       }
     } catch (error) {
       console.error("Ошибка при назначении анализа:", error);
@@ -156,9 +154,9 @@ const CoachPanel: React.FC = () => {
           </div>
         )}
 
-        {selectedSport && selectedTeam && (
+        {selectedSport && (
           <div>
-            <label>Выберите тип анализа:</label>
+            <label>Выберите анализ:</label>
             <select
               value={selectedAnalysis || ""}
               onChange={(e) => setSelectedAnalysis(Number(e.target.value))}

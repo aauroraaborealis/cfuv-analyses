@@ -5,6 +5,7 @@ import Register from './components/Register';
 import MainRoute from './components/MainRoute';
 import AnalysisSelector from './components/AnalysisSelector';
 import CoachPanel from './components/CoachPanel';
+import Login from './components/Login';
 
 const App: React.FC = () => {
     return (
@@ -16,6 +17,7 @@ const App: React.FC = () => {
                     <Route path="/register" element={<Register />} />
                     <Route path="/analysis" element={<AnalysisSelector />} />
                     <Route path="/coach-panel" element={<CoachPanel />} />
+                    <Route path="/login" element={<Login />} />
                 </Routes>
             </div>
         </Router>
