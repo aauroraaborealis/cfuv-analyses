@@ -1,6 +1,8 @@
 const express = require("express");
 const router = express.Router();
 const db = require("../db");
+const jwt = require('jsonwebtoken'); // Для создания токена
+require('dotenv').config();
 
 router.post("/assign", async (req, res) => {
   const { analyze_id, sport_id, team_id, student_id, due_date } = req.body;
@@ -87,6 +89,73 @@ router.get('/', async (req, res) => {
   } catch (error) {
     console.error('Ошибка получения анализов:', error.message);
     res.status(500).json({ message: 'Ошибка получения анализов' });
+  }
+});
+
+
+// Роут для получения анализов пользователя
+router.get("/user", async (req, res) => {
+  const token = req.headers.authorization?.split(" ")[1];
+
+  console.log(token);
+
+  if (!token) {
+    return res.status(401).json({ message: "Authorization token is required." });
+  }
+
+  try {
+    // Расшифровываем токен и получаем student_id
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const student_id = decoded.id;
+
+    console.log(decoded);
+    console.log(student_id);
+
+
+
+    if (!student_id) {
+      return res.status(401).json({ message: "Invalid token." });
+    }
+
+    // Получаем все анализы, назначенные индивидуально студенту
+    const userAnalysesQuery = `
+      SELECT
+        aa.assignment_id,
+        a.analyze_name,
+        aa.scheduled_date,
+        aa.assigned_to_team
+      FROM analyze_assignments aa
+      JOIN analyzes a ON aa.analyze_id = a.analyze_id
+      WHERE aa.student_id = $1
+      AND aa.assigned_to_team = false
+    `;
+    const userAnalyses = await db.query(userAnalysesQuery, [student_id]);
+
+    // Получаем все анализы, назначенные для команды, в которой состоит студент
+    const teamAnalysesQuery = `
+      SELECT
+        aa.assignment_id,
+        a.analyze_name,
+        aa.scheduled_date,
+        aa.assigned_to_team
+      FROM analyze_assignments aa
+      JOIN analyzes a ON aa.analyze_id = a.analyze_id
+      JOIN students s ON aa.team_id = s.team_id
+      WHERE s.student_id = $1
+      AND aa.assigned_to_team = true
+    `;
+    const teamAnalyses = await db.query(teamAnalysesQuery, [student_id]);
+
+    // Объединяем результаты
+    const allAnalyses = [...userAnalyses.rows, ...teamAnalyses.rows];
+
+    console.log({ analyses: allAnalyses });
+
+    // Отправляем объединенные данные
+    res.status(200).json({ analyses: allAnalyses });
+  } catch (error) {
+    console.error("Ошибка получения анализов пользователя:", error);
+    res.status(500).json({ message: "Internal server error." });
   }
 });
 

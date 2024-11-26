@@ -1,82 +1,90 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
 
 interface Analysis {
-  id: number;
-  analysis_name: string;
-  due_date: string;
-  team_name: string; // Команда или личное назначение
+  assignment_id: string;
+  analyze_name: string;
+  scheduled_date: string;
+  assigned_to_team: boolean;
 }
 
 const UserAnalyses: React.FC = () => {
   const [analyses, setAnalyses] = useState<Analysis[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState("");
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchAnalyses = async () => {
-      setIsLoading(true);
-      setError("");
+      setLoading(true);
+      setError(null);
+
+      // Извлечение токена из localStorage
+      const token = localStorage.getItem("token");
+
+      console.log(token);
+
+      if (!token) {
+        setError("Вы не авторизованы. Выполните вход.");
+        setLoading(false);
+        return;
+      }
 
       try {
-        const userData = localStorage.getItem("userData");
-        if (!userData) {
-          setError("Данные пользователя не найдены. Войдите в систему.");
-          setIsLoading(false);
-          return;
+        const response = await fetch("http://localhost:8080/api/analysis/user", {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${token}`, // Добавляем токен в заголовок
+            "Content-Type": "application/json",
+          },
+        });
+
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(errorData.message || "Ошибка запроса");
         }
 
-        const user = JSON.parse(userData);
-        const response = await fetch(
-          `http://localhost:8080/api/user-analyses?user_id=${user.id}`
-        );
-
-        if (response.ok) {
-          const data = await response.json();
-          setAnalyses(data);
-        } else {
-          setError("Не удалось загрузить анализы.");
-        }
-      } catch (error) {
-        console.error("Ошибка загрузки анализов:", error);
-        setError("Произошла ошибка при загрузке анализов.");
+        const data = await response.json();
+        setAnalyses(data.analyses); // Устанавливаем полученные анализы
+      } catch (err: any) {
+        setError(err.message || "Неизвестная ошибка");
       } finally {
-        setIsLoading(false);
+        setLoading(false);
       }
     };
 
     fetchAnalyses();
   }, []);
 
-  if (isLoading) {
-    return <div>Загрузка...</div>;
+  if (loading) {
+    return <p>Загрузка...</p>;
   }
 
   if (error) {
-    return <div className="error-message">{error}</div>;
+    return <p style={{ color: "red" }}>{error}</p>;
   }
 
   return (
-    <div className="user-analyses">
-      <h2>Ваши назначенные анализы</h2>
-      {analyses.length > 0 ? (
+    <div>
+      <h2>Назначенные анализы</h2>
+      {analyses.length === 0 ? (
+        <p>У вас нет назначенных анализов.</p>
+      ) : (
         <ul>
           {analyses.map((analysis) => (
-            <li key={analysis.id}>
+            <li key={analysis.assignment_id}>
               <p>
-                <strong>Название анализа:</strong> {analysis.analysis_name}
+                <strong>Анализ:</strong> {analysis.analyze_name}
               </p>
               <p>
-                <strong>Дата сдачи:</strong>{" "}
-                {new Date(analysis.due_date).toLocaleDateString()}
+                <strong>Дата сдачи:</strong> {new Date(analysis.scheduled_date).toLocaleDateString()}
               </p>
               <p>
-                <strong>Тип назначения:</strong> {analysis.team_name}
+                <strong>Назначен для:</strong>{" "}
+                {analysis.assigned_to_team ? "Команды" : "Лично вам"}
               </p>
+              <hr />
             </li>
           ))}
         </ul>
-      ) : (
-        <p>Нет назначенных анализов.</p>
       )}
     </div>
   );

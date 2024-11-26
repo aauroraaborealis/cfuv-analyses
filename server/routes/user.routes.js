@@ -3,9 +3,10 @@ const router = new Router();
 const db = require('../db');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken'); // Для создания токена
+require('dotenv').config();
 
 // Секретный ключ для токена
-const JWT_SECRET = process.env.JWT_SECRET || "your_secret_key";
+const JWT_SECRET = process.env.JWT_SECRET;
 
 router.post('/register', async (req, res) => {
   const { first_name, middle_name, last_name, email, password, birth_date, gender, sport_id, in_team, team_id } = req.body;
@@ -70,6 +71,50 @@ router.post('/register', async (req, res) => {
     }
     console.error(error);
     res.status(500).json({ message: 'An error occurred during registration.' });
+  }
+});
+
+
+router.post("/login", async (req, res) => {
+  const { email, password } = req.body;
+  console.log(email, password);
+
+  if (!email || !password) {
+    return res.status(400).json({ message: "Email and password are required." });
+  }
+
+  try {
+    // Проверяем существование пользователя
+    const userQuery = `
+      SELECT student_id, email, password_hash FROM students WHERE email = $1
+    `;
+    const userResult = await db.query(userQuery, [email]);
+
+    if (userResult.rowCount === 0) {
+      return res.status(404).json({ message: "User not found." });
+    }
+
+    const user = userResult.rows[0];
+
+    // Проверяем правильность пароля
+    const passwordMatch = await bcrypt.compare(password, user.password_hash);
+
+    if (!passwordMatch) {
+      return res.status(401).json({ message: "Invalid credentials." });
+    }
+
+    // Генерируем JWT токен
+    const token = jwt.sign(
+      { student_id: user.student_id }, // payload
+      process.env.JWT_SECRET, // секретный ключ
+      { expiresIn: "24h" } // срок действия токена
+    );
+
+    // Отправляем токен клиенту
+    res.status(200).json({ message: "Login successful.", token });
+  } catch (error) {
+    console.error("Ошибка авторизации:", error);
+    res.status(500).json({ message: "Internal server error." });
   }
 });
 
