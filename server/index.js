@@ -4,7 +4,7 @@ const userRouter = require('./routes/user.routes');
 const teamRouter = require('./routes/team.routes');
 const sportRouter = require('./routes/sport.routes');
 const analysisRouter = require('./routes/analysis.routes');
-
+const studentsRouter = require('./routes/students.routes.js');
 
 const db = require('./db'); // Подключаем вашу конфигурацию для базы данных
 
@@ -27,5 +27,7 @@ app.use('/api', userRouter);
 app.use('/api/team', teamRouter);
 app.use('/api/sport', sportRouter);
 app.use('/api/analysis', analysisRouter);
+app.use('/api/students', studentsRouter);
+
 
 app.listen(PORT, () => console.log(`server started on ${PORT}`));
