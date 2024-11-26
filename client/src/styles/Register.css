@@ -16,6 +16,11 @@
     gap: 10px;
 }
 
+.reg-form .column select{
+  width: 100%;
+  gap: 10px;
+}
+
 /* Контейнер для select */
 .custom-select-container {
     width: 100%;

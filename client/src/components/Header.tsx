@@ -15,13 +15,15 @@ const Header: React.FC = () => {
 
   return (
     <header className="headerStyle">
-      <nav>
-        <Link to="/">Главная</Link>
+      <nav className="header-nav">
+        <Link to="/" className="h-link">Главная</Link>
+        <Link to="/login" className="h-link">Войти</Link>
+        <Link to="/register" className="h-link">Зарегестрироваться</Link>
         {!isCoachMode ? (
-          <button onClick={handleToggleCoachMode}>Зайти как тренер</button>
+          <button onClick={handleToggleCoachMode} className="trainer-btn">Зайти как тренер</button>
         ) : (
           <>
-            <button onClick={handleToggleCoachMode}>Выйти из режима тренера</button>
+            <button onClick={handleToggleCoachMode} className="trainer-btn">Выйти из режима тренера</button>
             <Link to="/assign-analysis">Управление анализами</Link>
           </>
         )}

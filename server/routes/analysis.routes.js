@@ -151,4 +151,107 @@ router.get("/user", async (req, res) => {
 });
 
 
+router.post("/submit", async (req, res) => {
+  const { assignment_id, analyze_data } = req.body;
+
+  if (!assignment_id || !analyze_data) {
+    return res
+      .status(400)
+      .json({ message: "Assignment ID and analyze data are required." });
+  }
+
+  try {
+    const token = req.headers.authorization?.split(" ")[1];
+    if (!token) {
+      return res.status(401).json({ message: "Unauthorized." });
+    }
+
+    const decodedToken = jwt.verify(token, process.env.JWT_SECRET);
+    const student_id = decodedToken.student_id;
+
+    const assignmentCheck = await db.query(
+      "SELECT * FROM analyze_assignments WHERE assignment_id = $1",
+      [assignment_id]
+    );
+
+    if (assignmentCheck.rowCount === 0) {
+      return res.status(404).json({ message: "Assignment not found." });
+    }
+
+    const assignment = assignmentCheck.rows[0];
+    const analyzeId = assignment.analyze_id;
+
+    const analyzeTypeQuery = await db.query(
+      "SELECT analyze_name FROM analyzes WHERE analyze_id = $1",
+      [analyzeId]
+    );
+
+    if (analyzeTypeQuery.rowCount === 0) {
+      return res.status(404).json({ message: "Analyze type not found." });
+    }
+
+    const analyzeName = analyzeTypeQuery.rows[0].analyze_name;
+    let targetTable;
+
+    switch (analyzeName) {
+      case "Антропометрия и биоимпедансометрия":
+        targetTable = "anthropometry_bioimpedance";
+        break;
+      case "Клинический анализ крови":
+        targetTable = "blood_clinical_analysis";
+        break;
+      case "Клинический анализ мочи":
+        targetTable = "urine_clinical_analysis";
+        break;
+      default:
+        return res.status(400).json({ message: "Unsupported analyze type." });
+    }
+
+    // Маппинг русских полей в английские
+    const fieldMapping = {
+      Гемоглобин: "hemoglobin",
+      Глюкоза: "glucose",
+      Холестерин: "cholesterol",
+      Рост: "height",
+      Вес: "weight",
+      "Окружность талии": "waist_circumference",
+      "Окружность бедер": "hip_circumference",
+      Белок: "protein",
+      Лейкоциты: "leukocytes",
+      Эритроциты: "erythrocytes",
+    };
+
+    const mappedData = {};
+    for (const [key, value] of Object.entries(analyze_data)) {
+      if (fieldMapping[key]) {
+        mappedData[fieldMapping[key]] = value;
+      }
+    }
+
+    if (Object.keys(mappedData).length === 0) {
+      return res.status(400).json({ message: "No valid analyze data provided." });
+    }
+
+    const result = await db.query(
+      `INSERT INTO ${targetTable} (assignment_id, student_id, analyze_id, ${Object.keys(mappedData).join(
+        ", "
+      )}, analyze_date, created_at)
+       VALUES ($1, $2, $3, ${Object.values(mappedData)
+         .map((_, i) => `$${i + 4}`)
+         .join(", ")}, CURRENT_DATE, CURRENT_TIMESTAMP)
+       RETURNING *`,
+      [assignment_id, student_id, analyzeId, ...Object.values(mappedData)]
+    );
+
+    res.status(201).json({
+      message: "Analysis submitted successfully.",
+      result: result.rows[0],
+    });
+  } catch (error) {
+    console.error("Ошибка отправки анализа:", error);
+    res.status(500).json({ message: "Internal server error." });
+  }
+});
+
+
 module.exports = router;
