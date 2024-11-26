@@ -3,6 +3,8 @@ const router = express.Router();
 const db = require("../db");
 const jwt = require('jsonwebtoken'); // Для создания токена
 require('dotenv').config();
+const { notifyUser } = require('../socketServer');
+
 
 router.post("/assign", async (req, res) => {
   const { analyze_id, sport_id, team_id, student_id, due_date } = req.body;
@@ -71,10 +73,38 @@ router.post("/assign", async (req, res) => {
     ];
     const result = await db.query(query, values);
 
+    console.log(result);
+     
+    if (student_id) {
+      // Получаем название анализа
+      const analyzeNameQuery = await db.query(
+        "SELECT analyze_name FROM analyzes WHERE analyze_id = $1",
+        [analyze_id]
+      );
+    
+      const analyzeName = analyzeNameQuery.rows[0]?.analyze_name || "Неизвестный анализ";
+
+      let scheduled_date = due_date;
+    
+      // Уведомляем пользователя
+      notifyUser(student_id, {
+        type: 'NEW_ANALYSIS',
+        data: {
+          assignment_id: result.rows[0].assignment_id,
+          analyze_id,
+          analyze_name: analyzeName, // Добавляем название анализа
+          scheduled_date,
+          assigned_to_team: !!team_id, // Проставляем флаг, если назначено команде
+        },
+      });
+    }
+    
+
     res.status(201).json({
       message: "Analysis assigned successfully.",
       assignment_id: result.rows[0].assignment_id,
     });
+
   } catch (error) {
     console.error("Ошибка назначения анализа:", error);
     res.status(500).json({ message: "Internal server error." });
@@ -163,8 +193,6 @@ router.get("/user", async (req, res) => {
         };
       })
     );
-
-    console.log({ analyses: analysesWithStatus });
 
     res.status(200).json({ analyses: analysesWithStatus });
   } catch (error) {
