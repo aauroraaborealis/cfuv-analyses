@@ -22,7 +22,7 @@ const Header: React.FC = () => {
         ) : (
           <>
             <button onClick={handleToggleCoachMode}>Выйти из режима тренера</button>
-            <Link to="/coach-panel">Управление анализами</Link>
+            <Link to="/assign-analysis">Управление анализами</Link>
           </>
         )}
       </nav>

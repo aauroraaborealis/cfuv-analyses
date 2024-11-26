@@ -97,8 +97,6 @@ router.get('/', async (req, res) => {
 router.get("/user", async (req, res) => {
   const token = req.headers.authorization?.split(" ")[1];
 
-  console.log(token);
-
   if (!token) {
     return res.status(401).json({ message: "Authorization token is required." });
   }
@@ -107,11 +105,6 @@ router.get("/user", async (req, res) => {
     // Расшифровываем токен и получаем student_id
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
     const student_id = decoded.id;
-
-    console.log(decoded);
-    console.log(student_id);
-
-
 
     if (!student_id) {
       return res.status(401).json({ message: "Invalid token." });
@@ -148,8 +141,6 @@ router.get("/user", async (req, res) => {
 
     // Объединяем результаты
     const allAnalyses = [...userAnalyses.rows, ...teamAnalyses.rows];
-
-    console.log({ analyses: allAnalyses });
 
     // Отправляем объединенные данные
     res.status(200).json({ analyses: allAnalyses });

@@ -2,14 +2,14 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 const Login: React.FC = () => {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [email, setEmail] = useState<string>("");
+  const [password, setPassword] = useState<string>("");
+  const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
 
-  const handleLogin = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
-    const credentials = { email, password };
+    setError(null); // Очистка ошибок перед отправкой
 
     try {
       const response = await fetch("http://localhost:8080/api/login", {
@@ -17,28 +17,28 @@ const Login: React.FC = () => {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(credentials),
+        body: JSON.stringify({ email, password }),
       });
 
-      if (response.ok) {
-        const result = await response.json();
-        // Сохраняем данные пользователя в localStorage
-        localStorage.setItem("userData", JSON.stringify(result.user));
-        alert("Вы успешно вошли!");
-        navigate("/"); // Перенаправляем на главную страницу
-      } else {
-        alert("Неверный email или пароль.");
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || "Ошибка входа");
       }
-    } catch (error) {
-      console.error("Ошибка входа:", error);
-      alert("Ошибка входа. Попробуйте снова.");
+
+      const data = await response.json();
+      localStorage.setItem("token", data.token); // Сохраняем токен в localStorage
+      alert("Вы успешно вошли в систему!");
+      navigate("/"); // Перенаправление на другую страницу
+    } catch (err: any) {
+      setError(err.message || "Неизвестная ошибка");
     }
   };
 
   return (
     <div className="login-form">
       <h2>Вход</h2>
-      <form onSubmit={handleLogin}>
+      {error && <p style={{ color: "red" }}>{error}</p>}
+      <form onSubmit={handleSubmit}>
         <div className="column">
           <label>Email:</label>
           <input
@@ -48,7 +48,6 @@ const Login: React.FC = () => {
             required
           />
         </div>
-
         <div className="column">
           <label>Пароль:</label>
           <input
@@ -58,7 +57,6 @@ const Login: React.FC = () => {
             required
           />
         </div>
-
         <button type="submit" className="submit-button">
           Войти
         </button>

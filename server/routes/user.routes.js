@@ -11,8 +11,6 @@ const JWT_SECRET = process.env.JWT_SECRET;
 router.post('/register', async (req, res) => {
   const { first_name, middle_name, last_name, email, password, birth_date, gender, sport_id, in_team, team_id } = req.body;
 
-  console.log(first_name, middle_name, last_name, email, password, birth_date, gender, sport_id, in_team, team_id);
-
   if (!first_name || !last_name || !email || !password || !birth_date || !gender || !sport_id) {
     return res.status(400).json({ message: 'All fields are required.' });
   }
@@ -77,7 +75,6 @@ router.post('/register', async (req, res) => {
 
 router.post("/login", async (req, res) => {
   const { email, password } = req.body;
-  console.log(email, password);
 
   if (!email || !password) {
     return res.status(400).json({ message: "Email and password are required." });
@@ -86,7 +83,7 @@ router.post("/login", async (req, res) => {
   try {
     // Проверяем существование пользователя
     const userQuery = `
-      SELECT student_id, email, password_hash FROM students WHERE email = $1
+      SELECT student_id, email, first_name, password_hash FROM students WHERE email = $1
     `;
     const userResult = await db.query(userQuery, [email]);
 
@@ -103,11 +100,15 @@ router.post("/login", async (req, res) => {
       return res.status(401).json({ message: "Invalid credentials." });
     }
 
-    // Генерируем JWT токен
+    // Генерируем токен (структура payload должна совпадать с регистрацией)
     const token = jwt.sign(
-      { student_id: user.student_id }, // payload
-      process.env.JWT_SECRET, // секретный ключ
-      { expiresIn: "24h" } // срок действия токена
+      {
+        id: user.student_id,
+        email: user.email,
+        name: user.first_name,
+      },
+      process.env.JWT_SECRET, // Убедитесь, что ключ совпадает
+      { expiresIn: "7d" }
     );
 
     // Отправляем токен клиенту
