@@ -282,9 +282,12 @@ const UserAnalyses: React.FC = () => {
               ) : (
                 <button
                   onClick={() =>
-                    navigate(`/submit/${analysis.assignment_id}`, {
-                      state: { analyze_name: analysis.analyze_name },
+                    navigate(`/submit-analysis/${analysis.assignment_id}`, {
+                      state: {
+                        analyze_name: analysis.analyze_name,
+                      },
                     })
+                    
                   }
                 >
                   Сдать

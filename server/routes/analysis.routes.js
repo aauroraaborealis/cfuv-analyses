@@ -93,7 +93,6 @@ router.get('/', async (req, res) => {
 });
 
 
-// Роут для получения анализов пользователя
 router.get("/user", async (req, res) => {
   const token = req.headers.authorization?.split(" ")[1];
 
@@ -115,6 +114,7 @@ router.get("/user", async (req, res) => {
       SELECT
         aa.assignment_id,
         a.analyze_name,
+        a.analysis_table,
         aa.scheduled_date,
         aa.assigned_to_team
       FROM analyze_assignments aa
@@ -129,6 +129,7 @@ router.get("/user", async (req, res) => {
       SELECT
         aa.assignment_id,
         a.analyze_name,
+        a.analysis_table,
         aa.scheduled_date,
         aa.assigned_to_team
       FROM analyze_assignments aa
@@ -142,8 +143,30 @@ router.get("/user", async (req, res) => {
     // Объединяем результаты
     const allAnalyses = [...userAnalyses.rows, ...teamAnalyses.rows];
 
-    // Отправляем объединенные данные
-    res.status(200).json({ analyses: allAnalyses });
+    // Проверяем, есть ли результаты для каждого назначения
+    const analysesWithStatus = await Promise.all(
+      allAnalyses.map(async (analysis) => {
+        const { assignment_id, analysis_table } = analysis;
+
+        if (!analysis_table) {
+          return { ...analysis, is_submitted: false }; // Если таблица не определена
+        }
+
+        const resultCheckQuery = `
+          SELECT 1 FROM ${analysis_table} WHERE assignment_id = $1 AND student_id = $2
+        `;
+        const resultCheck = await db.query(resultCheckQuery, [assignment_id, student_id]);
+
+        return {
+          ...analysis,
+          is_submitted: resultCheck.rowCount > 0, // true, если результат есть
+        };
+      })
+    );
+
+    console.log({ analyses: analysesWithStatus });
+
+    res.status(200).json({ analyses: analysesWithStatus });
   } catch (error) {
     console.error("Ошибка получения анализов пользователя:", error);
     res.status(500).json({ message: "Internal server error." });
@@ -151,8 +174,11 @@ router.get("/user", async (req, res) => {
 });
 
 
+
 router.post("/submit", async (req, res) => {
   const { assignment_id, analyze_data } = req.body;
+
+  console.log(assignment_id, analyze_data);
 
   if (!assignment_id || !analyze_data) {
     return res
@@ -167,7 +193,11 @@ router.post("/submit", async (req, res) => {
     }
 
     const decodedToken = jwt.verify(token, process.env.JWT_SECRET);
-    const student_id = decodedToken.student_id;
+
+    console.log(decodedToken);
+    const student_id = decodedToken.id;
+
+    console.log(student_id);
 
     const assignmentCheck = await db.query(
       "SELECT * FROM analyze_assignments WHERE assignment_id = $1",

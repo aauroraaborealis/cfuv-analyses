@@ -14,10 +14,23 @@ const SubmitAnalysis: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [formData, setFormData] = useState<FormData>({});
 
-  const analyzeFields: { [key: string]: string[] } = {
-    "Антропометрия и биоимпедансометрия": ["Рост", "Вес", "Окружность талии", "Окружность бедер"],
-    "Клинический анализ крови": ["Гемоглобин", "Глюкоза", "Холестерин"],
-    "Клинический анализ мочи": ["Белок", "Лейкоциты", "Эритроциты"],
+  const analyzeFields: { [key: string]: { label: string; type: string }[] } = {
+    "Антропометрия и биоимпедансометрия": [
+      { label: "Рост", type: "number" },
+      { label: "Вес", type: "number" },
+      { label: "Окружность талии", type: "number" },
+      { label: "Окружность бедер", type: "number" },
+    ],
+    "Клинический анализ крови": [
+      { label: "Гемоглобин", type: "number" },
+      { label: "Глюкоза", type: "number" },
+      { label: "Холестерин", type: "number" },
+    ],
+    "Клинический анализ мочи": [
+      { label: "Белок", type: "number" },
+      { label: "Лейкоциты", type: "integer" },
+      { label: "Эритроциты", type: "integer" },
+    ],
   };
 
   const handleInputChange = (field: string, value: string) => {
@@ -59,6 +72,16 @@ const SubmitAnalysis: React.FC = () => {
     }
   };
 
+  const validateInput = (type: string, value: string): boolean => {
+    if (type === "number") {
+      return /^\d+(\.\d+)?$/.test(value); // Допускаются числа с точкой
+    }
+    if (type === "integer") {
+      return /^\d+$/.test(value); // Только целые числа
+    }
+    return true; // Если тип не указан, пропускаем валидацию
+  };
+
   return (
     <div>
       <h2>Сдать анализ</h2>
@@ -67,13 +90,18 @@ const SubmitAnalysis: React.FC = () => {
       </p>
       <form onSubmit={handleSubmit}>
         {analyzeFields[analyze_name]?.map((field) => (
-          <div key={field} style={{ marginBottom: "10px" }}>
+          <div key={field.label} style={{ marginBottom: "10px" }}>
             <label>
-              {field}:
+              {field.label}:
               <input
                 type="text"
-                value={formData[field] || ""}
-                onChange={(e) => handleInputChange(field, e.target.value)}
+                value={formData[field.label] || ""}
+                onChange={(e) => {
+                  const value = e.target.value;
+                  if (validateInput(field.type, value)) {
+                    handleInputChange(field.label, value);
+                  }
+                }}
                 required
               />
             </label>
