@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import "../styles/Login.css";
 
 const Login: React.FC = () => {
   const [email, setEmail] = useState<string>("");
@@ -46,6 +47,7 @@ const Login: React.FC = () => {
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             required
+            className="css-13cymwt-control"
           />
         </div>
         <div className="column">
@@ -55,6 +57,7 @@ const Login: React.FC = () => {
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required
+            className="css-13cymwt-control"
           />
         </div>
         <button type="submit" className="submit-button">

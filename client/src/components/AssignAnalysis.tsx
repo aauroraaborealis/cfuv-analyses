@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from "react";
 import Select from "react-select";
+import "../styles/AssignAnalysis.css";
+
 
 interface Option {
   value: string;
@@ -161,9 +163,9 @@ const AssignAnalysis: React.FC = () => {
   };
 
   return (
-    <div>
+    <div className="container">
       <h2>Назначение анализа</h2>
-      <form onSubmit={handleSubmit}>
+      <form onSubmit={handleSubmit} className="assign-form">
         <div>
           <label>Выберите анализ:</label>
           <Select
@@ -246,6 +248,7 @@ const AssignAnalysis: React.FC = () => {
             value={dueDate}
             onChange={(e) => setDueDate(e.target.value)}
             required
+            className="input-react"
           />
         </div>
         <button type="submit">Назначить анализ</button>

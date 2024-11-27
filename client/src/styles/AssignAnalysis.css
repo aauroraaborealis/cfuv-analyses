@@ -1,0 +1,9 @@
+.assign-form {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.assign-form input {
+    margin-top: 10px;
+}

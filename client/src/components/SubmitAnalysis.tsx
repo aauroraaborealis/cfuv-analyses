@@ -83,15 +83,12 @@ const SubmitAnalysis: React.FC = () => {
   };
 
   return (
-    <div>
-      <h2>Сдать анализ</h2>
-      <p>
-        <strong>Анализ:</strong> {analyze_name}
-      </p>
+    <div className="container">
+        <h2>{analyze_name}</h2> 
       <form onSubmit={handleSubmit}>
         {analyzeFields[analyze_name]?.map((field) => (
           <div key={field.label} style={{ marginBottom: "10px" }}>
-            <label>
+            <label className="column">
               {field.label}:
               <input
                 type="text"
@@ -103,6 +100,8 @@ const SubmitAnalysis: React.FC = () => {
                   }
                 }}
                 required
+                style={{ marginTop: "5px" }}
+                className="input-react"
               />
             </label>
           </div>

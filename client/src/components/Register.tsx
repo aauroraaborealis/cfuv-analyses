@@ -214,6 +214,7 @@ const Register: React.FC = () => {
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             required
+            className="css-13cymwt-control"
           />
         </div>
         <div className="column">
@@ -223,6 +224,7 @@ const Register: React.FC = () => {
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required
+            className="css-13cymwt-control"
           />
         </div>
 
@@ -234,6 +236,8 @@ const Register: React.FC = () => {
             value={name}
             onChange={(e) => setName(e.target.value)}
             required
+            className="css-13cymwt-control"
+
           />
         </div>
         <div className="column">
@@ -242,6 +246,8 @@ const Register: React.FC = () => {
             type="text"
             value={middlename}
             onChange={(e) => setMiddlename(e.target.value)}
+            className="css-13cymwt-control"
+
           />
         </div>
         <div className="column">
@@ -251,6 +257,8 @@ const Register: React.FC = () => {
             value={surname}
             onChange={(e) => setSurname(e.target.value)}
             required
+            className="css-13cymwt-control"
+
           />
         </div>
         <div className="column">
@@ -260,6 +268,8 @@ const Register: React.FC = () => {
             value={birthDate}
             onChange={(e) => setBirthDate(e.target.value)}
             required
+            className="css-13cymwt-control"
+
           />
         </div>
         <div className="column">
@@ -268,10 +278,11 @@ const Register: React.FC = () => {
             value={gender}
             onChange={(e) => setGender(e.target.value)}
             required
+            className="css-13cymwt-control"
           >
-            <option value="" disabled>
+            {/* <option value="" disabled>
               Выберите пол
-            </option>
+            </option> */}
             <option value="M">Мужской</option>
             <option value="F">Женский</option>
           </select>
@@ -302,15 +313,7 @@ const Register: React.FC = () => {
         <span>Такого вида спорта нет в списках</span>
         <button
           type="button"
-          style={{
-            marginTop: "10px",
-            padding: "5px 10px",
-            backgroundColor: "#28a745",
-            color: "#fff",
-            border: "none",
-            borderRadius: "4px",
-            cursor: "pointer",
-          }}
+          className="add-btn"
           onClick={handleAddNewSport}
         >
           Добавить вид спорта "
@@ -326,7 +329,7 @@ const Register: React.FC = () => {
         {sport && (
           <>
             <div className="column">
-              <label>
+              <label className="team-checkbox">
                 <input
                   type="checkbox"
                   checked={isTeamSport}
