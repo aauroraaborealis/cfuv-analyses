@@ -20,6 +20,17 @@ const SubmitAnalysis: React.FC = () => {
       { label: "Вес", type: "number" },
       { label: "Окружность талии", type: "number" },
       { label: "Окружность бедер", type: "number" },
+      { label: "ИМТ", type: "number" },
+      { label: "АКМ", type: "number" },
+      { label: "ДАКМ", type: "number" },
+      { label: "ЖМ", type: "number" },
+      { label: "ДЖМ", type: "number" },
+      { label: "СКМ", type: "number" },
+      { label: "ДСКМ", type: "number" },
+      { label: "ОО", type: "number" },
+      { label: "ОЖ", type: "number" },
+      { label: "ВЖ", type: "number" },
+      { label: "ФУ", type: "number" },
     ],
     "Клинический анализ крови": [
       { label: "Гемоглобин", type: "number" },
@@ -30,6 +41,83 @@ const SubmitAnalysis: React.FC = () => {
       { label: "Белок", type: "number" },
       { label: "Лейкоциты", type: "integer" },
       { label: "Эритроциты", type: "integer" },
+    ],
+    "Тонометрия": [
+      { label: "АДс", type: "number" },
+      { label: "АДд", type: "number" },
+    ],
+    "Ритмокардиография": [
+      { label: "ЧСС", type: "number" },
+      { label: "RMSSD", type: "number" },
+      { label: "CV", type: "number" },
+      { label: "TP", type: "number" },
+      { label: "HF", type: "number" },
+      { label: "LF", type: "number" },
+      { label: "VLF", type: "number" },
+      { label: "СФ", type: "number" },
+      { label: "SI", type: "number" },
+      { label: "Тип вегетативной регуляции", type: "text" },
+    ],
+    "Частометрия": [
+      { label: "КЧССМ", type: "number" },
+      { label: "Максимальная частота движений", type: "number" },
+    ],
+    "Хронорефлексометрия": [
+      { label: "ПЗМР", type: "number" },
+      { label: "СДР", type: "number" },
+      { label: "РДО", type: "number" },
+    ],
+    "Скоростно-силовые и силовые качества": [
+      { label: "Кистевая динамометрия (сила)", type: "number" },
+      { label: "Кистевая динамометрия (выносливость)", type: "number" },
+      { label: "Высота прыжка из приседа (SJ)", type: "number" },
+      { label: "Высота прыжка вверх без взмаха руками", type: "number" },
+      { label: "Высота прыжка вверх со взмахом руками", type: "number" },
+      { label: "CMJ/SJ", type: "number" },
+      { label: "Мощность прыжка", type: "number" },
+    ],
+    "Стабилометрия": [
+      { label: "Проба Ромберга", type: "text" },
+      { label: "S (о)", type: "number" },
+      { label: "V (о)", type: "number" },
+      { label: "S (з)", type: "number" },
+      { label: "V (з)", type: "number" },
+      { label: "P (о)", type: "number" },
+      { label: "P3", type: "number" },
+      { label: "Кэ", type: "number" },
+      { label: "Динамическая проба", type: "text" },
+      { label: "Стресс-проба", type: "text" },
+    ],
+    "Проба с приседаниями": [
+      { label: "ЧСС покоя", type: "number" },
+      { label: "Скорость восстановления ЧСС", type: "number" },
+      { label: "Приковая ЧСС", type: "number" },
+      { label: "Показатели ВСР", type: "text" },
+    ],
+    "Эргометрические тесты": [
+      { label: "Общий объём работы", type: "number" },
+      { label: "ЧСС", type: "number" },
+      { label: "Пиковое ЧСС", type: "number" },
+      { label: "ЧССАэП", type: "number" },
+      { label: "ЧССАнП", type: "number" },
+      { label: "VO2", type: "number" },
+      { label: "VO2max", type: "number" },
+      { label: "VO2АэП", type: "number" },
+      { label: "VO2АнП", type: "number" },
+      { label: "Мощность/скорость АэП", type: "number" },
+      { label: "Мощность/скорость АнП", type: "number" },
+      { label: "La", type: "number" },
+      { label: "ЛВ", type: "number" },
+      { label: "ДК", type: "number" },
+    ],
+    "Ортостатическая проба": [
+      { label: "ЧСС", type: "number" },
+      { label: "АДс", type: "number" },
+      { label: "АДд", type: "number" },
+    ],
+    "Специальные функциональные пробы": [
+      { label: "ЧСС", type: "number" },
+      { label: "La", type: "number" },
     ],
   };
 
@@ -64,7 +152,7 @@ const SubmitAnalysis: React.FC = () => {
       }
 
       alert("Анализ успешно отправлен!");
-      navigate("/"); // Перенаправляем на главную страницу
+      navigate("/");
     } catch (err: any) {
       setError(err.message || "Неизвестная ошибка");
     } finally {
@@ -74,17 +162,17 @@ const SubmitAnalysis: React.FC = () => {
 
   const validateInput = (type: string, value: string): boolean => {
     if (type === "number") {
-      return /^\d+(\.\d+)?$/.test(value); // Допускаются числа с точкой
+      return /^\d+(\.\d+)?$/.test(value);
     }
     if (type === "integer") {
-      return /^\d+$/.test(value); // Только целые числа
+      return /^\d+$/.test(value);
     }
-    return true; // Если тип не указан, пропускаем валидацию
+    return true;
   };
 
   return (
     <div className="container">
-        <h2>{analyze_name}</h2> 
+      <h2>{analyze_name}</h2>
       <form onSubmit={handleSubmit}>
         {analyzeFields[analyze_name]?.map((field) => (
           <div key={field.label} style={{ marginBottom: "10px" }}>

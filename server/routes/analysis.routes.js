@@ -261,6 +261,36 @@ router.post("/submit", async (req, res) => {
       case "Клинический анализ мочи":
         targetTable = "urine_clinical_analysis";
         break;
+      case "Тонометрия":
+        targetTable = "tonometry";
+        break;
+      case "Ритмокардиография":
+        targetTable = "rhythmocardiography";
+        break;
+      case "Частометрия":
+        targetTable = "frequencymetry";
+        break;
+      case "Скоростно-силовые и силовые качества":
+        targetTable = "speed_strength_qualities";
+        break;
+      case "Хронорефлексометрия":
+        targetTable = "chronoreflectometry";
+        break;
+      case "Стабилометрия":
+        targetTable = "stabilometry";
+        break;
+      case "Проба с приседаниями":
+        targetTable = "squat_test";
+        break;
+      case "Эргометрические тесты":
+        targetTable = "ergometric_tests";
+        break;
+      case "Ортостатическая проба":
+        targetTable = "orthostatic_test";
+        break;
+      case "Специальные функциональные пробы":
+        targetTable = "special_functional_tests";
+        break;
       default:
         return res.status(400).json({ message: "Unsupported analyze type." });
     }
@@ -270,14 +300,105 @@ router.post("/submit", async (req, res) => {
       Гемоглобин: "hemoglobin",
       Глюкоза: "glucose",
       Холестерин: "cholesterol",
-      Рост: "height",
-      Вес: "weight",
-      "Окружность талии": "waist_circumference",
-      "Окружность бедер": "hip_circumference",
+
       Белок: "protein",
       Лейкоциты: "leukocytes",
       Эритроциты: "erythrocytes",
+      // Anthropometry and bioimpedance
+      "Рост": "height",
+      "Вес": "weight",
+      "Окружность талии": "waist_circumference",
+      "Окружность бедер": "hip_circumference",
+      "ИМТ": "imt",
+      "АКМ": "akm",
+      "ДАКМ": "dakm",
+      "ЖМ": "jkm",
+      "ДЖМ": "djkm",
+      "СКМ": "skm",
+      "ДСКМ": "dskm",
+      "ОО": "oo",
+      "ОЖ": "ozh",
+      "ВЖ": "vzh",
+      "ФУ": "fu",
+    
+      // Tonometry
+      "АДс": "ads",
+      "АДд": "add",
+    
+      // Rhythmocardiography
+      "ЧСС": "chss",
+      "RMSSD": "rmssd",
+      "CV": "cv",
+      "TP": "tp",
+      "HF": "hf",
+      "LF": "lf",
+      "VLF": "vlf",
+      "СФ": "sf",
+      "SI": "si",
+      "Тип вегетативной регуляции": "vegetative_regulation",
+    
+      // Frequencymetry
+      "КЧССМ": "kchs",
+      "Максимальная частота движений": "max_movement_frequency",
+    
+      // Speed-strength qualities
+      "Кистевая динамометрия (сила)": "hand_dynamometry_strength",
+      "Кистевая динамометрия (выносливость)": "hand_dynamometry_endurance",
+      "Высота прыжка из приседа (SJ)": "sj_jump_height",
+      "Высота прыжка вверх без взмаха руками": "jump_height_no_hands",
+      "Высота прыжка вверх со взмахом руками": "jump_height_with_hands",
+      "CMJ/SJ": "cmj_sj_ratio",
+      "Мощность прыжка": "jump_power",
+    
+      // Stabilometry
+      "Проба Ромберга": "romberg_test",
+      "S (о)": "s_o",
+      "V (о)": "v_o",
+      "S (з)": "s_z",
+      "V (з)": "v_z",
+      "P (о)": "p_o",
+      "P3": "p_z",
+      "Кэ": "ke",
+      "Динамическая проба": "dynamic_test",
+      "Стресс-проба": "stress_test",
+    
+      // Chronoreflectometry
+      "ПЗМР": "pzmr",
+      "СДР": "sdr",
+      "РДО": "rdo",
+
+          // New mappings for Squat Test
+      "ЧСС покоя": "chss_resting",
+      "Скорость восстановления ЧСС": "chss_recovery_speed",
+      "Приковая ЧСС": "chss_peak",
+      "Показатели ВСР": "vsr_indicators",
+
+      // New mappings for Ergometric Tests
+      "Общий объём работы": "total_work_volume",
+      ЧСС: "chss",
+      "Пиковое ЧСС": "peak_chss",
+      "ЧССАэП": "chss_aep",
+      "ЧССАнП": "chss_anp",
+      VO2: "vo2",
+      VO2max: "vo2_max",
+      "VO2АэП": "vo2_aep",
+      "VO2АнП": "vo2_anp",
+      "Мощность/скорость АэП": "power_speed_aep",
+      "Мощность/скорость АнП": "power_speed_anp",
+      La: "la",
+      ЛВ: "lv",
+      ДК: "dk",
+
+      // New mappings for Orthostatic Test
+      "ЧСС (ортостатическая проба)": "chss",
+      "АДс": "ads",
+      "АДд": "add",
+
+      // New mappings for Special Functional Tests
+      "ЧСС (контрольные поединки)": "chss",
+      La: "la",
     };
+    
 
     const mappedData = {};
     for (const [key, value] of Object.entries(analyze_data)) {

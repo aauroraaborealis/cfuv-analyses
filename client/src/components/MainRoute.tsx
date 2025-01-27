@@ -1,7 +1,5 @@
 import React from 'react';
 import { Route, Routes, useNavigate } from 'react-router-dom';
-import AnalysisSelector from './AnalysisSelector';
-import AnthropometryForm from './AnthropometryForm';
 import Register from './Register';
 import UserAnalyses from './UserAnalyses';
 
