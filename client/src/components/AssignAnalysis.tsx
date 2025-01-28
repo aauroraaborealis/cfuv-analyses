@@ -167,7 +167,7 @@ const AssignAnalysis: React.FC = () => {
       <h2>Назначение анализа</h2>
       <form onSubmit={handleSubmit} className="assign-form">
         <div>
-          <label>Выберите анализ:</label>
+          <label className="mb">Выберите анализ:</label>
           <Select
             options={analyzes}
             value={selectedAnalyze}
@@ -178,7 +178,7 @@ const AssignAnalysis: React.FC = () => {
           />
         </div>
         <div>
-          <label>Выберите вид спорта:</label>
+          <label className="mb">Выберите вид спорта:</label>
           <Select
             options={sports}
             value={selectedSport}
@@ -193,7 +193,7 @@ const AssignAnalysis: React.FC = () => {
           />
         </div>
         <div>
-          <label>Назначить:</label>
+          <label className="mb">Назначить:</label>
           <div>
             <label>
               <input
@@ -217,7 +217,7 @@ const AssignAnalysis: React.FC = () => {
         </div>
         {assignTo === "team" && (
           <div>
-            <label>Выберите команду:</label>
+            <label className="mb">Выберите команду:</label>
             <Select
               options={teams}
               value={selectedTeam}
@@ -242,7 +242,7 @@ const AssignAnalysis: React.FC = () => {
           </div>
         )}
         <div>
-          <label>Дата сдачи анализа:</label>
+          <label className="mb">Дата сдачи анализа:</label>
           <input
             type="date"
             value={dueDate}

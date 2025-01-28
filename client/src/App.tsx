@@ -7,6 +7,8 @@ import MainRoute from './components/MainRoute';
 import Login from './components/Login';
 import AssignAnalysis from './components/AssignAnalysis';
 import SubmitAnalysis from './components/SubmitAnalysis';
+import Admin from './components/Admin';
+import DisplayAnalysis from './components/DisplayAnalysis';
 
 
 const App: React.FC = () => {
@@ -19,6 +21,9 @@ const App: React.FC = () => {
                     <Route path="/register" element={<Register />} />
                     {/* <Route path="/analysis" element={<AnalysisSelector />} /> */}
                     <Route path="/login" element={<Login />} />
+                    <Route path="/admin" element={<Admin />} />
+                    <Route path="/analysis-results" element={<DisplayAnalysis />} />
+
                     <Route path="/assign-analysis" element={<AssignAnalysis />} />
                     <Route path="/submit-analysis/:assignment_id" element={<SubmitAnalysis />} />
                 </Routes>

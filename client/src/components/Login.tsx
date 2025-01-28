@@ -13,6 +13,15 @@ const Login: React.FC = () => {
     setError(null); // Очистка ошибок перед отправкой
 
     try {
+      // Проверка локально для admin/admin
+      if (email === "admin@admin" && password === "admin@admin") {
+        localStorage.setItem("token", "adminToken");
+        localStorage.setItem("admin", "true");
+        navigate("/admin"); // Перенаправление для администратора
+        return;
+      }
+
+      // Если это не админ, выполняем запрос к серверу
       const response = await fetch("http://localhost:8080/api/login", {
         method: "POST",
         headers: {
@@ -28,8 +37,8 @@ const Login: React.FC = () => {
 
       const data = await response.json();
       localStorage.setItem("token", data.token); // Сохраняем токен в localStorage
-      alert("Вы успешно вошли в систему!");
-      navigate("/"); // Перенаправление на другую страницу
+      localStorage.removeItem("admin"); // Удаляем статус администратора
+      navigate("/"); // Перенаправление на главную страницу
     } catch (err: any) {
       setError(err.message || "Неизвестная ошибка");
     }

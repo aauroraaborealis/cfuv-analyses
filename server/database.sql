@@ -14,8 +14,8 @@ CREATE TABLE anthropometry_bioimpedance (
     user_id INTEGER REFERENCES users(id), -- Ссылка на пользователя
     height NUMERIC, -- Рост (см)
     weight NUMERIC, -- Вес (кг)
-    waist_circumference NUMERIC, -- Окружность талии (см)
-    hip_circumference NUMERIC, -- Окружность бедер (см)
+    waist_circumference NUMERIC, -- Обхват талии (см)
+    hip_circumference NUMERIC, -- Обхват бедер (см)
     created_at TIMESTAMP DEFAULT NOW() -- Дата и время создания записи
 );
 
