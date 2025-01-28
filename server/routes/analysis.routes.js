@@ -183,8 +183,6 @@ router.post("/assign", async (req, res) => {
     ];
     const result = await db.query(query, values);
 
-    console.log(result);
-     
     if (student_id) {
       // Получаем название анализа
       const analyzeNameQuery = await db.query(
@@ -202,12 +200,55 @@ router.post("/assign", async (req, res) => {
         data: {
           assignment_id: result.rows[0].assignment_id,
           analyze_id,
+          due_date,
+          assigned_to_team: !!team_id, // Проставляем флаг, если назначено команде
+        },
+      });
+
+      console.log(student_id, {
+        type: 'NEW_ANALYSIS',
+        data: {
+          assignment_id: result.rows[0].assignment_id,
+          analyze_id,
           analyze_name: analyzeName, // Добавляем название анализа
           scheduled_date,
           assigned_to_team: !!team_id, // Проставляем флаг, если назначено команде
         },
       });
     }
+
+    if (team_id) {
+      // Получаем всех студентов, входящих в команду
+      const teamMembersQuery = await db.query(
+        "SELECT student_id FROM students WHERE team_id = $1",
+        [team_id]
+      );
+
+      const analyzeNameQuery = await db.query(
+        "SELECT analyze_name FROM analyzes WHERE analyze_id = $1",
+        [analyze_id]
+      );
+    
+      const analyzeName = analyzeNameQuery.rows[0]?.analyze_name || "Неизвестный анализ";
+    
+      const teamMembers = teamMembersQuery.rows;
+    
+      for (const member of teamMembers) {
+        notifyUser(member.student_id, {
+          type: 'NEW_ANALYSIS',
+          data: {
+            assignment_id: result.rows[0].assignment_id,
+            analyze_id,
+            analyze_name: analyzeName,
+            scheduled_date: due_date,
+            assigned_to_team: true, // Указываем, что назначено команде
+          },
+        });
+    
+        console.log(`Уведомление отправлено студенту ${member.student_id}`);
+      }
+    }
+    
     
 
     res.status(201).json({

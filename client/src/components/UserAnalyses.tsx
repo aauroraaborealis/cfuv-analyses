@@ -51,8 +51,7 @@ const UserAnalyses: React.FC = () => {
         );
 
         if (!response.ok) {
-          const errorData = await response.json();
-          throw new Error(errorData.message || "Ошибка запроса");
+          throw new Error('Вы не авторизованы. Выполните вход или зарегестрируйтесь');        
         }
 
         const data = await response.json();
@@ -77,6 +76,35 @@ const UserAnalyses: React.FC = () => {
     };
 
     fetchAnalyses();
+
+    const token = localStorage.getItem("token");
+    if (!token) {
+      setError("Вы не авторизованы. Выполните вход.");
+      return;
+    }
+
+    const ws = new WebSocket("ws://localhost:8080", token);
+    ws.onopen = () => {
+      console.log("WebSocket соединение установлено.");
+    };
+    ws.onmessage = (event) => {
+      const message = JSON.parse(event.data);
+      console.log(message);
+      if (message.type === "NEW_ANALYSIS") {
+        console.log(message);
+        const newAnalysis = message.data as Analysis;
+        setAnalyses((prev) => [newAnalysis, ...prev]);
+      }
+    };
+    ws.onerror = (error) => {
+      console.error("Ошибка WebSocket:", error);
+    };
+    ws.onclose = () => {
+      console.log("WebSocket соединение закрыто.");
+    };
+    return () => {
+      ws.close();
+    };
   }, []);
 
   // Функция для загрузки детальной информации

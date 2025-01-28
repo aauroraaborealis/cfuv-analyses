@@ -17,7 +17,7 @@ const Login: React.FC = () => {
       if (email === "admin@admin" && password === "admin@admin") {
         localStorage.setItem("token", "adminToken");
         localStorage.setItem("admin", "true");
-        navigate("/admin"); // Перенаправление для администратора
+        navigate("/analysis-results"); // Перенаправление для администратора
         return;
       }
 
