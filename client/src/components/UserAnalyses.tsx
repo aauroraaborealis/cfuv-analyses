@@ -93,6 +93,7 @@ const UserAnalyses: React.FC = () => {
       if (message.type === "NEW_ANALYSIS") {
         console.log(message);
         const newAnalysis = message.data as Analysis;
+        console.log(newAnalysis);
         setAnalyses((prev) => [newAnalysis, ...prev]);
       }
     };

@@ -1,13 +1,15 @@
-const Router = require('express');
-const router = new Router();
-const db = require('../db'); // Подключение к базе данных
+import { Router, Request, Response } from 'express';
+import db from '../db.js';
 
-// Маршрут для создания команды
-router.post('/create', async (req, res) => {
+const router = Router();
+
+router.post('/create', async (req: Request, res: Response) => {
   const { sport_id, team_name } = req.body;
 
   if (!sport_id || !team_name) {
-    return res.status(400).json({ message: "Team name and sport are required." });
+    return res
+      .status(400)
+      .json({ message: 'Team name and sport are required.' });
   }
 
   try {
@@ -20,12 +22,12 @@ router.post('/create', async (req, res) => {
 
     res.status(201).json(result.rows[0]);
   } catch (error) {
-    console.error("Ошибка создания команды:", error);
-    res.status(500).json({ message: "Internal server error" });
+    console.error('Ошибка создания команды:', error);
+    res.status(500).json({ message: 'Internal server error' });
   }
 });
 
-router.get('/list', async (req, res) => {
+router.get('/list', async (req: Request, res: Response) => {
   const { sport_id } = req.query;
 
   if (!sport_id) {
@@ -45,4 +47,4 @@ router.get('/list', async (req, res) => {
   }
 });
 
-module.exports = router;
+export default router;

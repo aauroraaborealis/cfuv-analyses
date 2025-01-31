@@ -1,8 +1,9 @@
-const Router = require('express');
-const router = new Router();
-const db = require('../db');
+import { Router, Request, Response } from 'express';
+import db from '../db.js';
 
-router.post('/create', async (req, res) => {
+const router = Router();
+
+router.post('/create', async (req: Request, res: Response) => {
   const { sport_name } = req.body;
 
   if (!sport_name) {
@@ -14,7 +15,7 @@ router.post('/create', async (req, res) => {
       'SELECT sport_id FROM sports WHERE sport_name = $1',
       [sport_name]
     );
-    if (sportCheck.rowCount > 0) {
+    if (sportCheck.rowCount !== null && sportCheck.rowCount > 0) {
       return res.status(409).json({ message: 'Sport already exists.' });
     }
 
@@ -37,7 +38,7 @@ router.post('/create', async (req, res) => {
   }
 });
 
-router.get('/list', async (req, res) => {
+router.get('/list', async (req: Request, res: Response) => {
   try {
     const result = await db.query('SELECT sport_id, sport_name FROM sports');
     res.status(200).json(result.rows);
@@ -49,4 +50,4 @@ router.get('/list', async (req, res) => {
   }
 });
 
-module.exports = router;
+export default router;
