@@ -163,10 +163,10 @@ const AssignAnalysis: React.FC = () => {
   };
 
   return (
-    <div className="container">
+    <div className="container assign-cont">
       <h2>Назначение анализа</h2>
       <form onSubmit={handleSubmit} className="assign-form">
-        <div>
+        <div className="column">
           <label className="mb">Выберите анализ:</label>
           <Select
             options={analyzes}
@@ -177,7 +177,7 @@ const AssignAnalysis: React.FC = () => {
             isSearchable
           />
         </div>
-        <div>
+        <div className="column">
           <label className="mb">Выберите вид спорта:</label>
           <Select
             options={sports}
@@ -192,7 +192,7 @@ const AssignAnalysis: React.FC = () => {
             isSearchable
           />
         </div>
-        <div>
+        <div className="column">
           <label className="mb">Назначить:</label>
           <div>
             <label>
@@ -214,9 +214,9 @@ const AssignAnalysis: React.FC = () => {
               Студенту
             </label>
           </div>
-        </div>
+        </div >
         {assignTo === "team" && (
-          <div>
+          <div className="column">
             <label className="mb">Выберите команду:</label>
             <Select
               options={teams}
@@ -229,8 +229,8 @@ const AssignAnalysis: React.FC = () => {
           </div>
         )}
         {assignTo === "student" && (
-          <div>
-            <label>Выберите студента:</label>
+          <div className="column">
+            <label className="mb">Выберите студента:</label>
             <Select
               options={students}
               value={selectedStudent}
@@ -241,7 +241,7 @@ const AssignAnalysis: React.FC = () => {
             />
           </div>
         )}
-        <div>
+        <div className="column">
           <label className="mb">Дата сдачи анализа:</label>
           <input
             type="date"

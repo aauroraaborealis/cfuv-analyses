@@ -13,6 +13,16 @@ interface TeamOption {
   label: string;
 }
 
+interface GenderOption {
+  value: string;
+  label: string;
+}
+
+const genders = [
+  { value: 'M', label: 'Мужской' },
+  { value: 'F', label: 'Женский' },
+];
+
 const Register: React.FC = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -26,8 +36,9 @@ const Register: React.FC = () => {
   const [isTeamSport, setIsTeamSport] = useState(false);
   const [team, setTeam] = useState<TeamOption | null>(null);
   const [newTeamName, setNewTeamName] = useState("");
-  const [gender, setGender] = useState(""); // Пол
+  // const [gender, setGender] = useState(""); // Пол
   const [newSportName, setNewSportName] = useState(""); // Для нового вида спорта
+  const [gender, setGender] = useState<GenderOption | null>(null); // Одно значение
 
 
   const navigate = useNavigate();
@@ -86,11 +97,13 @@ const Register: React.FC = () => {
       middle_name: middlename || null,
       last_name: surname,
       birth_date: birthDate,
-      gender, // Добавляем пол
+      gender: gender?.value,
       sport_id: sport?.value || null,
       in_team: isTeamSport,
       team_id: isTeamSport && team ? team.value : null,
     };
+
+    console.log(user);
   
     try {
       const response = await fetch("http://localhost:8080/api/register", {
@@ -274,18 +287,16 @@ const Register: React.FC = () => {
         </div>
         <div className="column">
           <label>Пол:</label>
-          <select
-            value={gender}
-            onChange={(e) => setGender(e.target.value)}
-            required
-            className="css-13cymwt-control"
-          >
-            {/* <option value="" disabled>
-              Выберите пол
-            </option> */}
-            <option value="M">Мужской</option>
-            <option value="F">Женский</option>
-          </select>
+
+
+          <Select
+  options={genders}
+  value={gender}
+  onChange={(selectedOption) => setGender(selectedOption || null)}
+  placeholder="Выберите пол"
+  isClearable
+  isSearchable
+/>
         </div>
 
         {/* Sport and Team Selection */}
@@ -359,15 +370,7 @@ const Register: React.FC = () => {
                       <span>Такой команды нет в списках</span>
                       <button
                         type="button"
-                        style={{
-                          marginTop: "10px",
-                          padding: "5px 10px",
-                          backgroundColor: "#28a745",
-                          color: "#fff",
-                          border: "none",
-                          borderRadius: "4px",
-                          cursor: "pointer",
-                        }}
+                        className="create-btn"
                         onClick={handleAddNewTeam}
                       >
                         Создать команду "

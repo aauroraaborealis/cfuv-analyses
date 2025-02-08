@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import Select from "react-select";
+import "../styles/DisplayAnalysis.css";
 
 interface Option {
   value: string;
@@ -77,9 +78,9 @@ export default function DisplayAnalysis() {
       {error && <p style={{ color: "red" }}>{error}</p>}
 
       {tableData.length > 0 && (
-        <table style={{ marginTop: "20px", border: "1px solid #ccc", width: "100%",  marginBottom: "50px"}}>
+        <table className="res-table">
           <thead>
-            <tr>
+            <tr className="table-header">
               {Object.keys(tableData[0]).map((key) => (
                 <th key={key} style={{padding: "5px" }}>
                   {key}
@@ -93,7 +94,6 @@ export default function DisplayAnalysis() {
                 {Object.values(row).map((value, cellIndex) => (
                   <td
                     key={cellIndex}
-                    style={{ padding: "5px", textAlign: "center" }}
                   >
                     {value !== null && value !== undefined ? String(value) : "-"}
                   </td>

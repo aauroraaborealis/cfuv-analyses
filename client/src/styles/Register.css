@@ -4,16 +4,18 @@
     justify-content: center;
     align-items: center;
     min-width: 40vw;
+    margin-bottom: 10px;
 }
 
 .submit-button{
+  margin-top: 14px;
     align-self: center;
     justify-self: start;
 }
 
 .reg-form .column {
     width: 100%;
-    gap: 10px;
+    margin-top: 10px;
 }
 
 .reg-form .column select{
@@ -23,12 +25,37 @@
   font-weight: normal;
 }
 
-.team-checkbox{
+/* .team-checkbox{
   margin: 10px 0;
-}
+} */
 
 .add-btn{
   background-color: #2D6C30;
   border-radius: 5px;
   width: 90%;
+}
+
+.css-13cymwt-control{
+  margin-bottom: 0;
+}
+
+.register-form h2{
+  margin: 0;
+  margin-top: 16px;
+}
+
+.reg-form input {
+  font-family: "Montserrat", sans-serif;
+  font-size: 16px;
+  margin-top: 2px;
+}
+
+.create-btn{
+  margin-top: 10px;  
+  color: white;
+  font-size: 14px;
+}
+
+input[type="checkbox"] {
+  accent-color: var(--green-main);
 }

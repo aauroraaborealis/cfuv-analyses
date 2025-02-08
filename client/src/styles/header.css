@@ -1,55 +1,26 @@
-.headerStyle {
-    display: flex;
-    justify-content: space-between; 
-    align-items: center;
-    background-color: #2D6C30;
-    color: white;
-    width: 100%;
-}
-
-.buttonStyle {
-    background-color: #2D6C30;
-    border: none;
-    color: #ffffff;
-    padding: 10px 15px;
-    border-radius: 5px;
-    cursor: pointer
-};
-
-.trainer-btn{
-    align-self: flex-end;
-}
-
-.header-nav{
-    width: 100%;
+header{
     display: flex;
     justify-content: space-between;
-    align-items: center;
-    color: white;
     padding: 10px 20px;
+    background-color: #42552c;
+    color: white;
 }
 
-.header-nav a{
+header button {
+    margin: 0;
+    padding: 0;
+    border: none;
+    background-color: transparent;
+    font-size: 16px;
+    margin-left: 20px;
+}
+
+a {
+    font-size: 16px;
     color: white;
     text-decoration: none;
 }
 
-.header-nav a:hover{
-    text-decoration: underline;
-}
-
-
-.trainer-btn{
-    color: black;
-    font-weight: bold;
-    font-size: 16px;
-    background-color: #fff;
-    margin: 0;
-}
-
-.logout{
-    margin: 0;
-    padding: 0;
-    font-size: 16px;
-    font-weight: 100;
+h2{
+    font-weight: 600;
 }

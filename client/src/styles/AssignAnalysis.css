@@ -1,17 +1,51 @@
 .assign-form {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
 }
 
 .assign-form input {
-    margin-top: 10px;
+  margin-top: 10px;
 }
 
-.mb{
-    margin-bottom: 5px;
+.mb {
+  margin-bottom: 5px;
 }
 
 .css-b62m3t-container {
-    margin-top: 5px;
+  margin-top: 5px;
+}
+
+.assign-form button {
+  max-width: 300px;
+  font-size: 16px;
+  margin-top: 20px;
+}
+
+input[type="radio"] {
+  accent-color: var(--green-main);
+}
+
+.assign-cont {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  min-width: 40vw;
+  margin-bottom: 10px;
+}
+
+.assign-cont .column {
+    width: 100%;
+    margin-top: 10px;
+}
+
+.assign-form{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    min-width: 40vw;
+    margin-bottom: 10px;
+
 }

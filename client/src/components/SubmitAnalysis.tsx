@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useParams, useLocation, useNavigate } from "react-router-dom";
 import analyzeFields from "../utils/analyzeFields";
+import "../styles/AnalysisForm.css";
 
 interface FormData {
   [key: string]: string;
@@ -71,11 +72,11 @@ const SubmitAnalysis: React.FC = () => {
   };
 
   return (
-    <div className="container">
+    <div className="container analysis-form">
       <h2>{analyze_name}</h2>
       <form onSubmit={handleSubmit}>
         {analyzeFields[analyze_name]?.map((field) => (
-          <div key={field.label} style={{ marginBottom: "10px" }}>
+          <div key={field.label} className="form-ques">
             <label className="column">
               {field.label}:
               <input

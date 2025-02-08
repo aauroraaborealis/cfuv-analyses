@@ -1,5 +1,6 @@
 import React from "react";
 import { Link, useNavigate } from "react-router-dom";
+import "../styles/header.css";
 
 const Header: React.FC = () => {
   const navigate = useNavigate();
@@ -18,20 +19,21 @@ const Header: React.FC = () => {
         display: "flex",
         justifyContent: "space-between",
         padding: "10px 20px",
-        backgroundColor: isAdmin ? "#ac0d0d" : "#008000", // Красный для коуча, зеленый для остальных
+        // backgroundColor: isAdmin ? "#ac0d0d" : "#42552c", // Красный для коуча, зеленый для остальных
+        backgroundColor: "#42552c",  // Красный для коуча, зеленый для остальных
         color: "white",
       }}
     >
-      <h1>{isAdmin ? "Панель тренера" : "Анализы"}</h1>
+      <h2>{isAdmin ? "Панель тренера" : "Анализы"}</h2>
 
       <nav style={{ display: "flex", alignItems: "center"}} >
         {!token ? (
           // Для незарегистрированных
           <>
-            <Link to="/login" style={{ color: "white", textDecoration: "none"}}>
+            <Link to="/login">
               Вход
             </Link>
-            <Link to="/register" style={{ color: "white", textDecoration: "none", marginLeft: "20px" }}>
+            <Link to="/register" style={{marginLeft: "20px" }}>
               Регистрация
             </Link>
           </>
@@ -40,25 +42,17 @@ const Header: React.FC = () => {
           <>
             <Link
               to="/assign-analysis"
-              style={{ color: "white", textDecoration: "none" }}
             >
                Назначение анализа
             </Link>
             <Link
               to="/analysis-results"
-              style={{ color: "white", textDecoration: "none", marginLeft: "20px"  }}
+              style={{ marginLeft: "20px"  }}
             >
               Результаты анализов
             </Link>
-            <button
+            <button className="logout-btn"
               onClick={handleLogout}
-              style={{
-                backgroundColor: "transparent",
-                border: "none",
-                color: "white",
-                cursor: "pointer",
-                margin: "0"
-              }}
             >
               Выйти
             </button>
@@ -66,18 +60,11 @@ const Header: React.FC = () => {
         ) : (
           // Для обычных зарегистрированных пользователей
           <>
-            <Link to="/" style={{ color: "white", textDecoration: "none" }}>
+            <Link to="/">
               Главная
             </Link>
-            <button
+            <button className="logout-btn"
               onClick={handleLogout}
-              style={{
-                backgroundColor: "transparent",
-                border: "none",
-                color: "white",
-                cursor: "pointer",
-                margin: "0"
-              }}
             >
               Выйти
             </button>

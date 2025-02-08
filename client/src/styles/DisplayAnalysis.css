@@ -1,0 +1,38 @@
+.table-header {
+    background-color: #606c3883;
+}
+
+.table-header:hover {
+    background-color: #606c3883;
+}
+
+table {
+    width: 100%;
+    border-spacing: 0; /* Убирает зазоры между ячейками */
+    margin-top: 20px;
+    border: 1px solid  #606c3883; /* Основная граница таблицы */
+    border-radius: 5px; /* Радиус углов таблицы */
+    overflow: hidden; /* Обрезает содержимое за границами радиуса */
+}
+
+th, td {
+    /* border: 1px solid var(--green-main); Черные границы вокруг ячеек */
+    padding: 10px; /* Внутренний отступ */
+}
+
+th {
+    border: 1px solid  #606c3883;
+}
+
+td {
+    padding: 5px;
+    text-align: center;
+    /* border: 1px solid var(--green-main); */
+    border-left: 1px solid  #606c3883;
+    border-right: 1px solid  #606c3883;
+
+}
+
+tr:hover {
+    background-color: #606c383d;
+}

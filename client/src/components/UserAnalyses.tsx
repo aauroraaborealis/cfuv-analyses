@@ -11,8 +11,8 @@ interface Analysis {
 }
 
 interface DetailedAnalysis extends Analysis {
-  results: string; // Или любые другие дополнительные поля
-  details: string; // Пример дополнительной информации
+  results: string; 
+  details: string; 
 }
 
 const UserAnalyses: React.FC = () => {
@@ -21,8 +21,8 @@ const UserAnalyses: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [selectedAnalysis, setSelectedAnalysis] = useState<string | null>(null);
   const [detailedAnalysis, setDetailedAnalysis] =
-    useState<DetailedAnalysis | null>(null); // Для детальной информации
-  const [loadingDetails, setLoadingDetails] = useState<boolean>(false); // Для состояния загрузки деталей
+    useState<DetailedAnalysis | null>(null); 
+  const [loadingDetails, setLoadingDetails] = useState<boolean>(false); 
 
   const navigate = useNavigate();
 
@@ -51,7 +51,9 @@ const UserAnalyses: React.FC = () => {
         );
 
         if (!response.ok) {
-          throw new Error('Вы не авторизованы. Выполните вход или зарегестрируйтесь');        
+          throw new Error(
+            "Вы не авторизованы. Выполните вход или зарегестрируйтесь"
+          );
         }
 
         const data = await response.json();
@@ -108,7 +110,6 @@ const UserAnalyses: React.FC = () => {
     };
   }, []);
 
-  // Функция для загрузки детальной информации
 
   const fetchDetails = async (assignmentId: string, analyzeName: string) => {
     setLoadingDetails(true);
@@ -143,7 +144,7 @@ const UserAnalyses: React.FC = () => {
       }
 
       const data = await response.json();
-      setDetailedAnalysis(data); // Сохраняем детальную информацию
+      setDetailedAnalysis(data);
     } catch (err: any) {
       setError(err.message || "Неизвестная ошибка");
     } finally {
@@ -156,32 +157,34 @@ const UserAnalyses: React.FC = () => {
 
   return (
     <div className="container">
-      <h2>Назначенные анализы</h2>
+      <h2 className="analysis-header">Назначенные вам анализы</h2>
       {analyses.length === 0 ? (
         <p>У вас нет назначенных анализов.</p>
       ) : (
         <ul className="a-ul">
           {analyses.map((analysis) => (
-            <li key={analysis.assignment_id} className="analysis-list">
-              <div className="analysis-text">
-                <p>
-                  <strong>Анализ:</strong> {analysis.analyze_name}
-                </p>
-                <p>
-                  <strong>Дата сдачи:</strong>{" "}
-                  {new Date(analysis.scheduled_date).toLocaleDateString()}
-                </p>
-                <p>
-                  <strong>Назначен:</strong>{" "}
-                  {analysis.assigned_to_team
-                    ? "Командe, в которой вы состоите"
-                    : "Лично вам"}
-                </p>
-              </div>
-              {analysis.is_submitted ? (
-                <div>
-                  <p
-                    style={{ color: "green", cursor: "pointer" }}
+            <>
+              <li key={analysis.assignment_id} className="analysis-list">
+                <div className="analysis-text">
+                  <p className="analisys-name">{analysis.analyze_name}</p>
+                  <p className="analisys-date">
+                    Дата сдачи:{" "}
+                    {new Date(analysis.scheduled_date).toLocaleDateString()}
+                  </p>
+                  <p className="analysis-assigned">
+                    Назначен{" "}
+                    {analysis.assigned_to_team
+                      ? "командe, в которой вы состоите"
+                      : "персонально вам"}
+                  </p>
+                </div>
+                {analysis.is_submitted ? (
+                  <button
+                    className={
+                      selectedAnalysis === analysis.assignment_id
+                        ? "analysis-res-div active"
+                        : "analysis-res-div"
+                    }
                     onClick={() => {
                       if (selectedAnalysis === analysis.assignment_id) {
                         setSelectedAnalysis(null); // Скрыть блок
@@ -191,51 +194,53 @@ const UserAnalyses: React.FC = () => {
                         fetchDetails(
                           analysis.assignment_id,
                           analysis.analyze_name
-                        ); // Запрос на детали
+                        );
                       }
                     }}
                   >
                     {selectedAnalysis === analysis.assignment_id
-                      ? "Скрыть результаты"
-                      : "Посмотреть результаты"}
-                  </p>
-                  {selectedAnalysis === analysis.assignment_id && (
-                    <div className="analysis-details">
-                      {loadingDetails ? (
-                        <p>Загрузка данных...</p>
-                      ) : detailedAnalysis &&
-                        detailedAnalysis.results.length > 0 ? (
-                        <div>
-                          {Object.entries(detailedAnalysis.results[0]).map(
-                            ([key, value]) => (
-                              <p key={key}>
-                                <strong>{key}:</strong> {value}
-                              </p>
-                            )
-                          )}
-                        </div>
-                      ) : (
-                        <p style={{ color: "red" }}>
-                          Не удалось загрузить результаты или данных нет
-                        </p>
+                      ? "Скрыть"
+                      : "Результаты"}
+                  </button>
+                ) : (
+                  <button
+                    className="submit-analysis-button"
+                    onClick={() =>
+                      navigate(`/submit-analysis/${analysis.assignment_id}`, {
+                        state: {
+                          analyze_name: analysis.analyze_name,
+                        },
+                      })
+                    }
+                  >
+                    Сдать
+                  </button>
+                )}
+              </li>
+              {selectedAnalysis === analysis.assignment_id && (
+                // <div className="analysis-details">
+                <div className={`analysis-details ${selectedAnalysis === analysis.assignment_id ? 'show' : ''}`}>
+                  {loadingDetails ? (
+                    <p>Загрузка данных...</p>
+                  ) : detailedAnalysis &&
+                    detailedAnalysis.results.length > 0 ? (
+                    <div className="details-more">
+                      {Object.entries(detailedAnalysis.results[0]).map(
+                        ([key, value]) => (
+                          <p key={key}>
+                            {key}: {value}
+                          </p>
+                        )
                       )}
                     </div>
+                  ) : (
+                    <p style={{ color: "red" }}>
+                      Не удалось загрузить результаты или данных нет
+                    </p>
                   )}
                 </div>
-              ) : (
-                <button
-                  onClick={() =>
-                    navigate(`/submit-analysis/${analysis.assignment_id}`, {
-                      state: {
-                        analyze_name: analysis.analyze_name,
-                      },
-                    })
-                  }
-                >
-                  Сдать
-                </button>
               )}
-            </li>
+            </>
           ))}
         </ul>
       )}

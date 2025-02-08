@@ -2,152 +2,25 @@ import { Request, Response, Router } from 'express';
 import db from '../db.js';
 import jwt from 'jsonwebtoken';
 import { notifyUser } from '../socketServer.js';
+import {
+  fieldMapping,
+  getTargetTable,
+  translateFields,
+  validTables,
+} from '../utils/vocabulary.js';
 
 const router = Router();
-
-const fieldMapping: Record<string, string> = {
-  Гемоглобин: 'hemoglobin',
-  Глюкоза: 'glucose',
-  Холестерин: 'cholesterol',
-
-  Белок: 'protein',
-  Лейкоциты: 'leukocytes',
-  Эритроциты: 'erythrocytes',
-
-  Рост: 'height',
-  Вес: 'weight',
-  'Обхват талии': 'waist_circumference',
-  'Обхват бедер': 'hip_circumference',
-  ИМТ: 'imt',
-  АКМ: 'akm',
-  ДАКМ: 'dakm',
-  ЖМ: 'jkm',
-  ДЖМ: 'djkm',
-  СКМ: 'skm',
-  ДСКМ: 'dskm',
-  ОО: 'oo',
-  ОЖ: 'ozh',
-  ВЖ: 'vzh',
-  ФУ: 'fu',
-
-  АДс: 'ads',
-  АДд: 'add',
-
-  ЧСС: 'chss',
-  RMSSD: 'rmssd',
-  CV: 'cv',
-  TP: 'tp',
-  HF: 'hf',
-  LF: 'lf',
-  VLF: 'vlf',
-  СФ: 'sf',
-  SI: 'si',
-  'Тип вегетативной регуляции': 'vegetative_regulation',
-
-  КЧССМ: 'kchs',
-  'Максимальная частота движений': 'max_movement_frequency',
-
-  'Кистевая динамометрия (сила)': 'hand_dynamometry_strength',
-  'Кистевая динамометрия (выносливость)': 'hand_dynamometry_endurance',
-  'Высота прыжка из приседа (SJ)': 'sj_jump_height',
-  'Высота прыжка вверх без взмаха руками': 'jump_height_no_hands',
-  'Высота прыжка вверх со взмахом руками': 'jump_height_with_hands',
-  'CMJ/SJ': 'cmj_sj_ratio',
-  'Мощность прыжка': 'jump_power',
-
-  'Проба Ромберга': 'romberg_test',
-  'S (о)': 's_o',
-  'V (о)': 'v_o',
-  'S (з)': 's_z',
-  'V (з)': 'v_z',
-  'P (о)': 'p_o',
-  P3: 'p_z',
-  Кэ: 'ke',
-  'Динамическая проба': 'dynamic_test',
-  'Стресс-проба': 'stress_test',
-
-  ПЗМР: 'pzmr',
-  'С����Р': 'sdr',
-  РДО: 'rdo',
-
-  'ЧСС покоя': 'chss_resting',
-  'Скорость восстановления ЧСС': 'chss_recovery_speed',
-  'Приковая ЧСС': 'chss_peak',
-  'Показатели ВСР': 'vsr_indicators',
-
-  'Общий объём работы': 'total_work_volume',
-  'Пиковое ЧСС': 'peak_chss',
-  ЧССАэП: 'chss_aep',
-  ЧССАнП: 'chss_anp',
-  VO2: 'vo2',
-  VO2max: 'vo2_max',
-  VO2АэП: 'vo2_aep',
-  VO2АнП: 'vo2_anp',
-  'Мощность/скорость АэП': 'power_speed_aep',
-  'Мощность/скорость АнП': 'power_speed_anp',
-  La: 'la',
-  ЛВ: 'lv',
-  ДК: 'dk',
-
-  'ЧСС (ортостатическая проба)': 'chss',
-  'ЧСС (контрольные поединки)': 'chss',
-
-  'Назначен на дату': 'analyze_date',
-  Имя: 'first_name',
-  Фамилия: 'last_name',
-  Отчество: 'middle_name',
-  Спорт: 'sport_name',
-  Команда: 'team_name',
-};
-
-const validTables = new Set([
-  'anthropometry_bioimpedance',
-  'blood_clinical_analysis',
-  'urine_clinical_analysis',
-  'tonometry',
-  'rhythmocardiography',
-  'frequencymetry',
-  'speed_strength_qualities',
-  'chronoreflectometry',
-  'stabilometry',
-  'squat_test',
-  'ergometric_tests',
-  'orthostatic_test',
-  'special_functional_tests',
-]);
-
-function getTargetTable(analyzeName: string): string | null {
-  const tableMap: Record<string, string> = {
-    'Антропометрия и биоимпедансометрия': 'anthropometry_bioimpedance',
-    'Клинический анализ крови': 'blood_clinical_analysis',
-    'Клинический анализ мочи': 'urine_clinical_analysis',
-    'Тонометрия': 'tonometry',
-    'Ритмокардиография': 'rhythmocardiography',
-    'Частометрия': 'frequencymetry',
-    'Скоростно-силовые и силовые качества': 'speed_strength_qualities',
-    'Хронорефлексометрия': 'chronoreflectometry',
-    'Стабилометрия': 'stabilometry',
-    'Проба с приседаниями': 'squat_test',
-    'Эргометрические тесты': 'ergometric_tests',
-    'Ортостатическая проба': 'orthostatic_test',
-    'Специальные функциональные пробы': 'special_functional_tests',
-  };
-
-  return tableMap[analyzeName] || null;
-}
 
 router.post('/assign', async (req: Request, res: Response) => {
   const { analyze_id, sport_id, team_id, student_id, due_date } = req.body;
 
   if (!analyze_id || !sport_id || !due_date || (!team_id && !student_id)) {
     return res.status(400).json({
-      message:
-        'Analyze ID, sport ID, due date, and either team or student ID are required.',
+      message: 'Не все поля заполнены',
     });
   }
 
   try {
-    // Проверка существования анализа, спорта, команды и студента
     const analyzeCheck = await db.query(
       'SELECT analyze_id FROM analyzes WHERE analyze_id = $1',
       [analyze_id]
@@ -184,7 +57,6 @@ router.post('/assign', async (req: Request, res: Response) => {
       }
     }
 
-    // Назначение анализа
     const query = `
       INSERT INTO analyze_assignments (
         analyze_id, team_id, student_id, scheduled_date, assigned_to_team
@@ -203,39 +75,26 @@ router.post('/assign', async (req: Request, res: Response) => {
     console.log(student_id);
 
     if (student_id) {
-
       const analyzeNameQuery = await db.query(
-        "SELECT analyze_name FROM analyzes WHERE analyze_id = $1",
+        'SELECT analyze_name FROM analyzes WHERE analyze_id = $1',
         [analyze_id]
       );
-    
-      const analyzeName = analyzeNameQuery.rows[0]?.analyze_name || "Неизвестный анализ";
+
+      const analyzeName =
+        analyzeNameQuery.rows[0]?.analyze_name || 'Неизвестный анализ';
       let scheduled_date = due_date;
-    
-      // Уведомляем пользователя
+
       notifyUser(student_id, {
         type: 'NEW_ANALYSIS',
         data: {
           assignment_id: result.rows[0].assignment_id,
           analyze_id,
-          analyze_name: analyzeName, // Добавляем название анализа
+          analyze_name: analyzeName,
           scheduled_date,
-          assigned_to_team: !!team_id, // Проставляем флаг, если назначено команде
-        },
-      });
-
-      console.log(student_id, {
-        type: 'NEW_ANALYSIS',
-        data: {
-          assignment_id: result.rows[0].assignment_id,
-          analyze_id,
-          analyze_name: analyzeName, // Добавляем название анализа
-          due_date,
-          assigned_to_team: !!team_id, // Проставляем флаг, если назначено команде
+          assigned_to_team: !!team_id,
         },
       });
     }
-    
 
     if (team_id) {
       const teamMembersQuery = await db.query(
@@ -245,13 +104,13 @@ router.post('/assign', async (req: Request, res: Response) => {
 
       const teamMembers = teamMembersQuery.rows;
 
-      
       const analyzeNameQuery = await db.query(
-        "SELECT analyze_name FROM analyzes WHERE analyze_id = $1",
+        'SELECT analyze_name FROM analyzes WHERE analyze_id = $1',
         [analyze_id]
       );
 
-      const analyzeName = analyzeNameQuery.rows[0]?.analyze_name || "Неизвестный анализ";
+      const analyzeName =
+        analyzeNameQuery.rows[0]?.analyze_name || 'Неизвестный анализ';
       let scheduled_date = due_date;
 
       for (const member of teamMembers) {
@@ -263,17 +122,6 @@ router.post('/assign', async (req: Request, res: Response) => {
             analyze_name: analyzeName,
             scheduled_date,
             assigned_to_team: true,
-          },
-        });
-
-        console.log(`Notification sent to student ${member.student_id}`);
-        console.log(student_id, {
-          type: 'NEW_ANALYSIS',
-          data: {
-            assignment_id: result.rows[0].assignment_id,
-            analyze_id,
-            due_date,
-            assigned_to_team: !!team_id,
           },
         });
       }
@@ -420,7 +268,7 @@ router.post('/submit', async (req: Request, res: Response) => {
     }
 
     const analyzeName = analyzeTypeQuery.rows[0].analyze_name;
-    const targetTable = getTargetTable(analyzeName); // Вспомогательная функция
+    const targetTable = getTargetTable(analyzeName);
 
     if (!targetTable) {
       return res.status(400).json({ message: 'Unsupported analyze type.' });
@@ -522,14 +370,10 @@ router.post('/details', async (req: Request, res: Response) => {
       Object.entries(fieldMapping).map(([key, value]) => [value, key])
     );
 
-    const translatedResults = results.rows.map((row) => {
-      const translatedRow: Record<string, string> = {};
-      for (const key in row) {
-        const translatedKey = reversedFieldMapping[key] || key;
-        translatedRow[translatedKey] = row[key];
-      }
-      return translatedRow;
-    });
+    const translatedResults = translateFields(
+      results.rows,
+      reversedFieldMapping
+    );
 
     return res.status(200).json({ results: translatedResults });
   } catch (error) {
@@ -585,14 +429,10 @@ router.get('/:tableName', async (req: Request, res: Response) => {
       Object.entries(fieldMapping).map(([key, value]) => [value, key])
     );
 
-    const translatedResults = results.rows.map((row) => {
-      const translatedRow: Record<string, string> = {};
-      for (const key in row) {
-        const translatedKey = reversedFieldMapping[key] || key;
-        translatedRow[translatedKey] = row[key];
-      }
-      return translatedRow;
-    });
+    const translatedResults = translateFields(
+      results.rows,
+      reversedFieldMapping
+    );
 
     res.json(translatedResults);
   } catch (error) {
