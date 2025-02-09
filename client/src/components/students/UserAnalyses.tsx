@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import "../styles/UserAnalyses.css";
+import "../../styles/UserAnalyses.css";
+import { apiRequest } from "../../utils/api";
+import Loading from "../Loading";
 
 interface Analysis {
   assignment_id: string;
@@ -11,8 +13,8 @@ interface Analysis {
 }
 
 interface DetailedAnalysis extends Analysis {
-  results: string; 
-  details: string; 
+  results: string;
+  details: string;
 }
 
 const UserAnalyses: React.FC = () => {
@@ -21,42 +23,21 @@ const UserAnalyses: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [selectedAnalysis, setSelectedAnalysis] = useState<string | null>(null);
   const [detailedAnalysis, setDetailedAnalysis] =
-    useState<DetailedAnalysis | null>(null); 
-  const [loadingDetails, setLoadingDetails] = useState<boolean>(false); 
+    useState<DetailedAnalysis | null>(null);
+  const [loadingDetails, setLoadingDetails] = useState<boolean>(false);
 
   const navigate = useNavigate();
 
   useEffect(() => {
-    const fetchAnalyses = async () => {
-      setLoading(true);
-      setError(null);
-
-      const token = localStorage.getItem("token");
-      if (!token) {
-        setError("Вы не авторизованы. Выполните вход.");
-        setLoading(false);
-        return;
-      }
-
+    const fetchAnalyses = async (token: string) => {
       try {
-        const response = await fetch(
-          "http://localhost:8080/api/analysis/user",
-          {
-            method: "GET",
-            headers: {
-              Authorization: `Bearer ${token}`,
-              "Content-Type": "application/json",
-            },
-          }
+        const data = await apiRequest<{ analyses: Analysis[] }>(
+          "analysis/user",
+          "GET",
+          null,
+          token
         );
 
-        if (!response.ok) {
-          throw new Error(
-            "Вы не авторизованы. Выполните вход или зарегестрируйтесь"
-          );
-        }
-
-        const data = await response.json();
         const sortedAnalyses = data.analyses.sort(
           (a: Analysis, b: Analysis) => {
             if (a.is_submitted === b.is_submitted) {
@@ -77,12 +58,12 @@ const UserAnalyses: React.FC = () => {
       }
     };
 
-    fetchAnalyses();
-
     const token = localStorage.getItem("token");
     if (!token) {
       setError("Вы не авторизованы. Выполните вход.");
       return;
+    } else {
+      fetchAnalyses(token);
     }
 
     const ws = new WebSocket("ws://localhost:8080", token);
@@ -109,7 +90,6 @@ const UserAnalyses: React.FC = () => {
       ws.close();
     };
   }, []);
-
 
   const fetchDetails = async (assignmentId: string, analyzeName: string) => {
     setLoadingDetails(true);
@@ -152,7 +132,7 @@ const UserAnalyses: React.FC = () => {
     }
   };
 
-  if (loading) return <p>Загрузка...</p>;
+  if (loading) return <Loading/>;
   if (error) return <p style={{ color: "red" }}>{error}</p>;
 
   return (
@@ -219,7 +199,9 @@ const UserAnalyses: React.FC = () => {
               </li>
               {selectedAnalysis === analysis.assignment_id && (
                 // <div className="analysis-details">
-                <div className={`analysis-details ${selectedAnalysis === analysis.assignment_id ? 'show' : ''}`}>
+                <div
+                  className={`analysis-details ${selectedAnalysis === analysis.assignment_id ? "show" : ""}`}
+                >
                   {loadingDetails ? (
                     <p>Загрузка данных...</p>
                   ) : detailedAnalysis &&

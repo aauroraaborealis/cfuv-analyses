@@ -1,10 +1,7 @@
 import React from 'react';
-import { Route, Routes, useNavigate } from 'react-router-dom';
-import Register from './Register';
-import UserAnalyses from './UserAnalyses';
+import UserAnalyses from './students/UserAnalyses';
 
 const MainRoute: React.FC = () => {
-  const navigate = useNavigate();
 
   return (
     <div>

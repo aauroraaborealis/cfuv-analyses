@@ -382,6 +382,33 @@ router.post('/details', async (req: Request, res: Response) => {
   }
 });
 
+router.get("/assignments", async (req, res) => {
+  try {
+    const query = `
+      SELECT 
+        aa.assignment_id,
+        a.analyze_name,
+        aa.scheduled_date,
+        aa.assigned_to_team,
+        s.first_name AS student_first_name,
+        s.last_name AS student_last_name,
+        t.team_name
+      FROM analyze_assignments aa
+      LEFT JOIN analyzes a ON aa.analyze_id = a.analyze_id
+      LEFT JOIN students s ON aa.student_id = s.student_id
+      LEFT JOIN teams t ON aa.team_id = t.team_id
+      ORDER BY aa.scheduled_date DESC;
+    `;
+
+    const result = await db.query(query);
+    
+    res.status(200).json(result.rows);
+  } catch (error) {
+    console.error("Ошибка при получении списка анализов:", error);
+    res.status(500).json({ message: "Ошибка сервера при получении анализов." });
+  }
+});
+
 router.get('/:tableName', async (req: Request, res: Response) => {
   const { tableName } = req.params;
 

@@ -1,0 +1,39 @@
+.assigned-container {
+    width: 90%;
+    max-width: 800px;
+    margin: auto;
+    text-align: center;
+  }
+  
+  .error-message {
+    color: red;
+    font-weight: bold;
+  }
+  
+  .no-data {
+    color: #606c38;
+    font-size: 18px;
+  }
+  
+  .assigned-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+  }
+  
+  .assigned-table th,
+  .assigned-table td {
+    border: 1px solid #42552c;
+    padding: 8px;
+    text-align: center;
+  }
+  
+  .assigned-table th {
+    background-color: #606c38;
+    color: white;
+  }
+  
+  .assigned-table tr:nth-child(even) {
+    background-color: #f5f5f5;
+  }
+  

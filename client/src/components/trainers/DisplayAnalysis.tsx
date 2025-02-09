@@ -1,11 +1,7 @@
 import { useEffect, useState } from "react";
 import Select from "react-select";
-import "../styles/DisplayAnalysis.css";
-
-interface Option {
-  value: string;
-  label: string;
-}
+import "../../styles/DisplayAnalysis.css";
+import { Option } from "../../utils/interfaces.js";
 
 export default function DisplayAnalysis() {
   const [analyzes, setAnalyzes] = useState<Option[]>([]);
@@ -63,7 +59,7 @@ export default function DisplayAnalysis() {
 
   return (
     <div className="container">
-        <h2>Просмотр результатов</h2>
+      <h2>Просмотр результатов</h2>
       <label>Выберите анализ:</label>
       <Select
         options={analyzes}
@@ -77,12 +73,12 @@ export default function DisplayAnalysis() {
       {loading && <p>Загрузка данных...</p>}
       {error && <p style={{ color: "red" }}>{error}</p>}
 
-      {tableData.length > 0 && (
+      {tableData.length > 0 ? (
         <table className="res-table">
           <thead>
             <tr className="table-header">
               {Object.keys(tableData[0]).map((key) => (
-                <th key={key} style={{padding: "5px" }}>
+                <th key={key} style={{ padding: "5px" }}>
                   {key}
                 </th>
               ))}
@@ -92,17 +88,24 @@ export default function DisplayAnalysis() {
             {tableData.map((row, index) => (
               <tr key={index}>
                 {Object.values(row).map((value, cellIndex) => (
-                  <td
-                    key={cellIndex}
-                  >
-                    {value !== null && value !== undefined ? String(value) : "-"}
+                  <td key={cellIndex}>
+                    {value !== null && value !== undefined
+                      ? String(value)
+                      : "-"}
                   </td>
                 ))}
               </tr>
             ))}
           </tbody>
         </table>
+      ) : (
+        !loading && !error && selectedAnalyze && (
+          <p className="no-data">
+            Данные для этого анализа отсуствуют
+          </p>
+        )
       )}
     </div>
   );
+
 }

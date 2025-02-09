@@ -2,25 +2,11 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Select from "react-select";
 import "../styles/Register.css";
-
-interface SportOption {
-  value: string; // UUID
-  label: string;
-}
-
-interface TeamOption {
-  value: string;
-  label: string;
-}
-
-interface GenderOption {
-  value: string;
-  label: string;
-}
+import { Option } from "../utils/interfaces.js";
 
 const genders = [
-  { value: 'M', label: 'Мужской' },
-  { value: 'F', label: 'Женский' },
+  { value: "M", label: "Мужской" },
+  { value: "F", label: "Женский" },
 ];
 
 const Register: React.FC = () => {
@@ -30,16 +16,14 @@ const Register: React.FC = () => {
   const [surname, setSurname] = useState("");
   const [middlename, setMiddlename] = useState("");
   const [birthDate, setBirthDate] = useState("");
-  const [sports, setSports] = useState<SportOption[]>([]);
-  const [teams, setTeams] = useState<TeamOption[]>([]);
-  const [sport, setSport] = useState<SportOption | null>(null);
+  const [sports, setSports] = useState<Option[]>([]);
+  const [teams, setTeams] = useState<Option[]>([]);
+  const [sport, setSport] = useState<Option | null>(null);
   const [isTeamSport, setIsTeamSport] = useState(false);
-  const [team, setTeam] = useState<TeamOption | null>(null);
+  const [team, setTeam] = useState<Option | null>(null);
   const [newTeamName, setNewTeamName] = useState("");
-  // const [gender, setGender] = useState(""); // Пол
-  const [newSportName, setNewSportName] = useState(""); // Для нового вида спорта
-  const [gender, setGender] = useState<GenderOption | null>(null); // Одно значение
-
+  const [newSportName, setNewSportName] = useState(""); 
+  const [gender, setGender] = useState<Option | null>(null);
 
   const navigate = useNavigate();
 
@@ -89,7 +73,7 @@ const Register: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-  
+
     const user = {
       email,
       password,
@@ -104,7 +88,7 @@ const Register: React.FC = () => {
     };
 
     console.log(user);
-  
+
     try {
       const response = await fetch("http://localhost:8080/api/register", {
         method: "POST",
@@ -113,16 +97,16 @@ const Register: React.FC = () => {
         },
         body: JSON.stringify(user),
       });
-  
+
       if (!response.ok) {
         const error = await response.json();
         alert(`Ошибка регистрации: ${error.message}`);
         return;
       }
-  
+
       const result = await response.json(); // Получаем токен из ответа
       localStorage.setItem("token", result.token); // Сохраняем токен
-  
+
       alert("Регистрация успешна!");
       navigate("/"); // Перенаправляем пользователя после регистрации
     } catch (error) {
@@ -130,7 +114,6 @@ const Register: React.FC = () => {
       alert("Ошибка регистрации");
     }
   };
-  
 
   const handleAddNewTeam = async () => {
     if (!newTeamName.trim() || !sport) {
@@ -180,7 +163,7 @@ const Register: React.FC = () => {
       alert("Введите название вида спорта!");
       return;
     }
-  
+
     try {
       const response = await fetch("http://localhost:8080/api/sport/create", {
         method: "POST",
@@ -191,30 +174,29 @@ const Register: React.FC = () => {
           sport_name: newSportName.trim(),
         }),
       });
-  
+
       if (!response.ok) {
         const error = await response.json();
         alert(`Ошибка добавления вида спорта: ${error.message}`);
         return;
       }
-  
+
       const result = await response.json();
-  
+
       // Добавляем новый вид спорта в список
       const newSport = { value: result.sport_id, label: result.sport_name };
       setSports((prevSports) => [...prevSports, newSport]);
-  
+
       // Устанавливаем новый вид спорта как выбранный
       setSport(newSport);
-  
+
       setNewSportName(""); // Сбрасываем поле ввода
       alert("Вид спорта успешно добавлен!");
     } catch (error) {
       console.error("Ошибка добавления вида спорта:", error);
     }
   };
-  
-  
+
   return (
     <div className="register-form">
       <h2>Регистрация</h2>
@@ -250,7 +232,6 @@ const Register: React.FC = () => {
             onChange={(e) => setName(e.target.value)}
             required
             className="css-13cymwt-control"
-
           />
         </div>
         <div className="column">
@@ -260,7 +241,6 @@ const Register: React.FC = () => {
             value={middlename}
             onChange={(e) => setMiddlename(e.target.value)}
             className="css-13cymwt-control"
-
           />
         </div>
         <div className="column">
@@ -271,7 +251,6 @@ const Register: React.FC = () => {
             onChange={(e) => setSurname(e.target.value)}
             required
             className="css-13cymwt-control"
-
           />
         </div>
         <div className="column">
@@ -282,60 +261,60 @@ const Register: React.FC = () => {
             onChange={(e) => setBirthDate(e.target.value)}
             required
             className="css-13cymwt-control"
-
           />
         </div>
         <div className="column">
           <label>Пол:</label>
 
-
           <Select
-  options={genders}
-  value={gender}
-  onChange={(selectedOption) => setGender(selectedOption || null)}
-  placeholder="Выберите пол"
-  isClearable
-  isSearchable
-/>
+            options={genders}
+            value={gender}
+            onChange={(selectedOption) => setGender(selectedOption || null)}
+            placeholder="Выберите пол"
+            isClearable
+            isSearchable
+          />
         </div>
 
         {/* Sport and Team Selection */}
         <div className="column">
-  <label>Вид спорта:</label>
-  <Select
-    options={sports}
-    value={sport}
-    onChange={(selectedOption) => {
-      setSport(selectedOption);
-      setIsTeamSport(false); // Сбрасываем командный спорт при смене вида спорта
-      setTeam(null);
-    }}
-    placeholder="Выберите вид спорта"
-    isClearable
-    isSearchable
-    noOptionsMessage={() => (
-      <div
-        style={{
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-        }}
-      >
-        <span>Такого вида спорта нет в списках</span>
-        <button
-          type="button"
-          className="add-btn"
-          onClick={handleAddNewSport}
-        >
-          Добавить вид спорта "
-          {newSportName.trim() &&
-            newSportName.charAt(0).toUpperCase() + newSportName.slice(1)}"
-        </button>
-      </div>
-    )}
-    onInputChange={(value) => setNewSportName(value)} // Обновляем ввод
-  />
-</div>
+          <label>Вид спорта:</label>
+          <Select
+            options={sports}
+            value={sport}
+            onChange={(selectedOption) => {
+              setSport(selectedOption);
+              setIsTeamSport(false); // Сбрасываем командный спорт при смене вида спорта
+              setTeam(null);
+            }}
+            placeholder="Выберите вид спорта"
+            isClearable
+            isSearchable
+            noOptionsMessage={() => (
+              <div
+                style={{
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "center",
+                }}
+              >
+                <span>Такого вида спорта нет в списках</span>
+                <button
+                  type="button"
+                  className="add-btn"
+                  onClick={handleAddNewSport}
+                >
+                  Добавить вид спорта "
+                  {newSportName.trim() &&
+                    newSportName.charAt(0).toUpperCase() +
+                      newSportName.slice(1)}
+                  "
+                </button>
+              </div>
+            )}
+            onInputChange={(value) => setNewSportName(value)} // Обновляем ввод
+          />
+        </div>
 
         {sport && (
           <>

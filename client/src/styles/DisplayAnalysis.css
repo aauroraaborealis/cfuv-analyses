@@ -36,3 +36,8 @@ td {
 tr:hover {
     background-color: #606c383d;
 }
+
+.no-data{
+    text-align: center;
+    margin-top: 20px;
+}

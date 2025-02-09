@@ -14,58 +14,37 @@ const Header: React.FC = () => {
   };
 
   return (
-    <header
-      style={{
-        display: "flex",
-        justifyContent: "space-between",
-        padding: "10px 20px",
-        // backgroundColor: isAdmin ? "#ac0d0d" : "#42552c", // Красный для коуча, зеленый для остальных
-        backgroundColor: "#42552c",  // Красный для коуча, зеленый для остальных
-        color: "white",
-      }}
-    >
+    <header>
       <h2>{isAdmin ? "Панель тренера" : "Анализы"}</h2>
 
-      <nav style={{ display: "flex", alignItems: "center"}} >
+      <nav style={{ display: "flex", alignItems: "center" }}>
         {!token ? (
           // Для незарегистрированных
           <>
-            <Link to="/login">
-              Вход
-            </Link>
-            <Link to="/register" style={{marginLeft: "20px" }}>
+            <Link to="/login">Вход</Link>
+            <Link to="/register" style={{ marginLeft: "20px" }}>
               Регистрация
             </Link>
           </>
         ) : isAdmin ? (
           // Для админов/коучей
           <>
-            <Link
-              to="/assign-analysis"
-            >
-               Назначение анализа
-            </Link>
-            <Link
-              to="/analysis-results"
-              style={{ marginLeft: "20px"  }}
-            >
+            <Link to="/assign-analysis">Назначение анализа</Link>
+            <Link to="/analysis-results" style={{ marginLeft: "20px" }}>
               Результаты анализов
             </Link>
-            <button className="logout-btn"
-              onClick={handleLogout}
-            >
+            <Link to="/assignments" style={{ marginLeft: "20px" }}>
+              Назначенные анализы
+            </Link>
+            <button className="logout-btn" onClick={handleLogout}>
               Выйти
             </button>
           </>
         ) : (
           // Для обычных зарегистрированных пользователей
           <>
-            <Link to="/">
-              Главная
-            </Link>
-            <button className="logout-btn"
-              onClick={handleLogout}
-            >
+            <Link to="/">Главная</Link>
+            <button className="logout-btn" onClick={handleLogout}>
               Выйти
             </button>
           </>
