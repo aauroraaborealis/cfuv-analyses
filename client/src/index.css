@@ -122,3 +122,7 @@ p {
   justify-content: center;
   align-items: center; 
 }
+
+.css-19bb58m input{
+  border-radius: 0px;
+}

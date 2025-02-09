@@ -1,6 +1,9 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useMutation } from "@tanstack/react-query";
+import axios from "axios";
 import "../styles/Login.css";
+import { SERVER_LINK } from "../utils/api"; // Убедитесь, что этот путь корректен
 
 const Login: React.FC = () => {
   const [email, setEmail] = useState<string>("");
@@ -8,40 +11,36 @@ const Login: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError(null); // Очистка ошибок перед отправкой
-
-    try {
-      // Проверка локально для admin/admin
-      if (email === "admin@admin" && password === "admin@admin") {
-        localStorage.setItem("token", "adminToken");
-        localStorage.setItem("admin", "true");
-        navigate("/analysis-results"); // Перенаправление для администратора
-        return;
-      }
-
-      // Если это не админ, выполняем запрос к серверу
-      const response = await fetch("http://localhost:8080/api/login", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ email, password }),
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || "Ошибка входа");
-      }
-
-      const data = await response.json();
+  // Мутация для входа
+  const loginMutation = useMutation({
+    mutationFn: async (credentials: { email: string; password: string }) => {
+      const { data } = await axios.post(`${SERVER_LINK}/login`, credentials);
+      return data;
+    },
+    onSuccess: (data) => {
       localStorage.setItem("token", data.token); // Сохраняем токен в localStorage
       localStorage.removeItem("admin"); // Удаляем статус администратора
       navigate("/"); // Перенаправление на главную страницу
-    } catch (err: any) {
-      setError(err.message || "Неизвестная ошибка");
+    },
+    onError: (err: any) => {
+      setError(err.response?.data?.message || "Ошибка входа");
+    },
+  });
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    setError(null); // Очистка ошибок перед отправкой
+
+    // Проверка локально для admin/admin
+    if (email === "admin@admin" && password === "admin@admin") {
+      localStorage.setItem("token", "adminToken");
+      localStorage.setItem("admin", "true");
+      navigate("/analysis-results"); // Перенаправление для администратора
+      return;
     }
+
+    // Выполнение мутации для входа
+    loginMutation.mutate({ email, password });
   };
 
   return (
@@ -69,8 +68,12 @@ const Login: React.FC = () => {
             className="css-13cymwt-control"
           />
         </div>
-        <button type="submit" className="submit-button">
-          Войти
+        <button
+          type="submit"
+          className="submit-button"
+          disabled={loginMutation.isPending} // Блокируем кнопку при загрузке
+        >
+          {loginMutation.isPending ? "Вход..." : "Войти"}
         </button>
       </form>
     </div>

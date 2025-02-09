@@ -21,30 +21,30 @@ const Header: React.FC = () => {
         {!token ? (
           // Для незарегистрированных
           <>
-            <Link to="/login">Вход</Link>
-            <Link to="/register" style={{ marginLeft: "20px" }}>
+            <Link className="hoverline" to="/login">Вход</Link>
+            <Link className="hoverline" to="/register" style={{ marginLeft: "20px" }}>
               Регистрация
             </Link>
           </>
         ) : isAdmin ? (
           // Для админов/коучей
           <>
-            <Link to="/assign-analysis">Назначение анализа</Link>
-            <Link to="/analysis-results" style={{ marginLeft: "20px" }}>
+            <Link className="hoverline" to="/assign-analysis">Назначение анализа</Link>
+            <Link className="hoverline" to="/analysis-results" style={{ marginLeft: "20px" }}>
               Результаты анализов
             </Link>
-            <Link to="/assignments" style={{ marginLeft: "20px" }}>
+            <Link className="hoverline" to="/assignments" style={{ marginLeft: "20px" }}>
               Назначенные анализы
             </Link>
-            <button className="logout-btn" onClick={handleLogout}>
+            <button className="logout-btn hoverline" onClick={handleLogout}>
               Выйти
             </button>
           </>
         ) : (
           // Для обычных зарегистрированных пользователей
           <>
-            <Link to="/">Главная</Link>
-            <button className="logout-btn" onClick={handleLogout}>
+            <Link className="hoverline" to="/">Главная</Link>
+            <button className="logout-btn hoverline" onClick={handleLogout}>
               Выйти
             </button>
           </>

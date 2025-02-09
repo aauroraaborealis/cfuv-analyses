@@ -13,6 +13,7 @@ header button {
     background-color: transparent;
     font-size: 16px;
     margin-left: 20px;
+    height: fit-content;
 }
 
 a {
@@ -24,3 +25,25 @@ a {
 h2{
     font-weight: 600;
 }
+
+.hoverline {
+    display: inline-block;
+    position: relative;
+  }
+  
+  .hoverline:after {
+    content: '';
+    position: absolute;
+    width: 100%;
+    transform: scaleX(0);
+    height: 1px;
+    bottom: -5px;
+    left: 0;
+    background-color: #ffffff;
+    transform-origin: bottom center;
+    transition: transform 0.5s ease-out;
+  }
+  
+  .hoverline:hover:after {
+    transform: scaleX(1);
+  }

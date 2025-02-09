@@ -409,6 +409,69 @@ router.get("/assignments", async (req, res) => {
   }
 });
 
+// router.get("/assignments", async (req, res) => {
+//   try {
+//     const page = parseInt(req.query.page as string) || 1;
+//     const limit = parseInt(req.query.limit as string) || 10;
+//     const offset = (page - 1) * limit;
+
+//     const sortBy = typeof req.query.sortBy === "string" && ["scheduled_date", "analyze_name", "student_first_name", "team_name"].includes(req.query.sortBy)
+//       ? req.query.sortBy
+//       : "scheduled_date";
+
+//     const sortOrder =
+//       typeof req.query.sortOrder === "string" &&
+//       req.query.sortOrder.toUpperCase() === "ASC"
+//         ? "ASC"
+//         : "DESC";
+
+//     const query = `
+//       SELECT 
+//         aa.assignment_id,
+//         a.analyze_name,
+//         aa.scheduled_date,
+//         aa.assigned_to_team,
+//         s.first_name AS student_first_name,
+//         s.last_name AS student_last_name,
+//         t.team_name
+//       FROM analyze_assignments aa
+//       LEFT JOIN analyzes a ON aa.analyze_id = a.analyze_id
+//       LEFT JOIN students s ON aa.student_id = s.student_id
+//       LEFT JOIN teams t ON aa.team_id = t.team_id
+//       ORDER BY ${sortBy} ${sortOrder}
+//       LIMIT $1 OFFSET $2;
+//     `;
+
+//     const countQuery = `
+//       SELECT COUNT(*) AS total
+//       FROM analyze_assignments aa
+//       LEFT JOIN analyzes a ON aa.analyze_id = a.analyze_id
+//       LEFT JOIN students s ON aa.student_id = s.student_id
+//       LEFT JOIN teams t ON aa.team_id = t.team_id;
+//     `;
+
+//     const [result, countResult] = await Promise.all([
+//       db.query(query, [limit, offset]),
+//       db.query(countQuery),
+//     ]);
+
+//     const totalRecords = parseInt(countResult.rows[0].total, 10);
+
+//     res.status(200).json({
+//       data: result.rows,
+//       pagination: {
+//         currentPage: page,
+//         pageSize: limit,
+//         totalRecords,
+//         totalPages: Math.ceil(totalRecords / limit),
+//       },
+//     });
+//   } catch (error) {
+//     console.error("Ошибка при получении списка анализов:", error);
+//     res.status(500).json({ message: "Ошибка сервера при получении анализов." });
+//   }
+// });
+
 router.get('/:tableName', async (req: Request, res: Response) => {
   const { tableName } = req.params;
 

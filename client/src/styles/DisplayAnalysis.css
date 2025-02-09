@@ -8,16 +8,15 @@
 
 table {
     width: 100%;
-    border-spacing: 0; /* Убирает зазоры между ячейками */
+    border-spacing: 0; 
     margin-top: 20px;
-    border: 1px solid  #606c3883; /* Основная граница таблицы */
-    border-radius: 5px; /* Радиус углов таблицы */
-    overflow: hidden; /* Обрезает содержимое за границами радиуса */
+    border: 1px solid  #606c3883; 
+    border-radius: 5px;
+    overflow: hidden; 
 }
 
 th, td {
-    /* border: 1px solid var(--green-main); Черные границы вокруг ячеек */
-    padding: 10px; /* Внутренний отступ */
+    padding: 10px;
 }
 
 th {
@@ -27,10 +26,7 @@ th {
 td {
     padding: 5px;
     text-align: center;
-    /* border: 1px solid var(--green-main); */
-    border-left: 1px solid  #606c3883;
-    border-right: 1px solid  #606c3883;
-
+    border: 1px solid  #606c3883;
 }
 
 tr:hover {
@@ -40,4 +36,18 @@ tr:hover {
 .no-data{
     text-align: center;
     margin-top: 20px;
+}
+
+.display-analysis{
+    text-align: center;
+}
+
+.display-controls{
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.display-r-select{
+    width: 30vw;
 }
