@@ -1,39 +1,74 @@
 import React from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { jwtDecode } from "jwt-decode";
 import "../styles/header.css";
+
+// Интерфейс для декодированного токена
+interface DecodedToken {
+  id: string;
+  email: string;
+  name: string;
+  role: "student" | "trainer";
+}
 
 const Header: React.FC = () => {
   const navigate = useNavigate();
-  const isAdmin = localStorage.getItem("admin") === "true";
   const token = localStorage.getItem("token");
+
+  let role: "student" | "trainer" | null = null;
+
+  if (token) {
+    try {
+      const decoded: DecodedToken = jwtDecode(token);
+      role = decoded.role;
+    } catch (error) {
+      console.error("Ошибка декодирования токена:", error);
+    }
+  }
 
   const handleLogout = () => {
     localStorage.removeItem("token");
-    localStorage.removeItem("admin");
+    localStorage.removeItem("role");
     navigate("/login");
   };
 
   return (
     <header>
-      <h2>{isAdmin ? "Панель тренера" : "Анализы"}</h2>
+      <h2>{role === "trainer" ? "Панель тренера" : "Анализы"}</h2>
 
       <nav style={{ display: "flex", alignItems: "center" }}>
         {!token ? (
-          // Для незарегистрированных
+          // Для незарегистрированных пользователей
           <>
-            <Link className="hoverline" to="/login">Вход</Link>
-            <Link className="hoverline" to="/register" style={{ marginLeft: "20px" }}>
+            <Link className="hoverline" to="/login">
+              Вход
+            </Link>
+            <Link
+              className="hoverline"
+              to="/register"
+              style={{ marginLeft: "20px" }}
+            >
               Регистрация
             </Link>
           </>
-        ) : isAdmin ? (
-          // Для админов/коучей
+        ) : role === "trainer" ? (
+          // Для тренеров
           <>
-            <Link className="hoverline" to="/assign-analysis">Назначение анализа</Link>
-            <Link className="hoverline" to="/analysis-results" style={{ marginLeft: "20px" }}>
+            <Link className="hoverline" to="/assign-analysis">
+              Назначение анализа
+            </Link>
+            <Link
+              className="hoverline"
+              to="/analysis-results"
+              style={{ marginLeft: "20px" }}
+            >
               Результаты анализов
             </Link>
-            <Link className="hoverline" to="/assignments" style={{ marginLeft: "20px" }}>
+            <Link
+              className="hoverline"
+              to="/assignments"
+              style={{ marginLeft: "20px" }}
+            >
               Назначенные анализы
             </Link>
             <button className="logout-btn hoverline" onClick={handleLogout}>
@@ -41,9 +76,11 @@ const Header: React.FC = () => {
             </button>
           </>
         ) : (
-          // Для обычных зарегистрированных пользователей
+          // Для студентов
           <>
-            <Link className="hoverline" to="/">Главная</Link>
+            <Link className="hoverline" to="/my-analysis">
+              Мои анализы
+            </Link>
             <button className="logout-btn hoverline" onClick={handleLogout}>
               Выйти
             </button>

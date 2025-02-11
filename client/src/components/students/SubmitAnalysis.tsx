@@ -56,7 +56,7 @@ const SubmitAnalysis: React.FC = () => {
     },
     onSuccess: () => {
       alert("Анализ успешно отправлен");
-      navigate("/");
+      navigate("/my-analysis");
     },
     onError: (err: any) => {
       setError(err.response?.data?.message || err.message || "Неизвестная ошибка");

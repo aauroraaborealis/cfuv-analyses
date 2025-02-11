@@ -1,15 +1,36 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useMutation } from "@tanstack/react-query";
 import axios from "axios";
 import "../styles/Login.css";
-import { SERVER_LINK } from "../utils/api"; // Убедитесь, что этот путь корректен
+import { SERVER_LINK } from "../utils/api";
+import {jwtDecode} from "jwt-decode";
+import { getRoleFromToken, isAuthenticated } from "../utils/auth";
+
+interface DecodedToken {
+  id: string;
+  email: string;
+  name: string;
+  role: "student" | "trainer";
+}
 
 const Login: React.FC = () => {
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
+
+    // Если уже авторизован - редиректим на нужный маршрут
+    useEffect(() => {
+      if (isAuthenticated()) {
+        const role = getRoleFromToken();
+        if (role === "trainer") {
+          navigate("/analysis-results");
+        } else if (role === "student") {
+          navigate("/my-analysis");
+        }
+      }
+    }, [navigate]);
 
   // Мутация для входа
   const loginMutation = useMutation({
@@ -18,9 +39,21 @@ const Login: React.FC = () => {
       return data;
     },
     onSuccess: (data) => {
-      localStorage.setItem("token", data.token); // Сохраняем токен в localStorage
-      localStorage.removeItem("admin"); // Удаляем статус администратора
-      navigate("/"); // Перенаправление на главную страницу
+      localStorage.setItem("token", data.token); // Сохраняем токен
+
+      try {
+        // Декодируем JWT токен, чтобы получить роль
+        const decoded: DecodedToken = jwtDecode(data.token);
+        localStorage.setItem("role", decoded.role); // Сохраняем роль
+
+        if (decoded.role === "student") {
+          navigate("/my-analysis"); // Студенты → my-analysis
+        } else if (decoded.role === "trainer") {
+          navigate("/analysis-results"); // Тренеры → analysis-results
+        } 
+      } catch (error) {
+        console.error("Ошибка декодирования токена:", error);
+      }
     },
     onError: (err: any) => {
       setError(err.response?.data?.message || "Ошибка входа");
@@ -29,17 +62,9 @@ const Login: React.FC = () => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    setError(null); // Очистка ошибок перед отправкой
+    setError(null);
 
-    // Проверка локально для admin/admin
-    if (email === "admin@admin" && password === "admin@admin") {
-      localStorage.setItem("token", "adminToken");
-      localStorage.setItem("admin", "true");
-      navigate("/analysis-results"); // Перенаправление для администратора
-      return;
-    }
-
-    // Выполнение мутации для входа
+    // Выполняем мутацию для входа
     loginMutation.mutate({ email, password });
   };
 
@@ -71,7 +96,7 @@ const Login: React.FC = () => {
         <button
           type="submit"
           className="submit-button"
-          disabled={loginMutation.isPending} // Блокируем кнопку при загрузке
+          disabled={loginMutation.isPending}
         >
           {loginMutation.isPending ? "Вход..." : "Войти"}
         </button>
