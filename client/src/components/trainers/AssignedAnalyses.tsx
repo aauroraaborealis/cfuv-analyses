@@ -19,6 +19,7 @@ interface AssignedAnalysis {
 
 const fetchAssignedAnalyses = async (): Promise<AssignedAnalysis[]> => {
   const { data } = await axios.get(`${SERVER_LINK}/analysis/assignments`);
+  console.log(data);
   return data;
 };
 

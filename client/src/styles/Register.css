@@ -59,3 +59,9 @@
 input[type="checkbox"] {
   accent-color: var(--green-main);
 }
+
+.error-form{
+  font-size: 12px;
+  margin-top: 5px;
+  color: darkred;
+}

@@ -17,7 +17,7 @@ interface User {
   password_hash: string;
 }
 
-router.post('/register', async (req: Request, res: Response) => {
+router.post('/register-students', async (req: Request, res: Response) => {
   const {
     first_name,
     middle_name,
