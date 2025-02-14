@@ -31,12 +31,17 @@ export default function AnalysisModal({
     enabled: !!assignmentId,
   });
 
-  const [isEditing, setIsEditing] = useState(false); // Состояние редактирования
+  const [isEditing, setIsEditing] = useState(false);
 
-  // Глобальная функция закрытия
-  const handleClose = () => {
+  // Закрывает обе модалки
+  const handleFullClose = () => {
     setIsEditing(false);
-    onClose(); // Закрываем всю модалку
+    onClose(); // ❗ Закрываем `AnalysisModal`
+  };
+
+  // Закрывает только `EditAnalysis`
+  const handleEditClose = () => {
+    setIsEditing(false);
   };
 
   if (!assignmentId) return null;
@@ -44,10 +49,10 @@ export default function AnalysisModal({
   return (
     <>
       {!isEditing ? (
-        <div className="modal-overlay" onClick={handleClose}>
+        <div className="modal-overlay">
           <div className="modal-content" onClick={(e) => e.stopPropagation()}>
             <div className="buttons-cont">
-              <button className="close-button" onClick={handleClose}>
+              <button className="close-button" onClick={handleFullClose}>
                 <img src="/close.svg" alt="Закрыть" />
               </button>
             </div>
@@ -111,11 +116,12 @@ export default function AnalysisModal({
           </div>
         </div>
       ) : (
-        // Если включено редактирование, показываем `EditAnalysis`
-        <EditAnalysis assignmentId={assignmentId} onClose={() => {
-          setIsEditing(false); // Закрываем `EditAnalysis` и возвращаем `AnalysisModal`
-        }} />
+       
+        <EditAnalysis assignmentId={assignmentId} onClose={handleEditClose} onFullClose={handleFullClose} /> 
+        // ❗ Закрывает только `EditAnalysis`
+
       )}
     </>
   );
 }
+ 

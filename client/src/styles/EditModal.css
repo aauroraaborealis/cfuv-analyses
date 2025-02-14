@@ -79,3 +79,12 @@
     font-size: medium;
     align-self: center;
 }
+
+.edit-buttons{
+  display: flex;
+  justify-content: space-between;
+}
+
+.delete-analysis-btn{
+  background-color: darkred;
+}

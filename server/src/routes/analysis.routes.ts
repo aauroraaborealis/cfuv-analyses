@@ -704,6 +704,27 @@ router.put("/assignment/:assignment_id", async (req: Request, res: Response) => 
   }
 });
 
+router.delete("/assignment/:assignment_id", async (req: Request, res: Response) => {
+  const { assignment_id } = req.params;
+
+  if (!assignment_id) {
+    return res.status(400).json({ message: "assignment_id обязателен" });
+  }
+
+  try {
+    const deleteQuery = `DELETE FROM analyze_assignments WHERE assignment_id = $1 RETURNING *;`;
+    const result = await db.query(deleteQuery, [assignment_id]);
+
+    if (result.rowCount === 0) {
+      return res.status(404).json({ message: "Анализ не найден" });
+    }
+
+    return res.status(200).json({ message: "Анализ успешно удалён" });
+  } catch (error) {
+    console.error("Ошибка при удалении анализа:", error);
+    return res.status(500).json({ message: "Ошибка сервера" });
+  }
+});
 
 
 export default router;

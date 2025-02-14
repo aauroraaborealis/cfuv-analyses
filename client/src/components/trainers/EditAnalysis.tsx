@@ -9,6 +9,7 @@ import { Option } from "../../utils/interfaces.js";
 interface EditAnalysisProps {
   assignmentId: string;
   onClose: () => void;
+  onFullClose: () => void;
 }
 
 const fetchAnalysisDetails = async (assignmentId: string) => {
@@ -21,6 +22,7 @@ const fetchAnalysisDetails = async (assignmentId: string) => {
 const EditAnalysis: React.FC<EditAnalysisProps> = ({
   assignmentId,
   onClose,
+  onFullClose, 
 }) => {
   const { data: initialData, isLoading: loadingInitialData } = useQuery({
     queryKey: ["analysisDetails", assignmentId],
@@ -153,11 +155,32 @@ const EditAnalysis: React.FC<EditAnalysisProps> = ({
     onSuccess: () => {
       alert("Анализ успешно обновлён!");
       queryClient.invalidateQueries({ queryKey: ["assignedAnalyses"] });
-      onClose();
+      onFullClose(); 
     },
     onError: (error: any) => {
       alert(
         `Ошибка обновления анализа: ${error.response?.data?.message || error.message}`
+      );
+    },
+  });
+
+  const deleteMutation = useMutation({
+    mutationFn: async () => {
+      const token = localStorage.getItem("token");
+      if (!token)
+        throw new Error("Ошибка: Токен не найден, авторизуйтесь заново.");
+      await axios.delete(`${SERVER_LINK}/analysis/assignment/${assignmentId}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+    },
+    onSuccess: () => {
+      alert("Анализ успешно удалён!");
+      queryClient.invalidateQueries({ queryKey: ["assignedAnalyses"] });
+      onFullClose();
+    },
+    onError: (error: any) => {
+      alert(
+        `Ошибка удаления: ${error.response?.data?.message || error.message}`
       );
     },
   });
@@ -297,11 +320,24 @@ const EditAnalysis: React.FC<EditAnalysisProps> = ({
               />
             </div>
 
-            <button type="submit" disabled={updateMutation.isPending}>
-              {updateMutation.isPending
-                ? "Обновление..."
-                : "Сохранить изменения"}
-            </button>
+            <div className="edit-buttons">
+              <button type="submit" disabled={updateMutation.isPending}>
+                {updateMutation.isPending
+                  ? "Обновление..."
+                  : "Сохранить изменения"}
+              </button>
+
+              <button
+                className="delete-analysis-btn"
+                onClick={(e) => {
+                  e.preventDefault(); // ❗️ Останавливаем стандартное поведение формы
+                  deleteMutation.mutate();
+                }}
+                disabled={deleteMutation.isPending}
+              >
+                {deleteMutation.isPending ? "Удаление..." : "Удалить анализ"}
+              </button>
+            </div>
           </form>
         )}
       </div>
