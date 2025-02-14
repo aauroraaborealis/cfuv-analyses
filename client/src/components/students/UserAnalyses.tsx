@@ -104,7 +104,7 @@ const UserAnalyses: React.FC = () => {
 
     try {
       const response = await fetch(
-        `http://localhost:8080/api/analysis/details`,
+        `http://localhost:8080/api/analysis/detailed-results`,
         {
           method: "POST",
           headers: {

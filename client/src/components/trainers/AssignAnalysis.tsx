@@ -80,10 +80,23 @@ const AssignAnalysis: React.FC = () => {
   // 🚀 Мутация для назначения анализа
   const assignMutation = useMutation({
     mutationFn: async (assignment: any) => {
+      const token = localStorage.getItem("token"); // Получаем токен из localStorage
+      if (!token) {
+        alert("Ошибка: Токен не найден, авторизуйтесь заново.");
+        return;
+      }
+  
       const response = await axios.post(
         `${SERVER_LINK}/analysis/assign`,
-        assignment
+        assignment,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`, // 🔥 Передаем токен в заголовке
+            "Content-Type": "application/json",
+          },
+        }
       );
+  
       return response.data;
     },
     onSuccess: () => {
@@ -95,6 +108,7 @@ const AssignAnalysis: React.FC = () => {
       );
     },
   });
+  
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();

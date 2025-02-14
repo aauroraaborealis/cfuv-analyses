@@ -8,15 +8,26 @@ import {
   translateFields,
   validTables,
 } from '../utils/vocabulary.js';
+import authMiddleware from '../middleware/authMiddleware.js';
 
 const router = Router();
 
-router.post('/assign', async (req: Request, res: Response) => {
+//Назначить анализ
+
+router.post('/assign', authMiddleware,  async (req: Request, res: Response) => {
   const { analyze_id, sport_id, team_id, student_id, due_date } = req.body;
+  
+  const created_by = req.user?.trainer_id; 
 
   if (!analyze_id || !sport_id || !due_date || (!team_id && !student_id)) {
     return res.status(400).json({
       message: 'Не все поля заполнены',
+    });
+  }
+
+  if (!created_by) {
+    return res.status(401).json({
+      message: 'Не авторизован',
     });
   }
 
@@ -59,8 +70,8 @@ router.post('/assign', async (req: Request, res: Response) => {
 
     const query = `
       INSERT INTO analyze_assignments (
-        analyze_id, team_id, student_id, scheduled_date, assigned_to_team
-      ) VALUES ($1, $2, $3, $4, $5)
+        analyze_id, team_id, student_id, scheduled_date, assigned_to_team, created_by
+      ) VALUES ($1, $2, $3, $4, $5, $6)
       RETURNING assignment_id;
     `;
     const values = [
@@ -69,6 +80,7 @@ router.post('/assign', async (req: Request, res: Response) => {
       student_id || null,
       due_date,
       !!team_id,
+      created_by // Теперь trainer_id записывается в created_by
     ];
     const result = await db.query(query, values);
 
@@ -137,6 +149,8 @@ router.post('/assign', async (req: Request, res: Response) => {
   }
 });
 
+//Получить все анализы
+
 router.get('/', async (req: Request, res: Response) => {
   try {
     const result = await db.query('SELECT * FROM analyzes');
@@ -146,6 +160,8 @@ router.get('/', async (req: Request, res: Response) => {
     res.status(500).json({ message: 'Internal server error.' });
   }
 });
+
+//Получить анализы  определенного юзера
 
 router.get('/user', async (req: Request, res: Response) => {
   const token = req.headers.authorization?.split(' ')[1];
@@ -222,6 +238,8 @@ router.get('/user', async (req: Request, res: Response) => {
     res.status(500).json({ message: 'Internal server error.' });
   }
 });
+
+//Внести показания анализа
 
 router.post('/submit', async (req: Request, res: Response) => {
   const { assignment_id, analyze_data } = req.body;
@@ -308,7 +326,7 @@ router.post('/submit', async (req: Request, res: Response) => {
   }
 });
 
-router.post('/details', async (req: Request, res: Response) => {
+router.post('/detailed-results', async (req: Request, res: Response) => {
   const {
     assignment_id,
     analyze_name,
@@ -532,5 +550,160 @@ router.get('/:tableName', async (req: Request, res: Response) => {
     });
   }
 });
+
+// router.get("/assignment/:assignment_id", async (req: Request, res: Response) => {
+//   const { assignment_id } = req.params;
+
+//   if (!assignment_id) {
+//     return res.status(400).json({ message: "assignment_id обязателен" });
+//   }
+
+//   try {
+//     // Запрос на получение информации о назначенном анализе
+//     const assignmentQuery = `
+//       SELECT 
+//         aa.assignment_id,
+//         aa.analyze_id,
+//         a.analyze_name,
+//         aa.scheduled_date,
+//         aa.assigned_to_team,
+//         aa.team_id,
+//         aa.student_id,
+//         t.team_name,
+//         s.first_name AS student_first_name,
+//         s.last_name AS student_last_name,
+//         tr.first_name AS trainer_first_name,
+//         tr.last_name AS trainer_last_name,
+//         aa.created_at
+//       FROM analyze_assignments aa
+//       LEFT JOIN analyzes a ON aa.analyze_id = a.analyze_id
+//       LEFT JOIN teams t ON aa.team_id = t.team_id
+//       LEFT JOIN students s ON aa.student_id = s.student_id
+//       LEFT JOIN trainers tr ON aa.created_by = tr.trainer_id
+//       WHERE aa.assignment_id = $1;
+//     `;
+
+//     const assignmentResult = await db.query(assignmentQuery, [assignment_id]);
+
+//     if (assignmentResult.rows.length === 0) {
+//       return res.status(404).json({ message: "Анализ не найден" });
+//     }
+
+//     const assignment = assignmentResult.rows[0];
+
+//     return res.status(200).json(assignment);
+//   } catch (error) {
+//     console.error("Ошибка получения анализа:", error);
+//     return res.status(500).json({ message: "Ошибка сервера" });
+//   }
+// });
+
+router.get("/assignment/:assignment_id", async (req: Request, res: Response) => {
+  const { assignment_id } = req.params;
+
+  if (!assignment_id) {
+    return res.status(400).json({ message: "assignment_id обязателен" });
+  }
+
+  try {
+    // Запрос на получение информации о назначенном анализе
+    const assignmentQuery = `
+      SELECT 
+        aa.assignment_id,
+        aa.analyze_id,
+        a.analyze_name,
+        aa.scheduled_date,
+        aa.assigned_to_team,
+        aa.team_id,
+        aa.student_id,
+        t.team_name,
+        s.first_name AS student_first_name,
+        s.last_name AS student_last_name,
+        tr.first_name AS trainer_first_name,
+        tr.last_name AS trainer_last_name,
+        aa.created_at,
+        -- Определяем вид спорта (берем либо у студента, либо у команды)
+        COALESCE(s.sport_id, t.sport_id) AS sport_id,
+        sp.sport_name
+      FROM analyze_assignments aa
+      LEFT JOIN analyzes a ON aa.analyze_id = a.analyze_id
+      LEFT JOIN teams t ON aa.team_id = t.team_id
+      LEFT JOIN students s ON aa.student_id = s.student_id
+      LEFT JOIN trainers tr ON aa.created_by = tr.trainer_id
+      LEFT JOIN sports sp ON sp.sport_id = COALESCE(s.sport_id, t.sport_id) -- Присоединяем таблицу sports
+      WHERE aa.assignment_id = $1;
+    `;
+
+    const assignmentResult = await db.query(assignmentQuery, [assignment_id]);
+
+    if (assignmentResult.rows.length === 0) {
+      return res.status(404).json({ message: "Анализ не найден" });
+    }
+
+    const assignment = assignmentResult.rows[0];
+
+    return res.status(200).json(assignment);
+  } catch (error) {
+    console.error("Ошибка получения анализа:", error);
+    return res.status(500).json({ message: "Ошибка сервера" });
+  }
+});
+
+router.put("/assignment/:assignment_id", async (req: Request, res: Response) => {
+  const { assignment_id } = req.params;
+  const { analyze_id, sport_id, due_date, team_id, student_id } = req.body;
+
+  console.log(req.params, req.body);
+
+  if (!assignment_id || !analyze_id || !sport_id || !due_date || (!team_id && !student_id)) {
+    return res.status(400).json({ message: "Не все обязательные поля заполнены" });
+  }
+
+  try {
+    // Проверяем, существует ли назначенный анализ
+    const checkQuery = "SELECT * FROM analyze_assignments WHERE assignment_id = $1";
+    const checkResult = await db.query(checkQuery, [assignment_id]);
+
+    if (checkResult.rowCount === 0) {
+      return res.status(404).json({ message: "Назначенный анализ не найден" });
+    }
+
+    // Обновляем данные в таблице
+    const updateQuery = `
+      UPDATE analyze_assignments
+      SET analyze_id = $1,
+          sport_id = $2,
+          scheduled_date = $3,
+          team_id = $4,
+          student_id = $5,
+          assigned_to_team = $6,
+          updated_at = NOW()
+      WHERE assignment_id = $7
+      RETURNING *;
+    `;
+
+    const values = [
+      analyze_id,
+      sport_id,
+      due_date,
+      team_id || null,
+      student_id || null,
+      !!team_id, // assigned_to_team (true, если team_id есть)
+      assignment_id,
+    ];
+
+    const updateResult = await db.query(updateQuery, values);
+
+    res.status(200).json({
+      message: "Анализ успешно обновлён",
+      assignment: updateResult.rows[0],
+    });
+  } catch (error) {
+    console.error("Ошибка обновления анализа:", error);
+    res.status(500).json({ message: "Ошибка сервера" });
+  }
+});
+
+
 
 export default router;
