@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
 import "../../styles/AssignedAnalyses.css";
 import { SERVER_LINK } from "../../utils/api";
@@ -20,7 +20,6 @@ interface AssignedAnalysis {
 
 const fetchAssignedAnalyses = async (): Promise<AssignedAnalysis[]> => {
   const { data } = await axios.get(`${SERVER_LINK}/analysis/assignments`);
-  console.log(data);
   return data;
 };
 
@@ -34,12 +33,19 @@ export default function AssignedAnalyses() {
     queryFn: fetchAssignedAnalyses,
   });
 
+  const queryClient = useQueryClient(); 
+
   const [currentPage, setCurrentPage] = useState(1);
   const [recordsPerPage, setRecordsPerPage] = useState(10);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedAssignmentId, setSelectedAssignmentId] = useState<
     string | null
   >(null);
+
+  const handleModalClose = () => {
+    setSelectedAssignmentId(null);
+    queryClient.invalidateQueries({ queryKey: ["assignedAnalyses"] }); // 🔥 Перезапрашиваем данные после закрытия модалки
+  };
 
   const filteredAnalyses = assignedAnalyses?.filter((analysis) => {
     const query = searchQuery.toLowerCase();
@@ -143,9 +149,10 @@ export default function AssignedAnalyses() {
 
       {selectedAssignmentId && (
         <AnalysisModal
-          assignmentId={selectedAssignmentId}
-          onClose={() => setSelectedAssignmentId(null)}
-        />
+  assignmentId={selectedAssignmentId}
+  onClose={handleModalClose} // 🔥 Теперь вызываем обновление данных
+/>
+
       )}
     </div>
   );

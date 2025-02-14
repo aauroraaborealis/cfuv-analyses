@@ -24,11 +24,16 @@
   .close-button {
     border: none;
     background: none;
-    font-size: 20px;
     cursor: pointer;
     color: rgb(0, 0, 0);
-    height: max-content;
+    height: fit-content;
     padding: 0;
+    font-size: 0%;
+  }
+
+  .close-button img{
+    height: 10px;
+    width: 10px;
   }
   
   .analysis-detail-info {
@@ -37,15 +42,25 @@
   
   .detail-item {
     display: flex;
-    justify-content: space-between;
+    flex-direction: column;
     margin-bottom: 10px;
+    text-align: left;
   }
-  
-  .label {
-    font-weight: bold;
+
+  .label{
+    color: hsl(0, 0%, 50%);
   }
-  
+/* 
+  .detailed-label{
+    font-size: larger;
+  } */
+
   .buttons-cont{
     display: flex;
     justify-content: end;
+  }
+
+  .edit-btn{
+    margin-top: 10px;
+    font-size: medium;
   }

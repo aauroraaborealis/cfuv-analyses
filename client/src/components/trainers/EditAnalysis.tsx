@@ -1,8 +1,5 @@
 import { useState, useEffect } from "react";
-import {
-  useQuery,
-  useMutation,
-} from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
 import Select from "react-select";
 import "../../styles/EditModal.css";
@@ -15,17 +12,23 @@ interface EditAnalysisProps {
 }
 
 const fetchAnalysisDetails = async (assignmentId: string) => {
-  const { data } = await axios.get(`${SERVER_LINK}/analysis/assignment/${assignmentId}`);
-  console.log(data);
+  const { data } = await axios.get(
+    `${SERVER_LINK}/analysis/assignment/${assignmentId}`
+  );
   return data;
 };
 
-const EditAnalysis: React.FC<EditAnalysisProps> = ({ assignmentId, onClose }) => {
+const EditAnalysis: React.FC<EditAnalysisProps> = ({
+  assignmentId,
+  onClose,
+}) => {
   const { data: initialData, isLoading: loadingInitialData } = useQuery({
     queryKey: ["analysisDetails", assignmentId],
     queryFn: () => fetchAnalysisDetails(assignmentId),
     enabled: !!assignmentId,
   });
+
+  const queryClient = useQueryClient();
 
   const [assignTo, setAssignTo] = useState<"team" | "student">("team");
   const [selectedAnalyze, setSelectedAnalyze] = useState<Option | null>(null);
@@ -83,7 +86,9 @@ const EditAnalysis: React.FC<EditAnalysisProps> = ({ assignmentId, onClose }) =>
   };
 
   const fetchTeams = async (sportId: string) => {
-    const { data } = await axios.get(`${SERVER_LINK}/team/list?sport_id=${sportId}`);
+    const { data } = await axios.get(
+      `${SERVER_LINK}/team/list?sport_id=${sportId}`
+    );
     return data.map((team: any) => ({
       value: team.team_id,
       label: team.team_name,
@@ -91,7 +96,9 @@ const EditAnalysis: React.FC<EditAnalysisProps> = ({ assignmentId, onClose }) =>
   };
 
   const fetchStudents = async (sportId: string) => {
-    const { data } = await axios.get(`${SERVER_LINK}/students/sport?sport_id=${sportId}`);
+    const { data } = await axios.get(
+      `${SERVER_LINK}/students/sport?sport_id=${sportId}`
+    );
     return data.map((student: any) => ({
       value: student.student_id,
       label: `${student.first_name} ${student.last_name}`,
@@ -145,17 +152,26 @@ const EditAnalysis: React.FC<EditAnalysisProps> = ({ assignmentId, onClose }) =>
     },
     onSuccess: () => {
       alert("Анализ успешно обновлён!");
+      queryClient.invalidateQueries({ queryKey: ["assignedAnalyses"] });
       onClose();
     },
     onError: (error: any) => {
-      alert(`Ошибка обновления анализа: ${error.response?.data?.message || error.message}`);
+      alert(
+        `Ошибка обновления анализа: ${error.response?.data?.message || error.message}`
+      );
     },
   });
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!selectedAnalyze || !dueDate || !selectedSport || (assignTo === "student" && !selectedStudent) || (assignTo === "team" && !selectedTeam)) {
+    if (
+      !selectedAnalyze ||
+      !dueDate ||
+      !selectedSport ||
+      (assignTo === "student" && !selectedStudent) ||
+      (assignTo === "team" && !selectedTeam)
+    ) {
       alert("Заполните все поля!");
       return;
     }
@@ -172,96 +188,122 @@ const EditAnalysis: React.FC<EditAnalysisProps> = ({ assignmentId, onClose }) =>
   return (
     <div className="modal-overlay">
       <div className="modal-content">
-      <div className="buttons-cont">
-              <button className="close-button" onClick={onClose}>
-                <img src="/close.svg" alt="Закрыть" className="edit-btn" />
-              </button>
-            </div>
-      <h2>Редактирование анализа</h2>
-      {loadingInitialData ? (
-        <p>Загрузка данных...</p>
-      ) : (
-        <form onSubmit={handleSubmit} className="assign-form">
-          <div className="column">
-            <label className="mb">Выберите анализ:</label>
-            <Select
-              options={analyzes}
-              value={selectedAnalyze}
-              onChange={setSelectedAnalyze}
-              placeholder={loadingAnalyzes ? "Загрузка..." : "Выберите анализ"}
-              isClearable
-              isSearchable
-            />
-          </div>
-
-          <div className="column">
-            <label className="mb">Выберите вид спорта:</label>
-            <Select
-              options={sports}
-              value={selectedSport}
-              onChange={(option) => {
-                setSelectedSport(option);
-                setSelectedStudent(null);
-                setSelectedTeam(null);
-              }}
-              placeholder={loadingSports ? "Загрузка..." : "Выберите вид спорта"}
-              isClearable
-              isSearchable
-            />
-          </div>
-
-          <div className="column">
-            <label className="mb">Дата сдачи анализа:</label>
-            <input type="date" value={dueDate} onChange={(e) => setDueDate(e.target.value)} required className="input-react" />
-          </div>
-
-          <div className="column">
-            <label className="mb">Назначено:</label>
-            <div>
-              <label>
-                <input type="radio" value="team" checked={assignTo === "team"} onChange={() => setAssignTo("team")} />
-                Команде
-              </label>
-              <label>
-                <input type="radio" value="student" checked={assignTo === "student"} onChange={() => setAssignTo("student")} />
-                Студенту
-              </label>
-            </div>
-          </div>
-
-          {assignTo === "team" && (
-            <div className="column">
-              <label className="mb">Выберите команду:</label>
-              <Select
-                options={teams}
-                value={selectedTeam}
-                onChange={setSelectedTeam}
-                placeholder={loadingTeams ? "Загрузка..." : "Выберите команду"}
-                isClearable
-                isSearchable
-              />
-            </div>
-          )}
-
-          {assignTo === "student" && (
-            <div className="column">
-              <label className="mb">Выберите студента:</label>
-              <Select
-                options={students}
-                value={selectedStudent}
-                onChange={setSelectedStudent}
-                placeholder={loadingStudents ? "Загрузка..." : "Выберите студента"}
-                isClearable
-                isSearchable
-              />
-            </div>
-          )}
-
-          <button type="submit" disabled={updateMutation.isPending}>
-            {updateMutation.isPending ? "Обновление..." : "Сохранить изменения"}
+        <div className="buttons-cont">
+          <button className="close-button" onClick={onClose}>
+            <img src="/close.svg" alt="Закрыть" />
           </button>
-        </form>
-      )}
+        </div>
+        <h2>Редактирование анализа</h2>
+        {loadingInitialData ? (
+          <p>Загрузка данных...</p>
+        ) : (
+          <form onSubmit={handleSubmit} className="edit-form">
+            <div className="column">
+              <label className="mb">Анализ:</label>
+              <Select
+                options={analyzes}
+                value={selectedAnalyze}
+                onChange={setSelectedAnalyze}
+                placeholder={
+                  loadingAnalyzes ? "Загрузка..." : "Выберите анализ"
+                }
+                isClearable
+                isSearchable
+              />
+            </div>
+
+            <div className="column">
+              <label className="mb">Вид спорта:</label>
+              <Select
+                options={sports}
+                value={selectedSport}
+                onChange={(option) => {
+                  setSelectedSport(option);
+                  setSelectedStudent(null);
+                  setSelectedTeam(null);
+                }}
+                placeholder={
+                  loadingSports ? "Загрузка..." : "Выберите вид спорта"
+                }
+                isClearable
+                isSearchable
+              />
+            </div>
+
+            <div className="column">
+              <label className="mb">Назначено:</label>
+              <div className="row">
+                <label>
+                  <input
+                    type="radio"
+                    value="team"
+                    checked={assignTo === "team"}
+                    onChange={() => setAssignTo("team")}
+                  />
+                  Команде
+                </label>
+                <label>
+                  <input
+                    type="radio"
+                    value="student"
+                    checked={assignTo === "student"}
+                    onChange={() => setAssignTo("student")}
+                  />
+                  Студенту
+                </label>
+              </div>
+            </div>
+
+            {assignTo === "team" && (
+              <div className="column">
+                <label className="mb">Команда:</label>
+                <Select
+                  options={teams}
+                  value={selectedTeam}
+                  onChange={setSelectedTeam}
+                  placeholder={
+                    loadingTeams ? "Загрузка..." : "Выберите команду"
+                  }
+                  isClearable
+                  isSearchable
+                />
+              </div>
+            )}
+
+            {assignTo === "student" && (
+              <div className="column">
+                <label className="mb">Студент:</label>
+                <Select
+                  options={students}
+                  value={selectedStudent}
+                  onChange={setSelectedStudent}
+                  placeholder={
+                    loadingStudents ? "Загрузка..." : "Выберите студента"
+                  }
+                  isClearable
+                  isSearchable
+                />
+              </div>
+            )}
+
+            <div className="column">
+              <label className="mb">Дата сдачи анализа:</label>
+              <input
+                type="date"
+                value={dueDate}
+                onChange={(e) => setDueDate(e.target.value)}
+                required
+                className="input-react"
+              />
+            </div>
+
+            <button type="submit" disabled={updateMutation.isPending}>
+              {updateMutation.isPending
+                ? "Обновление..."
+                : "Сохранить изменения"}
+            </button>
+          </form>
+        )}
       </div>
     </div>
   );

@@ -4,23 +4,13 @@
     padding: 20px;
     border-radius: 8px;
     min-width: 350px;
-    max-width: 400px;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
     position: relative;
   }
   
-  h2 {
+  .modal-content h2 {
     margin-top: 0;
     text-align: center;
-  }
-  
-  input, select {
-    width: 100%;
-    padding: 8px;
-    margin-top: 5px;
-    margin-bottom: 10px;
-    border-radius: 5px;
-    border: 1px solid #ccc;
   }
   
   .save-btn {
@@ -47,7 +37,6 @@
     padding: 20px;
     border-radius: 8px;
     min-width: 350px;
-    max-width: 400px;
     position: fixed;
     top: 0;
     left: 0;
@@ -72,3 +61,21 @@
     justify-content: center;
     z-index: 3;
   }
+
+.row{
+    display: flex;
+    align-items: center;
+}
+
+.edit-form{
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    text-align: start;
+}
+
+.edit-form button {
+    width: fit-content;
+    font-size: medium;
+    align-self: center;
+}
