@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import {
@@ -11,9 +11,9 @@ import {
   Legend,
   ResponsiveContainer,
 } from "recharts";
+import Select from "react-select";
 import "../../styles/UserDashboard.css";
 import { SERVER_LINK } from "../../utils/api";
-import Select from "react-select";
 
 // Функция получения анализов
 const fetchAnalyzes = async () => {
@@ -34,8 +34,6 @@ const fetchResults = async (analysisId: string) => {
     { headers: { Authorization: `Bearer ${token}` } }
   );
 
-  console.log(data);
-
   return data;
 };
 
@@ -50,42 +48,57 @@ export default function UserDashboard() {
     label: string;
   } | null>(null);
 
-  // const { data: results, isLoading: loadingResults } = useQuery({
-  //   queryKey: ["userResults", selectedAnalysis],
-  //   queryFn: () =>
-  //     selectedAnalysis
-  //       ? fetchResults(selectedAnalysis?.value)
-  //       : Promise.resolve([]),
-  //   enabled: !!selectedAnalysis,
-  // });
-
-  const { data: apiData, isLoading: loadingResults } = useQuery({
-    queryKey: ["userResults", selectedAnalysis],
+  const {
+    data: apiData,
+    isLoading: loadingResults,
+    error,
+  } = useQuery({
+    queryKey: ["userResults", selectedAnalysis?.value],
     queryFn: async () => {
       if (!selectedAnalysis) return { results: [], labels: {} };
 
-      const data = await fetchResults(selectedAnalysis.value);
-
-      console.log("📌 Данные после fetchResults:", data);
-
-      return data; // Убедись, что data содержит labels
+      try {
+        return await fetchResults(selectedAnalysis.value);
+      } catch (err: any) {
+        if (err.response && err.response.status === 404) {
+          return { results: [], labels: {}, notFound: true }; // Флаг, что данных нет
+        }
+        throw err; // Прокидываем другие ошибки
+      }
     },
     enabled: !!selectedAnalysis,
   });
 
-  // Разбираем данные из API
   const results = apiData?.results || [];
-  const labels = apiData?.labels || {};
+  const [labels, setLabels] = useState<Record<string, string>>({});
+  const [visibleKeys, setVisibleKeys] = useState<string[]>([]);
 
-  console.log("ЫАУКЦГЗПАИУЦШГКПШГ", results, labels);
-
-  if (loadingAnalyses) return <p>Загрузка списка анализов...</p>;
-
-  // Если анализ выбран, выводим список ключей показателей (кроме даты)
+  // Все ключи (кроме даты)
   const numericKeys =
-    results && results.length > 0
+    results.length > 0
       ? Object.keys(results[0]).filter((key) => key !== "analyze_date")
       : [];
+
+  // Обновляем метрики и лейблы при смене анализа, но сохраняем выбранные пользователем данные
+  useEffect(() => {
+    if (apiData?.labels) {
+      setLabels(apiData.labels);
+    }
+    if (numericKeys.length > 0) {
+      setVisibleKeys((prevKeys) =>
+        prevKeys.length === 0
+          ? numericKeys
+          : prevKeys.filter((k) => numericKeys.includes(k))
+      );
+    }
+  }, [apiData, numericKeys]);
+
+  // Обновление списка отображаемых ключей
+  const toggleKey = (key: string) => {
+    setVisibleKeys((prev) =>
+      prev.includes(key) ? prev.filter((k) => k !== key) : [...prev, key]
+    );
+  };
 
   return (
     <div className="container">
@@ -98,7 +111,6 @@ export default function UserDashboard() {
           options={analyses}
           value={selectedAnalysis}
           onChange={(option) => {
-            console.log("Выбран анализ:", option);
             setSelectedAnalysis(option);
           }}
           placeholder={loadingAnalyses ? "Загрузка..." : "Выберите анализ"}
@@ -111,92 +123,89 @@ export default function UserDashboard() {
         <>
           {loadingResults ? (
             <p>Загрузка результатов...</p>
+          ) : error || apiData?.notFound ? ( // <-- Добавляем проверку перед рендером
+            <p>Недостаточно данных для графика</p>
           ) : (
-            <div className="charts">
-              {/* График AreaChart */}
-              <div className="chart">
-                <h3>Динамика показателей</h3>
-                <ResponsiveContainer width="100%" height={400}>
-                  <AreaChart
-                    data={results}
-                    margin={{ top: 10, right: 30, left: 0, bottom: 0 }}
-                  >
-                    <defs>
-                      {numericKeys.map((key, index) => (
-                        <linearGradient
-                          key={key}
-                          id={`color${index}`}
-                          x1="0"
-                          y1="0"
-                          x2="0"
-                          y2="1"
-                        >
-                          <stop
-                            offset="5%"
-                            stopColor={`hsl(${index * 60}, 70%, 50%)`}
-                            stopOpacity={0.8}
-                          />
-                          <stop
-                            offset="95%"
-                            stopColor={`hsl(${index * 60}, 70%, 50%)`}
-                            stopOpacity={0}
-                          />
-                        </linearGradient>
-                      ))}
-                    </defs>
-
-                    <XAxis
-                      dataKey="analyze_date"
-                      tickFormatter={(date) =>
-                        new Date(date).toLocaleDateString()
-                      }
+            <div>
+              {/* Чекбоксы для выбора показателей */}
+              <div className="checkbox-container">
+                {numericKeys.map((key) => (
+                  <label key={key} className="checkbox-label">
+                    <input
+                      type="checkbox"
+                      checked={visibleKeys.includes(key)}
+                      onChange={() => toggleKey(key)}
                     />
-                    <YAxis />
-                    <CartesianGrid strokeDasharray="3 3" />
-                    {/* <Tooltip
-                      formatter={(value, name, entry) => {
-                        if (name === "labels") return;
-                        const label = entry.payload.labels?.[name] || name;
-                        return [`${value}`, label]; // 👈 Теперь labels корректно работает
-                      }}
-                      labelFormatter={(label) =>
-                        new Date(label).toLocaleDateString("ru-RU")
-                      } // 👈 Исправляем дату
-                    /> */}
+                    {labels[key] || key}
+                  </label>
+                ))}
+              </div>
 
-                    <Tooltip
-                      formatter={(value, name) => {
-                        return [`${value}`, labels?.[name] || name]; // <-- Теперь берет label из API
-                      }}
-                      labelFormatter={(label) =>
-                        new Date(label).toLocaleDateString("ru-RU")
-                      }
-                    />
+              {/* График */}
+              <div className="charts">
+                <div className="chart">
+                  <h3>Динамика показателей</h3>
+                  <ResponsiveContainer width="100%" height={400}>
+                    <AreaChart
+                      data={results}
+                      margin={{ top: 10, right: 30, left: 0, bottom: 0 }}
+                    >
+                      <defs>
+                        {numericKeys.map((key, index) => (
+                          <linearGradient
+                            key={key}
+                            id={`color${index}`}
+                            x1="0"
+                            y1="0"
+                            x2="0"
+                            y2="1"
+                          >
+                            <stop
+                              offset="5%"
+                              stopColor={`hsl(${index * 60}, 70%, 50%)`}
+                              stopOpacity={0.8}
+                            />
+                            <stop
+                              offset="95%"
+                              stopColor={`hsl(${index * 60}, 70%, 50%)`}
+                              stopOpacity={0}
+                            />
+                          </linearGradient>
+                        ))}
+                      </defs>
 
-                    {/* 
-                    <Legend
-                      formatter={(value) => {
-                        if (value === "labels") return; 
-                        console.log("Legend Entry:", results[0]?.labels);
-                        return results[0]?.labels?.[value] || value;
-                      }}
-                    /> */}
-                    <Legend
-                      formatter={(value) => labels?.[value] || value} // <-- Используем labels из API
-                    />
-
-                    {numericKeys.map((key, index) => (
-                      <Area
-                        key={key}
-                        type="monotone"
-                        dataKey={key}
-                        stroke={`hsl(${index * 60}, 70%, 50%)`}
-                        fillOpacity={1}
-                        fill={`url(#color${index})`}
+                      <XAxis
+                        dataKey="analyze_date"
+                        tickFormatter={(date) =>
+                          new Date(date).toLocaleDateString()
+                        }
                       />
-                    ))}
-                  </AreaChart>
-                </ResponsiveContainer>
+                      <YAxis />
+                      <CartesianGrid strokeDasharray="3 3" />
+                      <Tooltip
+                        formatter={(value, name) => [
+                          `${value}`,
+                          labels[name] || name,
+                        ]}
+                        labelFormatter={(label) =>
+                          new Date(label).toLocaleDateString("ru-RU")
+                        }
+                      />
+                      <Legend formatter={(value) => labels[value] || value} />
+
+                      {visibleKeys.map((key, index) => (
+                        <Area
+                          key={key}
+                          type="monotone"
+                          dataKey={key}
+                          stroke={`hsl(${index * 60}, 70%, 50%)`}
+                          fillOpacity={1}
+                          fill={`url(#color${index})`}
+                        />
+                      ))}
+                    </AreaChart>
+                  </ResponsiveContainer>
+                </div>
               </div>
             </div>
           )}
