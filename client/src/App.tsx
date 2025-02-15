@@ -10,6 +10,7 @@ import AssignedAnalyses from "./components/trainers/AssignedAnalyses";
 import UserAnalyses from "./components/students/UserAnalyses";
 import ProtectedRoute from "./components/ProtectedRoute"; // 🔥 Новый компонент
 import Page404 from "./components/Page404";
+import UserDashboard from "./components/students/UserDashboard";
 
 const App: React.FC = () => {
   return (
@@ -26,6 +27,7 @@ const App: React.FC = () => {
           <Route element={<ProtectedRoute allowedRoles={["student"]} />}>
             <Route path="/submit-analysis/:assignment_id" element={<SubmitAnalysis />} />
             <Route path="/my-analysis" element={<UserAnalyses />} />
+            <Route path="/dashboard" element={<UserDashboard />} />
           </Route>
 
           {/* 🔒 Маршруты только для тренеров */}

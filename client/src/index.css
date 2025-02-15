@@ -126,3 +126,7 @@ p {
 .css-19bb58m input{
   border-radius: 0px;
 }
+
+[x31] {
+  display: none !important;
+}
