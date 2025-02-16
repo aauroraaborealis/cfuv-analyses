@@ -7,7 +7,7 @@ import Select from "react-select";
 import axios from "axios";
 import "../styles/Register.css";
 import { SERVER_LINK } from "../utils/api";
-import { sudentsSchema } from "../utils/validationSchemas";
+import { studentsSchema } from "../utils/validationSchemas";
 import { fetchSports, fetchTeams } from "../utils/fetch";
 import { genders } from "../utils/interfaces";
 
@@ -78,7 +78,7 @@ const RegisterStudent: React.FC = () => {
     setValue,
     formState: { errors },
   } = useForm({
-    resolver: yupResolver(sudentsSchema),
+    resolver: yupResolver(studentsSchema),
     defaultValues: {
       email: "",
       password: "",

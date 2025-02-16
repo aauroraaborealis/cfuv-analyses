@@ -223,55 +223,6 @@ router.post("/login", async (req: Request, res: Response) => {
 });
 
 // Получение данных профиля
-// router.get("/user/profile", authMiddleware, async (req, res) => {
-//   try {
-//     if (!req.user) {
-//       return res.status(403).json({ message: "Нет доступа" });
-//     }
-
-//     let userQuery = "";
-//     let userValues = [];
-//     let userId;
-
-//     if (req.user.role === "student") {
-//       userId = req.user.student_id;
-//       if (!userId) return res.status(403).json({ message: "ID студента не найден" });
-
-//       userQuery = `
-//         SELECT student_id, first_name, middle_name, last_name, email, birth_date, gender, team_id, 'student' as role 
-//         FROM students 
-//         WHERE student_id = $1;
-//       `;
-//       userValues = [userId];
-//     } 
-//     else if (req.user.role === "trainer") {
-//       userId = req.user.trainer_id;
-//       if (!userId) return res.status(403).json({ message: "ID тренера не найден" });
-
-//       userQuery = `
-//         SELECT trainer_id, first_name, middle_name, last_name, email, gender, 'trainer' as role 
-//         FROM trainers 
-//         WHERE trainer_id = $1;
-//       `;
-//       userValues = [userId];
-//     } 
-//     else {
-//       return res.status(403).json({ message: "Неизвестный тип пользователя" });
-//     }
-
-//     const { rows } = await db.query(userQuery, userValues);
-//     if (rows.length === 0) {
-//       return res.status(404).json({ message: "Пользователь не найден" });
-//     }
-
-//     res.json({ user: rows[0] });
-//   } catch (err) {
-//     console.error("❌ Ошибка получения профиля:", err);
-//     res.status(500).json({ message: "Ошибка сервера" });
-//   }
-// });
-
-// Получение данных профиля
 router.get("/user/profile", authMiddleware, async (req, res) => {
   try {
     if (!req.user) {
@@ -334,8 +285,7 @@ router.get("/user/profile", authMiddleware, async (req, res) => {
 // Обновление данных пользователя
 router.put("/user/profile", authMiddleware, async (req, res) => {
   try {
-    const { first_name, middle_name, last_name, email, birth_date, gender, password, team_id } =
-      req.body;
+    const { first_name, middle_name, last_name, email, birth_date, gender, password, team_id, in_team } = req.body;
 
     if (!req.user) {
       return res.status(403).json({ message: "Нет доступа" });
@@ -351,11 +301,11 @@ router.put("/user/profile", authMiddleware, async (req, res) => {
 
       updateQuery = `
         UPDATE students 
-        SET first_name = $1, middle_name = $2, last_name = $3, email = $4, birth_date = $5, gender = $6, team_id = $7
-        WHERE student_id = $8
+        SET first_name = $1, middle_name = $2, last_name = $3, email = $4, birth_date = $5, gender = $6, team_id = $7, in_team = $8
+        WHERE student_id = $9
         RETURNING *;
       `;
-      updateValues = [first_name, middle_name, last_name, email, birth_date, gender, team_id, userId];
+      updateValues = [first_name, middle_name, last_name, email, birth_date, gender, team_id, in_team, userId];
     } 
     else if (req.user.role === "trainer") {
       userId = req.user.trainer_id;
@@ -393,5 +343,6 @@ router.put("/user/profile", authMiddleware, async (req, res) => {
     res.status(500).json({ message: "Ошибка сервера" });
   }
 });
+
 
 export default router;
