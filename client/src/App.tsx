@@ -38,7 +38,6 @@ const App: React.FC = () => {
             <Route path="/assign-analysis" element={<AssignAnalysis />} />
             <Route path="/assignments" element={<AssignedAnalyses />} />
             <Route path="/analysis-results" element={<DisplayAnalysis />} />
-            <Route path="/profile" element={<ProfileForm />} />
           </Route>
         </Routes>
       </div>

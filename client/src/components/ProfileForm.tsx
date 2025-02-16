@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
 import { useForm, Controller } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useQuery } from "@tanstack/react-query";
@@ -7,11 +6,19 @@ import Select from "react-select";
 import axios from "axios";
 import "../styles/Register.css";
 import { SERVER_LINK } from "../utils/api";
-import { editStudentsSchema, studentsSchema } from "../utils/validationSchemas";
+import { editStudentsSchema } from "../utils/validationSchemas";
 import { fetchSports, fetchTeams } from "../utils/fetch";
 import { genders, Option } from "../utils/interfaces";
 
+const formatDateForInput = (dateString: string) => {
+  const [day, month, year] = dateString.split('.');
+  return `${year}-${month}-${day}`;
+};
+
 const ProfileForm: React.FC = () => {
+  const [isEditing, setIsEditing] = useState(false); // ✅ Состояние режима редактирования
+  const [profileData, setProfileData] = useState<any>(null);
+
   const [newSportName, setNewSportName] = useState(""); // ✅ Состояние для нового вида спорта
   const [newTeamName, setNewTeamName] = useState(""); // ✅ Состояние для новой команды
 
@@ -93,6 +100,54 @@ const ProfileForm: React.FC = () => {
   const sport = watch("sport"); // Следим за выбранным видом спорта
   const isTeamSport = watch("isTeamSport"); // Следим за чекбоксом "Командный спорт"
 
+  const fetchProfile = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      if (!token) return;
+
+      const { data } = await axios.get(`${SERVER_LINK}/user/profile`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      console.log("🔹 Профиль пользователя:", data.user);
+      setProfileData(data.user);
+
+      // ✅ Устанавливаем данные профиля в форму
+      setValue("email", data.user.email);
+      setValue("first_name", data.user.first_name);
+      setValue("middle_name", data.user.middle_name);
+      setValue("last_name", data.user.last_name);
+      // setValue("birth_date", data.user.birth_date);
+      setValue("birth_date", formatDateForInput(data.user.birth_date));
+
+
+
+
+      // setValue("password", ""); // Пароль не заполняем, но можно ввести новый
+
+      // ✅ Устанавливаем пол
+      const genderOption = genders.find((g) => g.value === data.user.gender);
+      if (genderOption) setValue("gender", genderOption);
+
+      // ✅ Ищем вид спорта в загруженных данных
+      const userSport =
+        sports.find((s: Option) => s.value === data.user.sport_id) || null;
+      setValue("sport", userSport);
+
+      // ✅ Если спорт командный — загружаем команды
+      if (userSport) {
+        const teamsRes = await fetchTeams(userSport.value);
+        setValue(
+          "team",
+          teamsRes.find((t: Option) => t.value === data.user.team_id) || null
+        );
+        setValue("isTeamSport", !!data.user.team_id);
+      }
+    } catch (err) {
+      console.error("❌ Ошибка загрузки профиля", err);
+    }
+  };
+
   // 🔥 Используем React Query для видов спорта
   const {
     data: sports = [],
@@ -120,47 +175,7 @@ const ProfileForm: React.FC = () => {
   });
 
   useEffect(() => {
-    const fetchProfile = async () => {
-      try {
-        const token = localStorage.getItem("token");
-        if (!token) return;
 
-        const { data } = await axios.get(`${SERVER_LINK}/user/profile`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-
-        console.log("🔹 Профиль пользователя:", data.user);
-
-        // ✅ Устанавливаем данные профиля в форму
-        setValue("email", data.user.email);
-        setValue("first_name", data.user.first_name);
-        setValue("middle_name", data.user.middle_name);
-        setValue("last_name", data.user.last_name);
-        setValue("birth_date", data.user.birth_date.split("T")[0]);
-        // setValue("password", ""); // Пароль не заполняем, но можно ввести новый
-
-        // ✅ Устанавливаем пол
-        const genderOption = genders.find((g) => g.value === data.user.gender);
-        if (genderOption) setValue("gender", genderOption);
-
-        // ✅ Ищем вид спорта в загруженных данных
-        const userSport =
-          sports.find((s: Option) => s.value === data.user.sport_id) || null;
-        setValue("sport", userSport);
-
-        // ✅ Если спорт командный — загружаем команды
-        if (userSport) {
-          const teamsRes = await fetchTeams(userSport.value);
-          setValue(
-            "team",
-            teamsRes.find((t: Option) => t.value === data.user.team_id) || null
-          );
-          setValue("isTeamSport", !!data.user.team_id);
-        }
-      } catch (err) {
-        console.error("❌ Ошибка загрузки профиля", err);
-      }
-    };
 
     fetchProfile();
   }, [setValue, sports]); // ✅ sports теперь в зависимостях
@@ -192,6 +207,9 @@ const ProfileForm: React.FC = () => {
       );
   
       console.log("✅ Сервер ответил:", response.data);
+      setIsEditing(false); // ✅ После успешного обновления возвращаем в режим просмотра
+      await fetchProfile(); // 🔄 Обновляем данные профиля
+
       alert("Профиль обновлён!");
     } catch (error: any) {
       console.error("❌ Ошибка запроса:", error);
@@ -200,125 +218,130 @@ const ProfileForm: React.FC = () => {
   };
   
   
-
   return (
-    <div className="register-form">
-      <form
-        onSubmit={handleSubmit((data) => {
-          console.log("Форма отправлена:", data);
-          console.log("Ошибки валидации:", errors);
-          onSubmit(data);
-        })}
-        className="reg-form"
-      >
-        {/* Email и пароль */}
-        <div className="column">
-          <label>Email:</label>
-          <input {...register("email")} className="input-react" />
-          <p className="error-form">{errors.email?.message}</p>
+    <div className="profile-container">
+      {!isEditing ? (
+        // 📌 Режим ПРОСМОТРА
+        <div className="profile-view">
+          {profileData ? (
+            <>
+              <h2>Профиль</h2>
+              <p><strong>Email:</strong> {profileData.email}</p>
+              <p><strong>Имя:</strong> {profileData.first_name}</p>
+              <p><strong>Отчество:</strong> {profileData.middle_name}</p>
+              <p><strong>Фамилия:</strong> {profileData.last_name}</p>
+              <p><strong>Дата рождения:</strong> {profileData.birth_date.split("T")[0]}</p>
+              <p><strong>Пол:</strong> {profileData.gender === "M" ? "Мужской" : "Женский"}</p>
+              <p><strong>Вид спорта:</strong> {profileData.sport_name || "Не указан"}</p>
+              <p><strong>Команда:</strong> {profileData.team_name || "Нет"}</p>
+              <button onClick={() => setIsEditing(true)} className="edit-button">Редактировать</button>
+            </>
+          ) : (
+            <p>Загрузка профиля...</p>
+          )}
         </div>
-        {/* <div className="column">
-          <label>Пароль:</label>
-          <input
-            type="password"
-            {...register("password")}
-            className="input-react"
-          />
-          <p className="error-form">{errors.password?.message}</p>
-        </div> */}
-
-        {/* Личная информация */}
-        <div className="column">
-          <label>Имя:</label>
-          <input {...register("first_name")} className="input-react" />
-          <p className="error-form">{errors.first_name?.message}</p>
-        </div>
-        <div className="column">
-          <label>Отчество:</label>
-          <input {...register("middle_name")} className="input-react" />
-        </div>
-        <div className="column">
-          <label>Фамилия:</label>
-          <input {...register("last_name")} className="input-react" />
-          <p className="error-form">{errors.last_name?.message}</p>
-        </div>
-        <div className="column">
-          <label>Дата рождения:</label>
-          <input
-            type="date"
-            {...register("birth_date")}
-            className="input-react"
-          />
-          <p className="error-form">{errors.birth_date?.message}</p>
-        </div>
-
-        {/* Пол */}
-        <div className="column">
-          <label>Пол:</label>
-          <Controller
-            name="gender"
-            control={control}
-            render={({ field }) => (
-              <Select {...field} options={genders} placeholder="Выберите пол" />
-            )}
-          />
-          <p className="error-form">{errors.gender?.message}</p>
-        </div>
-
-        <div className="column">
-          <label>Вид спорта:</label>
-          <Controller
-            name="sport"
-            control={control}
-            render={({ field }) => (
-              <Select
-                {...field}
-                options={sports}
-                isLoading={loadingSports}
-                placeholder="Выберите вид спорта"
-                onChange={(selectedOption) => {
-                  field.onChange(selectedOption);
-                  setValue("isTeamSport", false); // Сбрасываем командный спорт
-                  setValue("team", null); // Сбрасываем команду
-                }}
-                isClearable
-                isSearchable
-                noOptionsMessage={() => (
-                  <div className="no-options-message">
-                    <span>Такого вида спорта нет в списках</span>
-                    <button
-                      type="button"
-                      className="create-btn"
-                      onClick={handleAddNewSport}
-                    >
-                      Добавить вид спорта "
-                      {newSportName.trim() &&
-                        newSportName.charAt(0).toUpperCase() +
-                          newSportName.slice(1)}
-                      "
-                    </button>
-                  </div>
+      ) : (
+        // 📌 Режим РЕДАКТИРОВАНИЯ
+        <div className="register-form">
+          <form
+            onSubmit={handleSubmit((data) => {
+              console.log("Форма отправлена:", data);
+              console.log("Ошибки валидации:", errors);
+              onSubmit(data);
+            })}
+            className="reg-form"
+          >
+            {/* Email */}
+            <div className="column">
+              <label>Email:</label>
+              <input {...register("email")} className="input-react" />
+              <p className="error-form">{errors.email?.message}</p>
+            </div>
+  
+            {/* Личная информация */}
+            <div className="column">
+              <label>Имя:</label>
+              <input {...register("first_name")} className="input-react" />
+              <p className="error-form">{errors.first_name?.message}</p>
+            </div>
+            <div className="column">
+              <label>Отчество:</label>
+              <input {...register("middle_name")} className="input-react" />
+            </div>
+            <div className="column">
+              <label>Фамилия:</label>
+              <input {...register("last_name")} className="input-react" />
+              <p className="error-form">{errors.last_name?.message}</p>
+            </div>
+            <div className="column">
+              <label>Дата рождения:</label>
+              <input type="date" {...register("birth_date")} className="input-react" />
+              <p className="error-form">{errors.birth_date?.message}</p>
+            </div>
+  
+            {/* Пол */}
+            <div className="column">
+              <label>Пол:</label>
+              <Controller
+                name="gender"
+                control={control}
+                render={({ field }) => (
+                  <Select {...field} options={genders} placeholder="Выберите пол" />
                 )}
-                onInputChange={(value) => setNewSportName(value)}
               />
-            )}
-          />
-        </div>
-
-        <div className="column">
-          <label className="team-checkbox">
-            <input
-              type="checkbox"
-              {...register("isTeamSport")}
-              onChange={(e) => setValue("isTeamSport", e.target.checked)}
-            />
-            Командный спорт
-          </label>
-        </div>
-
-        {sport && (
-          <>
-            {isTeamSport && (
+              <p className="error-form">{errors.gender?.message}</p>
+            </div>
+  
+            {/* Вид спорта */}
+            <div className="column">
+              <label>Вид спорта:</label>
+              <Controller
+                name="sport"
+                control={control}
+                render={({ field }) => (
+                  <Select
+                    {...field}
+                    options={sports}
+                    isLoading={loadingSports}
+                    placeholder="Выберите вид спорта"
+                    onChange={(selectedOption) => {
+                      field.onChange(selectedOption);
+                      setValue("isTeamSport", false);
+                      setValue("team", null);
+                    }}
+                    isClearable
+                    isSearchable
+                    noOptionsMessage={() => (
+                      <div className="no-options-message">
+                        <span>Такого вида спорта нет в списках</span>
+                        <button type="button" className="create-btn" onClick={handleAddNewSport}>
+                          Добавить вид спорта "
+                          {newSportName.trim() &&
+                            newSportName.charAt(0).toUpperCase() + newSportName.slice(1)}
+                          "
+                        </button>
+                      </div>
+                    )}
+                    onInputChange={(value) => setNewSportName(value)}
+                  />
+                )}
+              />
+            </div>
+  
+            {/* Чекбокс "Командный спорт" */}
+            <div className="column">
+              <label className="team-checkbox">
+                <input
+                  type="checkbox"
+                  {...register("isTeamSport")}
+                  onChange={(e) => setValue("isTeamSport", e.target.checked)}
+                />
+                Командный спорт
+              </label>
+            </div>
+  
+            {/* Команда */}
+            {sport && isTeamSport && (
               <div className="column">
                 <label>Команда:</label>
                 <Controller
@@ -335,15 +358,10 @@ const ProfileForm: React.FC = () => {
                       noOptionsMessage={() => (
                         <div className="no-options-message">
                           <span>Такой команды нет в списках</span>
-                          <button
-                            type="button"
-                            className="create-btn"
-                            onClick={handleAddNewTeam}
-                          >
+                          <button type="button" className="create-btn" onClick={handleAddNewTeam}>
                             Создать команду "
                             {newTeamName.trim() &&
-                              newTeamName.charAt(0).toUpperCase() +
-                                newTeamName.slice(1)}
+                              newTeamName.charAt(0).toUpperCase() + newTeamName.slice(1)}
                             "
                           </button>
                         </div>
@@ -354,13 +372,15 @@ const ProfileForm: React.FC = () => {
                 />
               </div>
             )}
-          </>
-        )}
-
-        <button type="submit" className="submit-button">
-          Редактировать
-        </button>
-      </form>
+  
+            {/* Кнопки "Сохранить" и "Отменить" */}
+            <button type="submit" className="submit-button">Сохранить</button>
+            <button type="button" onClick={() => setIsEditing(false)} className="cancel-button">
+              Отменить
+            </button>
+          </form>
+        </div>
+      )}
     </div>
   );
 };

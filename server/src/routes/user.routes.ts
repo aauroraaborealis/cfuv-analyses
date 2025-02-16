@@ -273,7 +273,21 @@ router.get("/user/profile", authMiddleware, async (req, res) => {
       return res.status(404).json({ message: "Пользователь не найден" });
     }
 
-    res.json({ user: rows[0] });
+    const user = rows[0];
+
+    // ❗ Исправляем баг с датой
+    const fixedUser = {
+      ...user,
+      birth_date: new Date(user.birth_date).toLocaleDateString("ru-RU", {
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit",
+      })
+    };
+
+    res.json({ user: fixedUser });
+
+    console.log(fixedUser);
   } catch (err) {
     console.error("❌ Ошибка получения профиля:", err);
     res.status(500).json({ message: "Ошибка сервера" });
@@ -337,7 +351,18 @@ router.put("/user/profile", authMiddleware, async (req, res) => {
       await db.query(passwordQuery, [hashedPassword, userId]);
     }
 
-    res.json({ message: "Данные успешно обновлены", user: updatedUser });
+    const fixedUser = {
+      ...updatedUser,
+      birth_date: new Date(updatedUser.birth_date).toLocaleDateString("ru-RU", {
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit",
+      })
+    };
+
+    console.log({ fixedUser });
+
+    res.json({ message: "Данные успешно обновлены", user: fixedUser });
   } catch (err) {
     console.error("❌ Ошибка обновления профиля:", err);
     res.status(500).json({ message: "Ошибка сервера" });
