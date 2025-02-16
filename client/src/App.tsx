@@ -11,6 +11,7 @@ import UserAnalyses from "./components/students/UserAnalyses";
 import ProtectedRoute from "./components/ProtectedRoute"; // 🔥 Новый компонент
 import Page404 from "./components/Page404";
 import UserDashboard from "./components/students/UserDashboard";
+import ProfileForm from "./components/ProfileForm";
 
 const App: React.FC = () => {
   return (
@@ -28,6 +29,8 @@ const App: React.FC = () => {
             <Route path="/submit-analysis/:assignment_id" element={<SubmitAnalysis />} />
             <Route path="/my-analysis" element={<UserAnalyses />} />
             <Route path="/dashboard" element={<UserDashboard />} />
+            <Route path="/profile" element={<ProfileForm />} />
+
           </Route>
 
           {/* 🔒 Маршруты только для тренеров */}
@@ -35,6 +38,7 @@ const App: React.FC = () => {
             <Route path="/assign-analysis" element={<AssignAnalysis />} />
             <Route path="/assignments" element={<AssignedAnalyses />} />
             <Route path="/analysis-results" element={<DisplayAnalysis />} />
+            <Route path="/profile" element={<ProfileForm />} />
           </Route>
         </Routes>
       </div>

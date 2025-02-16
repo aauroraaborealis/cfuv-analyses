@@ -8,33 +8,9 @@ import axios from "axios";
 import "../styles/Register.css";
 import { SERVER_LINK } from "../utils/api";
 import { sudentsSchema } from "../utils/validationSchemas";
+import { fetchSports, fetchTeams } from "../utils/fetch";
+import { genders } from "../utils/interfaces";
 
-// Опции для выбора пола
-const genders = [
-  { value: "M", label: "Мужской" },
-  { value: "F", label: "Женский" },
-];
-
-
-// Функция получения видов спорта
-const fetchSports = async () => {
-  const { data } = await axios.get(`${SERVER_LINK}/sport/list`);
-  return data.map((sport: any) => ({
-    value: sport.sport_id,
-    label: sport.sport_name,
-  }));
-};
-
-// Функция получения команд по ID вида спорта
-const fetchTeams = async (sportId: string) => {
-  const { data } = await axios.get(
-    `${SERVER_LINK}/team/list?sport_id=${sportId}`
-  );
-  return data.map((team: any) => ({
-    value: team.team_id,
-    label: team.team_name,
-  }));
-};
 
 const RegisterStudent: React.FC = () => {
   const navigate = useNavigate();

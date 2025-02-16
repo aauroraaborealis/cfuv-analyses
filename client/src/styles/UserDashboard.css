@@ -3,3 +3,29 @@
     gap: 5px;
     margin-top: 10px;
 }
+
+ .pie-cont{
+    display: flex;
+    border: var(--green-main) 1px solid;
+    border-radius: 20px;
+} 
+
+/* .progress-container h3{
+    height: fit-content;
+}  */
+
+.chart-wrapper{
+    max-width: 20vw;
+    margin: 0;
+    padding: 0;
+} 
+
+.pie-cont ul{
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.pending-analyses{
+    align-self: center;
+}

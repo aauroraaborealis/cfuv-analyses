@@ -6,12 +6,8 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import Select from "react-select";
 import axios from "axios";
 import { SERVER_LINK } from "../utils/api";
+import { genders } from "../utils/interfaces";
 
-// Поля для тренера
-const genders = [
-  { value: "M", label: "Мужской" },
-  { value: "F", label: "Женский" },
-];
 
 // ✅ Схема валидации для тренеров
 const schema = yup.object().shape({

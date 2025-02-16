@@ -14,15 +14,9 @@ import {
 import Select from "react-select";
 import "../../styles/UserDashboard.css";
 import { SERVER_LINK } from "../../utils/api";
+import ProgressPieChart from "./ProgressPieChart";
+import { fetchAnalyzes } from "../../utils/fetch";
 
-// Функция получения анализов
-const fetchAnalyzes = async () => {
-  const { data } = await axios.get(`${SERVER_LINK}/analysis`);
-  return data.map((analyze: any) => ({
-    value: analyze.analyze_id,
-    label: analyze.analyze_name,
-  }));
-};
 
 // Функция получения результатов по анализу
 const fetchResults = async (analysisId: string) => {
@@ -103,6 +97,8 @@ export default function UserDashboard() {
   return (
     <div className="container">
       <h2>Дашборд пользователя</h2>
+
+      {/* <ProgressPieChart /> */}
 
       {/* Селект для выбора анализа */}
       <div className="filters">
