@@ -78,15 +78,25 @@ const Header: React.FC = () => {
         ) : (
           // Для студентов
           <>
-            <Link
-              className="hoverline"
-              to="/dashboard"
-            >
+            <Link className="hoverline" to="/dashboard">
               Cтатистика
             </Link>
-            <Link className="hoverline" to="/my-analysis" style={{ marginLeft: "20px" }}>
-              Мои анализы
+            <Link
+              className="hoverline"
+              to="/my-analysis"
+              style={{ marginLeft: "20px" }}
+            >
+              Анализы
             </Link>
+
+            <Link
+              className="hoverline"
+              to="/profile"
+              style={{ marginLeft: "20px" }}
+            >
+              Профиль
+            </Link>
+
             <button className="logout-btn hoverline" onClick={handleLogout}>
               Выйти
             </button>

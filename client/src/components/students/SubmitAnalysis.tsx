@@ -5,6 +5,7 @@ import { useMutation } from "@tanstack/react-query";
 import "../../styles/AnalysisForm.css";
 import { SERVER_LINK } from "../../utils/api";
 import axios from "axios";
+import SuccessModal from "../shared/SuccessModal"; // ✅ Импортируем модалку
 
 interface FormData {
   [key: string]: string;
@@ -17,6 +18,7 @@ const SubmitAnalysis: React.FC = () => {
   const { analyze_name } = location.state || {};
   const [formData, setFormData] = useState<FormData>({});
   const [error, setError] = useState<string | null>(null);
+  const [showModal, setShowModal] = useState<boolean>(false); // ✅ Добавляем состояние модалки
 
   const handleInputChange = (field: string, value: string) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
@@ -55,14 +57,17 @@ const SubmitAnalysis: React.FC = () => {
       return response.data;
     },
     onSuccess: () => {
-      alert("Анализ успешно отправлен");
-      navigate("/my-analysis");
+      setShowModal(true);
+
+      setTimeout(() => {
+        setShowModal(false); // ✅ Авто-скрытие через 3 секунды
+        navigate("/my-analysis"); // ✅ Переход после закрытия модалки
+      }, 3000);
     },
     onError: (err: any) => {
       setError(err.response?.data?.message || err.message || "Неизвестная ошибка");
     },
   });
-
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -99,6 +104,17 @@ const SubmitAnalysis: React.FC = () => {
           {mutation.isPending ? "Отправка..." : "Отправить"}
         </button>
       </form>
+
+      {/* ✅ Показываем модалку при успешной отправке */}
+      {showModal && (
+        <SuccessModal
+          message="Анализ успешно отправлен!"
+          onClose={() => {
+            setShowModal(false);
+            navigate("/my-analysis"); // ✅ Перенаправление после закрытия вручную
+          }}
+        />
+      )}
     </div>
   );
 };

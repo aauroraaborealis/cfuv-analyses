@@ -10,6 +10,8 @@ import {
   Tooltip,
   Legend,
   ResponsiveContainer,
+  Line,
+  LineChart,
 } from "recharts";
 import Select from "react-select";
 import "../../styles/UserDashboard.css";
@@ -17,6 +19,13 @@ import { SERVER_LINK } from "../../utils/api";
 import ProgressPieChart from "./ProgressPieChart";
 import { fetchAnalyzes } from "../../utils/fetch";
 
+// const colors = ["#606C38", "#BC6C25", "#81667A", "#94D1BE", "#BBACC1", "#6f1d1b", "#edafb8", "#f4a261", "#e09f3e", "#0fa3b1"];
+
+// const colors = ["#532A09", "#784618", "#915C27", "#AD8042", "#BFAB67", "#BFC882", "#A4B75C", "#647332", "#3E4C22", "#2E401C"];
+
+// const colors = ["#54478C", "#2C699A", "#0488A8", "#0DB39E", "#16DB93", "#83E377", "#B9E769", "#EFEA5A", "#F1C453", "#F29E4C"];
+
+const colors = ["#42552c", "#606c38","#532A09", "#784618", "#915C27", "#AD8042", "#BFAB67", "#BFC882", "#A4B75C", "#647332", "#3E4C22", "#2E401C", "#264653", "#287271", "#2A9D8F", "#8AB17D", "#BAB874", "#E9C46A", "#EFB366", "#F4A261", "#EE8959", "#E76F51"];
 
 // Функция получения результатов по анализу
 const fetchResults = async (analysisId: string) => {
@@ -120,7 +129,7 @@ export default function UserDashboard() {
           {loadingResults ? (
             <p>Загрузка результатов...</p>
           ) : error || apiData?.notFound ? ( // <-- Добавляем проверку перед рендером
-            <p>Недостаточно данных для графика</p>
+            <p className="no-data">Недостаточно данных для графика</p>
           ) : (
             <div>
               {/* Чекбоксы для выбора показателей */}
@@ -141,66 +150,44 @@ export default function UserDashboard() {
               <div className="charts">
                 <div className="chart">
                   <h3>Динамика показателей</h3>
-                  <ResponsiveContainer width="100%" height={400}>
-                    <AreaChart
-                      data={results}
-                      margin={{ top: 10, right: 30, left: 0, bottom: 0 }}
-                    >
-                      <defs>
-                        {numericKeys.map((key, index) => (
-                          <linearGradient
-                            key={key}
-                            id={`color${index}`}
-                            x1="0"
-                            y1="0"
-                            x2="0"
-                            y2="1"
-                          >
-                            <stop
-                              offset="5%"
-                              stopColor={`hsl(${index * 60}, 70%, 50%)`}
-                              stopOpacity={0.8}
-                            />
-                            <stop
-                              offset="95%"
-                              stopColor={`hsl(${index * 60}, 70%, 50%)`}
-                              stopOpacity={0}
-                            />
-                          </linearGradient>
-                        ))}
-                      </defs>
 
-                      <XAxis
-                        dataKey="analyze_date"
-                        tickFormatter={(date) =>
-                          new Date(date).toLocaleDateString()
-                        }
-                      />
-                      <YAxis />
-                      <CartesianGrid strokeDasharray="3 3" />
-                      <Tooltip
-                        formatter={(value, name) => [
-                          `${value}`,
-                          labels[name] || name,
-                        ]}
-                        labelFormatter={(label) =>
-                          new Date(label).toLocaleDateString("ru-RU")
-                        }
-                      />
-                      <Legend formatter={(value) => labels[value] || value} />
+<ResponsiveContainer width="100%" height={400}>
+  <LineChart
+    data={results}
+    margin={{ top: 10, right: 30, left: 0, bottom: 0 }}
+  >
+    <XAxis
+      dataKey="analyze_date"
+      tickFormatter={(date) =>
+        new Date(date).toLocaleDateString()
+      }
+    />
+    <YAxis />
+    <CartesianGrid strokeDasharray="3 3" />
+    <Tooltip
+      formatter={(value, name) => [
+        `${value}`,
+        labels[name] || name,
+      ]}
+      labelFormatter={(label) =>
+        new Date(label).toLocaleDateString("ru-RU")
+      }
+    />
+    <Legend formatter={(value) => labels[value] || value} />
 
-                      {visibleKeys.map((key, index) => (
-                        <Area
-                          key={key}
-                          type="monotone"
-                          dataKey={key}
-                          stroke={`hsl(${index * 60}, 70%, 50%)`}
-                          fillOpacity={1}
-                          fill={`url(#color${index})`}
-                        />
-                      ))}
-                    </AreaChart>
-                  </ResponsiveContainer>
+    {visibleKeys.map((key, index) => (
+      <Line
+        key={key}
+        type="monotone"
+        dataKey={key}
+        stroke={colors[index % colors.length]} // ✅ Используем цвета из палитры
+        strokeWidth={2}
+        dot={{ r: 3 }}
+      />
+    ))}
+  </LineChart>
+</ResponsiveContainer>
+
                 </div>
               </div>
             </div>

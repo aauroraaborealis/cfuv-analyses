@@ -1,14 +1,14 @@
 import { useState } from "react";
-import {
-  useQuery,
-  useMutation,
-} from "@tanstack/react-query";
+import { useQuery, useMutation } from "@tanstack/react-query";
 import axios from "axios";
 import Select from "react-select";
+import { toast } from "react-toastify"; // ✅ Импортируем toast
+import "react-toastify/dist/ReactToastify.css"; // ✅ Подключаем стили
 import "../../styles/AssignAnalysis.css";
 import { SERVER_LINK } from "../../utils/api";
 import { Option } from "../../utils/interfaces.js";
 import { fetchAnalyzes, fetchSports, fetchStudents, fetchTeams } from "../../utils/fetch";
+import SuccessModal from "../shared/SuccessModal"; // ✅ Импортируем нашу модалку
 
 const AssignAnalysis: React.FC = () => {
   const [assignTo, setAssignTo] = useState<"team" | "student">("team");
@@ -17,8 +17,8 @@ const AssignAnalysis: React.FC = () => {
   const [selectedTeam, setSelectedTeam] = useState<Option | null>(null);
   const [selectedStudent, setSelectedStudent] = useState<Option | null>(null);
   const [dueDate, setDueDate] = useState("");
+  const [showModal, setShowModal] = useState(false); // ✅ Состояние для модалки
 
-  // Запросы через `useQuery`
   const { data: analyzes = [], isLoading: loadingAnalyzes } = useQuery({
     queryKey: ["analyzes"],
     queryFn: fetchAnalyzes,
@@ -44,35 +44,33 @@ const AssignAnalysis: React.FC = () => {
   // 🚀 Мутация для назначения анализа
   const assignMutation = useMutation({
     mutationFn: async (assignment: any) => {
-      const token = localStorage.getItem("token"); // Получаем токен из localStorage
-      if (!token) {
-        alert("Ошибка: Токен не найден, авторизуйтесь заново.");
-        return;
-      }
-  
+      const token = localStorage.getItem("token");
+      if (!token) throw new Error("Нет токена авторизации");
+
       const response = await axios.post(
         `${SERVER_LINK}/analysis/assign`,
         assignment,
         {
           headers: {
-            Authorization: `Bearer ${token}`, // 🔥 Передаем токен в заголовке
+            Authorization: `Bearer ${token}`,
             "Content-Type": "application/json",
           },
         }
       );
-  
+
       return response.data;
     },
     onSuccess: () => {
-      alert("Анализ успешно назначен");
+      setShowModal(true); // ✅ Показываем модалку при успешном назначении
+
+      setTimeout(() => {
+        setShowModal(false); // ✅ Авто-закрытие модалки через 3 сек
+      }, 3000);
     },
     onError: (error: any) => {
-      alert(
-        `Ошибка назначения анализа: ${error.response?.data?.message || error.message}`
-      );
+      toast.error(`Ошибка: ${error.response?.data?.message || error.message}`); // ✅ Показать тост-уведомление об ошибке
     },
   });
-  
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -84,7 +82,7 @@ const AssignAnalysis: React.FC = () => {
       (assignTo === "student" && !selectedStudent) ||
       (assignTo === "team" && !selectedTeam)
     ) {
-      alert("Заполните все поля!");
+      toast.warn("Заполните все поля!"); // ✅ Тост-уведомление, если не все поля заполнены
       return;
     }
 
@@ -170,9 +168,7 @@ const AssignAnalysis: React.FC = () => {
               options={students}
               value={selectedStudent}
               onChange={setSelectedStudent}
-              placeholder={
-                loadingStudents ? "Загрузка..." : "Выберите студента"
-              }
+              placeholder={loadingStudents ? "Загрузка..." : "Выберите студента"}
               isClearable
               isSearchable
             />
@@ -188,13 +184,18 @@ const AssignAnalysis: React.FC = () => {
             className="input-react"
           />
         </div>
-        <button
-          type="submit"
-          disabled={assignMutation.isPending}
-        >
-          {assignMutation.isPending ? "Назначение..." : "Назначить анализ"}{" "}
+        <button type="submit" disabled={assignMutation.isPending}>
+          {assignMutation.isPending ? "Назначение..." : "Назначить анализ"}
         </button>
       </form>
+
+      {/* ✅ Модалка при успешном назначении */}
+      {showModal && (
+        <SuccessModal
+          message="Анализ успешно назначен!"
+          onClose={() => setShowModal(false)}
+        />
+      )}
     </div>
   );
 };

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useForm, Controller } from "react-hook-form";
 import * as yup from "yup";
@@ -7,12 +7,16 @@ import Select from "react-select";
 import axios from "axios";
 import { SERVER_LINK } from "../utils/api";
 import { genders } from "../utils/interfaces";
-
+import { toast, ToastContainer } from "react-toastify";
+import SuccessModal from "./shared/SuccessModal";
 
 // ✅ Схема валидации для тренеров
 const schema = yup.object().shape({
   email: yup.string().email("Некорректный email").required("Введите email"),
-  password: yup.string().min(6, "Минимум 6 символов").required("Введите пароль"),
+  password: yup
+    .string()
+    .min(6, "Минимум 6 символов")
+    .required("Введите пароль"),
   first_name: yup.string().required("Введите имя"),
   middle_name: yup.string().nullable(),
   last_name: yup.string().required("Введите фамилию"),
@@ -38,6 +42,8 @@ const RegisterTrainer: React.FC = () => {
     },
   });
 
+  const [showModal, setShowModal] = useState(false); // ✅ Состояние для модалки
+
   const onSubmit = async (data: any) => {
     try {
       const response = await axios.post(`${SERVER_LINK}/register-trainers`, {
@@ -48,61 +54,92 @@ const RegisterTrainer: React.FC = () => {
       console.log(response);
 
       localStorage.setItem("token", response.data.token);
-      alert("Регистрация тренера успешна!");
-      navigate("/analysis-results");
+
+      setShowModal(true);
+
+      setTimeout(() => {
+        setShowModal(false); // ✅ Авто-скрытие через 3 секунды
+        navigate("/analysis-results");
+      }, 3000);
     } catch (error: any) {
-      alert(error.response?.data?.message || "Ошибка регистрации тренера");
+      toast.error(
+        error.response?.data?.message || "Ошибка регистрации тренера"
+      );
     }
   };
 
   return (
     <div className="register-form">
-    <form onSubmit={handleSubmit(onSubmit)} className="reg-form">
-      <div className="column">
-        <label>Email:</label>
-        <input {...register("email")} className="input-react" />
-        <p className="error-form">{errors.email?.message}</p>
-      </div>
+      <form onSubmit={handleSubmit(onSubmit)} className="reg-form">
+        <div className="column">
+          <label>Email:</label>
+          <input {...register("email")} className="input-react" />
+          <p className="error-form">{errors.email?.message}</p>
+        </div>
 
-      <div className="column">
-        <label>Пароль:</label>
-        <input type="password" {...register("password")} className="input-react" />
-        <p className="error-form">{errors.password?.message}</p>
-      </div>
+        <div className="column">
+          <label>Пароль:</label>
+          <input
+            type="password"
+            {...register("password")}
+            className="input-react"
+          />
+          <p className="error-form">{errors.password?.message}</p>
+        </div>
 
-      <div className="column">
-        <label>Фамилия:</label>
-        <input {...register("last_name")} className="input-react" />
-        <p className="error-form">{errors.last_name?.message}</p>
-      </div>
+        <div className="column">
+          <label>Фамилия:</label>
+          <input {...register("last_name")} className="input-react" />
+          <p className="error-form">{errors.last_name?.message}</p>
+        </div>
 
-      <div className="column">
-        <label>Имя:</label>
-        <input {...register("first_name")} className="input-react" />
-        <p className="error-form">{errors.first_name?.message}</p>
-      </div>
+        <div className="column">
+          <label>Имя:</label>
+          <input {...register("first_name")} className="input-react" />
+          <p className="error-form">{errors.first_name?.message}</p>
+        </div>
 
-      <div className="column">
-        <label>Отчество:</label>
-        <input {...register("middle_name")} className="input-react" />
-      </div>
+        <div className="column">
+          <label>Отчество:</label>
+          <input {...register("middle_name")} className="input-react" />
+        </div>
 
-      <div className="column">
-        <label>Пол:</label>
-        <Controller
-          name="gender"
-          control={control}
-          render={({ field }) => (
-            <Select {...field} options={genders} placeholder="Выберите пол" />
-          )}
+        <div className="column">
+          <label>Пол:</label>
+          <Controller
+            name="gender"
+            control={control}
+            render={({ field }) => (
+              <Select {...field} options={genders} placeholder="Выберите пол" />
+            )}
+          />
+          <p className="error-form">{errors.gender?.message}</p>
+        </div>
+
+        <button type="submit" className="submit-button">
+          Зарегистрироваться
+        </button>
+      </form>
+
+      {showModal && (
+        <SuccessModal
+          message="Регистрация успешна!"
+          onClose={() => setShowModal(false)}
         />
-        <p className="error-form">{errors.gender?.message}</p>
-      </div>
+      )}
 
-      <button type="submit" className="submit-button">
-        Зарегистрироваться
-      </button>
-    </form>
+      <ToastContainer
+        position="top-center"
+        autoClose={5000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick={false}
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="light"
+      />
     </div>
   );
 };

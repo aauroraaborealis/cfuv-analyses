@@ -77,6 +77,8 @@ select:focus {
   --font-size-base: 16px;
   --font-size-large: 24px;
   --font-size-small: 14px;
+
+  --toastify-color-success: #42552c;
 }
 
 p {
@@ -129,4 +131,14 @@ p {
 
 [x31] {
   display: none !important;
+}
+
+.Toastify__toast {
+  font-family: "Montserrat", sans-serif !important;
+}
+
+.no-options-message{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }

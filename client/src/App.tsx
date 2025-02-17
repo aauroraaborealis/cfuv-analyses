@@ -12,6 +12,7 @@ import ProtectedRoute from "./components/ProtectedRoute"; // 🔥 Новый к�
 import Page404 from "./components/Page404";
 import UserDashboard from "./components/students/UserDashboard";
 import ProfileForm from "./components/ProfileForm";
+import SuccessModal from "./components/shared/SuccessModal";
 
 const App: React.FC = () => {
   return (

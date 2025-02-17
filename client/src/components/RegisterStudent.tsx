@@ -10,7 +10,8 @@ import { SERVER_LINK } from "../utils/api";
 import { studentsSchema } from "../utils/validationSchemas";
 import { fetchSports, fetchTeams } from "../utils/fetch";
 import { genders } from "../utils/interfaces";
-
+import { toast, ToastContainer } from "react-toastify";
+import SuccessModal from "./shared/SuccessModal";
 
 const RegisterStudent: React.FC = () => {
   const navigate = useNavigate();
@@ -18,57 +19,61 @@ const RegisterStudent: React.FC = () => {
   const [newSportName, setNewSportName] = useState(""); // ✅ Состояние для нового вида спорта
   const [newTeamName, setNewTeamName] = useState(""); // ✅ Состояние для новой команды
 
+  const [showModal, setShowModal] = useState(false); // ✅ Состояние для модалки
+
   const handleAddNewSport = async () => {
     if (!newSportName.trim()) {
-      alert("Введите название вида спорта!");
+      toast.error("Введите название вида спорта!");
       return;
     }
-  
+
     try {
       const response = await axios.post(`${SERVER_LINK}/sport/create`, {
         sport_name: newSportName.trim(),
       });
-  
+
       const result = response.data;
       const newSport = { value: result.sport_id, label: result.sport_name };
-  
+
       setValue("sport", newSport); // ✅ Устанавливаем новый вид спорта
       setNewSportName(""); // ✅ Очищаем поле ввода
       refetchSports(); // ✅ Обновляем список видов спорта
-  
-      alert("Вид спорта успешно добавлен!");
+
+      toast.success("Вид спорта успешно добавлен!");
     } catch (error: any) {
       console.error("Ошибка добавления вида спорта:", error);
-      alert(error.response?.data?.message || "Ошибка добавления вида спорта");
+      toast.error(
+        error.response?.data?.message || "Ошибка добавления вида спорта"
+      );
     }
   };
 
   const handleAddNewTeam = async () => {
     if (!newTeamName.trim() || !selectedSport) {
-      alert("Введите название команды и выберите вид спорта!");
+      toast.error("Введите название команды и выберите вид спорта!");
       return;
     }
-  
+
     try {
       const response = await axios.post(`${SERVER_LINK}/team/create`, {
         sport_id: selectedSport,
         team_name: newTeamName.trim(),
       });
-  
+
       const result = response.data;
       const newTeam = { value: result.team_id, label: result.team_name };
-  
+
       setValue("team", newTeam); // ✅ Устанавливаем новую команду
       setNewTeamName(""); // ✅ Очищаем поле ввода
       refetchTeams(); // ✅ Обновляем список команд
-  
-      alert("Команда успешно добавлена!");
+
+      toast.success("Команда успешно добавлена!");
     } catch (error: any) {
       console.error("Ошибка добавления команды:", error);
-      alert(error.response?.data?.message || "Ошибка добавления команды");
+      toast.error(error.response?.data?.message || "Ошибка добавления команды");
     }
   };
-  
+
   // 🎯 React Hook Form
   const {
     register,
@@ -97,7 +102,11 @@ const RegisterStudent: React.FC = () => {
   const isTeamSport = watch("isTeamSport"); // Следим за чекбоксом "Командный спорт"
 
   // 🔥 Используем React Query для видов спорта
-  const { data: sports = [], isLoading: loadingSports, refetch: refetchSports } = useQuery({
+  const {
+    data: sports = [],
+    isLoading: loadingSports,
+    refetch: refetchSports,
+  } = useQuery({
     queryKey: ["sports"],
     queryFn: fetchSports,
   });
@@ -105,7 +114,11 @@ const RegisterStudent: React.FC = () => {
   const selectedSport =
     sport && "value" in sport ? (sport.value as string) : null;
 
-  const { data: teams = [], isFetching: loadingTeams, refetch: refetchTeams } = useQuery({
+  const {
+    data: teams = [],
+    isFetching: loadingTeams,
+    refetch: refetchTeams,
+  } = useQuery({
     queryKey: selectedSport ? ["teams", selectedSport] : ["teams"],
     queryFn: async () => {
       if (!selectedSport) return [];
@@ -125,10 +138,16 @@ const RegisterStudent: React.FC = () => {
       });
 
       localStorage.setItem("token", response.data.token);
-      alert("Регистрация успешна!");
-      navigate("/my-analysis");
+
+      setShowModal(true);
+
+      setTimeout(() => {
+        setShowModal(false); // ✅ Авто-скрытие через 3 секунды
+        navigate("/my-analysis"); // ✅ Переход после закрытия модалки
+      }, 3000);
+
     } catch (error: any) {
-      alert(error.response?.data?.message || "Ошибка регистрации");
+      toast.error(error.response?.data?.message || "Ошибка регистрации");
     }
   };
 
@@ -223,7 +242,18 @@ const RegisterStudent: React.FC = () => {
                     </button>
                   </div>
                 )}
-                onInputChange={(value) => setNewSportName(value)}
+                // onInputChange={(value) => setNewSportName(value)}
+
+                inputValue={newSportName} // ✅ Принудительно обновляем поле
+                onInputChange={(value, { action }) => {
+                  if (action === "input-change") {
+                    const formattedValue = value
+                      .split(" ")
+                      .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+                      .join(" ");
+                      setNewSportName(formattedValue);
+                  }
+                }}
               />
             )}
           />
@@ -272,7 +302,16 @@ const RegisterStudent: React.FC = () => {
                           </button>
                         </div>
                       )}
-                      onInputChange={(value) => setNewTeamName(value)}
+                      inputValue={newTeamName} // ✅ Принудительно обновляем поле
+                      onInputChange={(value, { action }) => {
+                        if (action === "input-change") {
+                          const formattedValue = value
+                            .split(" ")
+                            .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+                            .join(" ");
+                          setNewTeamName(formattedValue);
+                        }
+                      }}
                     />
                   )}
                 />
@@ -285,6 +324,26 @@ const RegisterStudent: React.FC = () => {
           Зарегистрироваться
         </button>
       </form>
+
+      {showModal && (
+        <SuccessModal
+          message="Регистрация успешна!"
+          onClose={() => setShowModal(false)}
+        />
+      )}
+
+      <ToastContainer
+        position="top-center"
+        autoClose={5000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick={false}
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="light"
+      />
     </div>
   );
 };

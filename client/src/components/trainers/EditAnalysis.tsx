@@ -5,7 +5,14 @@ import Select from "react-select";
 import "../../styles/EditModal.css";
 import { SERVER_LINK } from "../../utils/api";
 import { Option } from "../../utils/interfaces.js";
-import { fetchAnalyzes, fetchSports, fetchStudents, fetchTeams } from "../../utils/fetch";
+import {
+  fetchAnalyzes,
+  fetchSports,
+  fetchStudents,
+  fetchTeams,
+} from "../../utils/fetch";
+import { toast, ToastContainer } from "react-toastify";
+import SuccessModal from "../shared/SuccessModal";
 
 interface EditAnalysisProps {
   assignmentId: string;
@@ -23,7 +30,7 @@ const fetchAnalysisDetails = async (assignmentId: string) => {
 const EditAnalysis: React.FC<EditAnalysisProps> = ({
   assignmentId,
   onClose,
-  onFullClose, 
+  onFullClose,
 }) => {
   const { data: initialData, isLoading: loadingInitialData } = useQuery({
     queryKey: ["analysisDetails", assignmentId],
@@ -39,6 +46,8 @@ const EditAnalysis: React.FC<EditAnalysisProps> = ({
   const [selectedTeam, setSelectedTeam] = useState<Option | null>(null);
   const [selectedStudent, setSelectedStudent] = useState<Option | null>(null);
   const [dueDate, setDueDate] = useState("");
+  const [showModal, setShowModal] = useState(false); // ✅ Состояние для модалки
+  const [modalText, setModalText] = useState(""); // ✅ Текст для модалки
 
   // Заполняем форму начальными данными
   useEffect(() => {
@@ -99,7 +108,7 @@ const EditAnalysis: React.FC<EditAnalysisProps> = ({
     mutationFn: async (assignment: any) => {
       const token = localStorage.getItem("token"); // Получаем токен из localStorage
       if (!token) {
-        alert("Ошибка: Токен не найден, авторизуйтесь заново.");
+        toast.error("Ошибка: Токен не найден, авторизуйтесь заново.");
         return;
       }
 
@@ -117,12 +126,17 @@ const EditAnalysis: React.FC<EditAnalysisProps> = ({
       return response.data;
     },
     onSuccess: () => {
-      alert("Анализ успешно обновлён!");
+      setModalText("Анализ успешно обновлён!");
+      setShowModal(true); // ✅ Показываем модалку с текстом
       queryClient.invalidateQueries({ queryKey: ["assignedAnalyses"] });
-      onFullClose(); 
+
+      setTimeout(() => {
+        setShowModal(false);
+        onFullClose();
+      }, 3000);
     },
     onError: (error: any) => {
-      alert(
+      toast.error(
         `Ошибка обновления анализа: ${error.response?.data?.message || error.message}`
       );
     },
@@ -138,12 +152,17 @@ const EditAnalysis: React.FC<EditAnalysisProps> = ({
       });
     },
     onSuccess: () => {
-      alert("Анализ успешно удалён!");
+      setModalText("Анализ успешно удалён!");
+      setShowModal(true); // ✅ Показываем модалку с текстом
       queryClient.invalidateQueries({ queryKey: ["assignedAnalyses"] });
-      onFullClose();
+
+      setTimeout(() => {
+        setShowModal(false);
+        onFullClose();
+      }, 3000);
     },
     onError: (error: any) => {
-      alert(
+      toast.error(
         `Ошибка удаления: ${error.response?.data?.message || error.message}`
       );
     },
@@ -159,7 +178,7 @@ const EditAnalysis: React.FC<EditAnalysisProps> = ({
       (assignTo === "student" && !selectedStudent) ||
       (assignTo === "team" && !selectedTeam)
     ) {
-      alert("Заполните все поля!");
+      toast.error("Заполните все поля!");
       return;
     }
 
@@ -305,6 +324,22 @@ const EditAnalysis: React.FC<EditAnalysisProps> = ({
           </form>
         )}
       </div>
+
+      {showModal && <SuccessModal message={modalText} onClose={() => setShowModal(false)} />}
+
+
+      <ToastContainer
+        position="top-center"
+        autoClose={5000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick={false}
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="light"
+      />
     </div>
   );
 };
