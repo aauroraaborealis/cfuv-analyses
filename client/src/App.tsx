@@ -1,5 +1,5 @@
 import React from "react";
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import Header from "./components/Header";
 import Login from "./components/Login";
 import Register from "./components/Register";
@@ -13,8 +13,12 @@ import Page404 from "./components/Page404";
 import UserDashboard from "./components/students/UserDashboard";
 import ProfileForm from "./components/ProfileForm";
 import SuccessModal from "./components/shared/SuccessModal";
+import useUserRole from "./components/hooks/useUserRole";
 
 const App: React.FC = () => {
+
+  const userRole = useUserRole(); // Получаем роль пользователя
+
   return (
     <Router>
       <div>
@@ -24,6 +28,22 @@ const App: React.FC = () => {
           <Route path="/register" element={<Register />} />
           <Route path="/login" element={<Login />} />
           <Route path="/not-found" element={<Page404 />} />
+
+          <Route
+            path="/"
+            element={
+              <ProtectedRoute allowedRoles={["student", "trainer"]}>
+                {userRole === "student" ? (
+                  <UserAnalyses />
+                ) : userRole === "trainer" ? (
+                  <DisplayAnalysis />
+                ) : (
+                  <Navigate to="/login" />
+                )}
+              </ProtectedRoute>
+            }
+          />
+          
 
           {/* 🔒 Маршруты только для студентов */}
           <Route element={<ProtectedRoute allowedRoles={["student"]} />}>
@@ -40,7 +60,12 @@ const App: React.FC = () => {
             <Route path="/assignments" element={<AssignedAnalyses />} />
             <Route path="/analysis-results" element={<DisplayAnalysis />} />
           </Route>
+
+          <Route path="*" element={<Page404 />} />
+
         </Routes>
+
+
       </div>
     </Router>
   );

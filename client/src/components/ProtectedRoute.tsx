@@ -1,33 +1,27 @@
 import React from "react";
 import { Navigate, Outlet } from "react-router-dom";
-import { jwtDecode } from "jwt-decode";
+import useUserRole from "./hooks/useUserRole"; // Используем хук
 
-// Интерфейс для декодированного токена
-interface DecodedToken {
-  id: string;
-  email: string;
-  name: string;
-  role: "student" | "trainer";
+interface ProtectedRouteProps {
+  allowedRoles: string[];
+  children?: React.ReactNode; // 🔥 Добавляем поддержку children
 }
 
-const ProtectedRoute: React.FC<{ allowedRoles: string[] }> = ({ allowedRoles }) => {
-  const token = localStorage.getItem("token");
+const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ allowedRoles, children }) => {
+  const userRole = useUserRole(); // Получаем роль пользователя
 
-  if (!token) {
+  if (!userRole) {
+    // Если роль не определена (токен отсутствует или невалиден), перенаправляем на /login
     return <Navigate to="/login" />;
   }
 
-  try {
-    const decoded: DecodedToken = jwtDecode(token);
-    if (!allowedRoles.includes(decoded.role)) {
-      return <Navigate to="/not-found" />;
-    }
-  } catch (error) {
-    console.error("Ошибка декодирования токена:", error);
-    return <Navigate to="/login" />;
+  if (!allowedRoles.includes(userRole)) {
+    // Если роль пользователя не входит в список разрешенных, перенаправляем на /not-found
+    return <Navigate to="/not-found" />;
   }
 
-  return <Outlet />;
+  // Если проверка прошла успешно, рендерим дочерние элементы или Outlet
+  return children ? <>{children}</> : <Outlet />;
 };
 
 export default ProtectedRoute;

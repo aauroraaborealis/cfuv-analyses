@@ -229,31 +229,9 @@ const RegisterStudent: React.FC = () => {
                 noOptionsMessage={() => (
                   <div className="no-options-message">
                     <span>Такого вида спорта нет в списках</span>
-                    <button
-                      type="button"
-                      className="create-btn"
-                      onClick={handleAddNewSport}
-                    >
-                      Добавить вид спорта "
-                      {newSportName.trim() &&
-                        newSportName.charAt(0).toUpperCase() +
-                          newSportName.slice(1)}
-                      "
-                    </button>
+
                   </div>
                 )}
-                // onInputChange={(value) => setNewSportName(value)}
-
-                inputValue={newSportName} // ✅ Принудительно обновляем поле
-                onInputChange={(value, { action }) => {
-                  if (action === "input-change") {
-                    const formattedValue = value
-                      .split(" ")
-                      .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-                      .join(" ");
-                      setNewSportName(formattedValue);
-                  }
-                }}
               />
             )}
           />
@@ -289,29 +267,8 @@ const RegisterStudent: React.FC = () => {
                       noOptionsMessage={() => (
                         <div className="no-options-message">
                           <span>Такой команды нет в списках</span>
-                          <button
-                            type="button"
-                            className="create-btn"
-                            onClick={handleAddNewTeam}
-                          >
-                            Создать команду "
-                            {newTeamName.trim() &&
-                              newTeamName.charAt(0).toUpperCase() +
-                                newTeamName.slice(1)}
-                            "
-                          </button>
                         </div>
                       )}
-                      inputValue={newTeamName} // ✅ Принудительно обновляем поле
-                      onInputChange={(value, { action }) => {
-                        if (action === "input-change") {
-                          const formattedValue = value
-                            .split(" ")
-                            .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-                            .join(" ");
-                          setNewTeamName(formattedValue);
-                        }
-                      }}
                     />
                   )}
                 />

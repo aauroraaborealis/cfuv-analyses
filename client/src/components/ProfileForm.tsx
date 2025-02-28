@@ -180,7 +180,7 @@ const ProfileForm: React.FC = () => {
 
   useEffect(() => {
     fetchProfile();
-  }, [setValue, sports]); // ✅ sports теперь в зависимостях
+  }, [setValue]); // ✅ sports теперь в зависимостях
 
   const onSubmit = async (data: any) => {
     console.log("🚀 Форма отправлена:", data);
@@ -384,8 +384,6 @@ const ProfileForm: React.FC = () => {
                           </button>
                         </div>
                       )}
-                      // onInputChange={(value) => setNewSportName(value)}
-
                       inputValue={newSportName} // ✅ Принудительно обновляем поле
                       onInputChange={(value, { action }) => {
                         if (action === "input-change") {
@@ -466,17 +464,9 @@ const ProfileForm: React.FC = () => {
                 </div>
               )}
 
-              {/* Кнопки "Сохранить" и "Отменить" */}
               <button type="submit" className="submit-button">
                 Сохранить
               </button>
-              {/* <button
-              type="button"
-              onClick={() => setIsEditing(false)}
-              className="close-button"
-            >
-              <img src="/close.svg" alt="Отменить" />
-            </button> */}
             </form>
           </div>
         </>

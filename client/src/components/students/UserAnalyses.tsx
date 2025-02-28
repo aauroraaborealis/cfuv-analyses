@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "../../styles/UserAnalyses.css";
-import { apiRequest } from "../../utils/api";
+import { apiRequest, SERVER_LINK, WS_LINK } from "../../utils/api";
 import Loading from "../Loading";
 
 interface Analysis {
@@ -66,7 +66,7 @@ const UserAnalyses: React.FC = () => {
       fetchAnalyses(token);
     }
 
-    const ws = new WebSocket("ws://localhost:8080", token);
+    const ws = new WebSocket(`${WS_LINK}`, token);
     ws.onopen = () => {
       console.log("WebSocket соединение установлено.");
     };
@@ -104,7 +104,7 @@ const UserAnalyses: React.FC = () => {
 
     try {
       const response = await fetch(
-        `http://localhost:8080/api/analysis/detailed-results`,
+        `${SERVER_LINK}/analysis/detailed-results`,
         {
           method: "POST",
           headers: {

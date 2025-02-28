@@ -5,6 +5,7 @@ import { Option } from "../../utils/interfaces.js";
 import SearchBar from "../shared/SearchBar";
 import Pagination from "../shared/Pagination";
 import RecordsPerPageSelect from "../shared/RecordsPerPageSelect";
+import { SERVER_LINK } from "../../utils/api";
 
 export default function DisplayAnalysis() {
   const [analyzes, setAnalyzes] = useState<Option[]>([]);
@@ -21,7 +22,7 @@ export default function DisplayAnalysis() {
   useEffect(() => {
     const fetchAnalyzes = async () => {
       try {
-        const response = await fetch("http://localhost:8080/api/analysis");
+        const response = await fetch(`${SERVER_LINK}/analysis`);
         const data = await response.json();
         setAnalyzes(
           data.map((analyze: any) => ({
@@ -51,7 +52,7 @@ export default function DisplayAnalysis() {
 
     try {
       const response = await fetch(
-        `http://localhost:8080/api/analysis/${selectedOption.value}`
+        `${SERVER_LINK}/analysis/${selectedOption.value}`
       );
 
       if (!response.ok) {
