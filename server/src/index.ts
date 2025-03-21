@@ -8,6 +8,7 @@ import analysisRouter from './routes/analysis.routes.js';
 import studentsRouter from './routes/students.routes.js';
 import statsRouter from './routes/stats.routes.js';
 import profileRouter from './routes/profile.routes.js';
+import assignmentRoutes from './routes/assignment.routes.js';
 import { initializeWebSocketServer } from './socketServer.js';
 import db from './db.js';
 
@@ -36,6 +37,7 @@ app.use('/api/analysis', analysisRouter);
 app.use('/api/students', studentsRouter);
 app.use('/api/stats', statsRouter);
 app.use('/api/user/profile', profileRouter);
+app.use('/api/assignment', assignmentRoutes);
 
 const server = http.createServer(app);
 

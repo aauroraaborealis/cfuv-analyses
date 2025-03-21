@@ -13,7 +13,7 @@ import Page404 from "./components/Page404";
 import UserDashboard from "./components/students/UserDashboard";
 import ProfileForm from "./components/ProfileForm";
 import SuccessModal from "./components/shared/SuccessModal";
-import useUserRole from "./components/hooks/useUserRole";
+import useUserRole from "./hooks/useUserRole";
 
 const App: React.FC = () => {
 

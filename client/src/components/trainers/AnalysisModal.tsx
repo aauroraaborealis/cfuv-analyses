@@ -11,9 +11,10 @@ interface AnalysisModalProps {
 }
 
 const fetchAnalysisDetails = async (assignmentId: string) => {
-  const { data } = await axios.get(
-    `${SERVER_LINK}/analysis/assignment/${assignmentId}`
-  );
+  const token = localStorage.getItem("token");
+  const { data } = await axios.get(`${SERVER_LINK}/assignment/${assignmentId}`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
   return data;
 };
 

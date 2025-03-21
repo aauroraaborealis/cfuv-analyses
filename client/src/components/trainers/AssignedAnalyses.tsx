@@ -19,7 +19,10 @@ interface AssignedAnalysis {
 }
 
 const fetchAssignedAnalyses = async (): Promise<AssignedAnalysis[]> => {
-  const { data } = await axios.get(`${SERVER_LINK}/analysis/assignments`);
+  const token = localStorage.getItem("token");
+  const { data } = await axios.get(`${SERVER_LINK}/assignment`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
   return data;
 };
 

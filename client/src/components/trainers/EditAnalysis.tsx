@@ -21,9 +21,10 @@ interface EditAnalysisProps {
 }
 
 const fetchAnalysisDetails = async (assignmentId: string) => {
-  const { data } = await axios.get(
-    `${SERVER_LINK}/analysis/assignment/${assignmentId}`
-  );
+  const token = localStorage.getItem("token");
+  const { data } = await axios.get(`${SERVER_LINK}/assignment/${assignmentId}`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
   return data;
 };
 
@@ -113,7 +114,7 @@ const EditAnalysis: React.FC<EditAnalysisProps> = ({
       }
 
       const response = await axios.put(
-        `${SERVER_LINK}/analysis/assignment/${assignmentId}`,
+        `${SERVER_LINK}/assignment/${assignmentId}`,
         assignment,
         {
           headers: {
@@ -147,7 +148,7 @@ const EditAnalysis: React.FC<EditAnalysisProps> = ({
       const token = localStorage.getItem("token");
       if (!token)
         throw new Error("Ошибка: Токен не найден, авторизуйтесь заново.");
-      await axios.delete(`${SERVER_LINK}/analysis/assignment/${assignmentId}`, {
+      await axios.delete(`${SERVER_LINK}/assignment/${assignmentId}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
     },

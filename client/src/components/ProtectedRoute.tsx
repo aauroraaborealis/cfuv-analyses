@@ -1,6 +1,6 @@
 import React from "react";
 import { Navigate, Outlet } from "react-router-dom";
-import useUserRole from "./hooks/useUserRole"; // Используем хук
+import useUserRole from "../hooks/useUserRole"; // Используем хук
 
 interface ProtectedRouteProps {
   allowedRoles: string[];
