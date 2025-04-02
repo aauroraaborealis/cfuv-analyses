@@ -72,6 +72,7 @@ select:focus {
   --green-light: #606c38;
   --black: black;
   --white: #ffffff;
+  --error: #911818;
 
   --font: "Montserrat", sans-serif;
   --font-size-base: 16px;

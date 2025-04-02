@@ -7,14 +7,23 @@ import Loading from "../Loading";
 interface Analysis {
   assignment_id: string;
   analyze_name: string;
+  analyze_id: string;
   scheduled_date: string;
   assigned_to_team: boolean;
   is_submitted: boolean;
 }
 
-interface DetailedAnalysis extends Analysis {
-  results: string;
-  details: string;
+interface AnalysisResult {
+  parameter_id: string;
+  parameter_name: string;
+  value: string;
+  unit: string;
+  is_normal: boolean;
+  created_at: string;
+}
+
+interface DetailedAnalysis {
+  results: AnalysisResult[];
 }
 
 const UserAnalyses: React.FC = () => {
@@ -51,6 +60,7 @@ const UserAnalyses: React.FC = () => {
         );
 
         setAnalyses(sortedAnalyses);
+        console.log(sortedAnalyses);
       } catch (err: any) {
         setError(err.message || "Неизвестная ошибка");
       } finally {
@@ -91,7 +101,7 @@ const UserAnalyses: React.FC = () => {
     };
   }, []);
 
-  const fetchDetails = async (assignmentId: string, analyzeName: string) => {
+  const fetchDetails = async (assignmentId: string, analyze_id: string) => {
     setLoadingDetails(true);
     setError(null);
 
@@ -113,7 +123,7 @@ const UserAnalyses: React.FC = () => {
           },
           body: JSON.stringify({
             assignment_id: assignmentId,
-            analyze_name: analyzeName,
+            analyze_id: analyze_id,
           }),
         }
       );
@@ -125,6 +135,7 @@ const UserAnalyses: React.FC = () => {
 
       const data = await response.json();
       setDetailedAnalysis(data);
+      console.log(data);
     } catch (err: any) {
       setError(err.message || "Неизвестная ошибка");
     } finally {
@@ -173,7 +184,7 @@ const UserAnalyses: React.FC = () => {
                         setSelectedAnalysis(analysis.assignment_id);
                         fetchDetails(
                           analysis.assignment_id,
-                          analysis.analyze_name
+                          analysis.analyze_id
                         );
                       }
                     }}
@@ -206,14 +217,17 @@ const UserAnalyses: React.FC = () => {
                     <p>Загрузка данных...</p>
                   ) : detailedAnalysis &&
                     detailedAnalysis.results.length > 0 ? (
-                    <div className="details-more">
-                      {Object.entries(detailedAnalysis.results[0]).map(
-                        ([key, value]) => (
-                          <p key={key}>
-                            {key}: {value}
-                          </p>
-                        )
-                      )}
+                      <div className="details-more">
+                      {detailedAnalysis.results.map(({ parameter_id, parameter_name, value, unit, is_normal }) => (
+                        <p
+                          key={parameter_id}
+                          style={{
+                            color: is_normal ? 'black' : '#911818',
+                          }}
+                        >
+                          {parameter_name}: {value} {unit}
+                        </p>
+                      ))}
                     </div>
                   ) : (
                     <p style={{ color: "red" }}>

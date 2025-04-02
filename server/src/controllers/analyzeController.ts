@@ -57,12 +57,12 @@ class AnalyzeController {
 
   async getDetailedResults(req: Request, res: Response) {
     try {
-      const { assignment_id, analyze_name } = req.body;
-      if (!assignment_id || !analyze_name) {
-        return res.status(400).json({ message: 'assignment_id и analyze_name обязательны' });
+      const { assignment_id, analyze_id } = req.body;
+      if (!assignment_id || !analyze_id) {
+        return res.status(400).json({ message: 'assignment_id и analyze_id обязательны' });
       }
 
-      const results = await AnalyzeService.getDetailedResults(assignment_id, analyze_name);
+      const results = await AnalyzeService.getDetailedResults(assignment_id, analyze_id);
       res.status(200).json({ results });
     } catch (error: any) {
       console.error('Ошибка получения детальных результатов анализа:', error);
@@ -73,9 +73,6 @@ class AnalyzeController {
   async getTableData(req: Request, res: Response) {
     try {
       const { tableName } = req.params;
-      if (!validTables.has(tableName)) {
-        return res.status(400).json({ message: "Указанная таблица недопустима или отсутствует." });
-      }
 
       const data = await AnalyzeService.getTableData(tableName);
       res.json(data);
