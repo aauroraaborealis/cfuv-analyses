@@ -28,7 +28,19 @@ import db from './db.js';
 const PORT: number = parseInt(process.env.PORT || '8080', 10);
 const app: Application = express();
 
-app.use(cors());
+app.use(
+  cors({
+    origin: (origin, callback) => {
+      if (!origin || /https:\/\/.*\.netlify\.app$/.test(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error('Not allowed by CORS'));
+      }
+    },
+    credentials: true,
+  })
+);
+
 app.use(express.json());
 app.use('/api', userRouter);
 app.use('/api/team', teamRouter);
