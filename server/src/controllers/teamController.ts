@@ -6,15 +6,16 @@ class TeamController {
     const { sport_id, team_name } = req.body;
 
     if (!sport_id || !team_name) {
-      return res.status(400).json({ message: 'Team name and sport are required.' });
+      return res.status(400).json({ message: 'Название и вид спорта обязательны' });
     }
 
     try {
       const team = await TeamService.createTeam(team_name, sport_id);
       res.status(201).json(team);
-    } catch (error) {
+    } catch (error: any) {
       console.error('Ошибка создания команды:', error);
-      res.status(500).json({ message: 'Internal server error' });
+      const errorMessage = error?.message || 'Внутренняя ошибка сервера';
+      return res.status(500).json({ message: errorMessage });
     }
   }
 

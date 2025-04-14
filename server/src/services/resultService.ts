@@ -33,8 +33,6 @@ export class ResultService {
     `;
     const results = await db.query(resultsQuery, [analysisId, userId]);
 
-    if (results.rows.length === 0) throw new Error('Данные не найдены.');
-
     const labels = Object.fromEntries(Object.entries(fieldMapping).map(([ru, en]) => [en, ru]));
 
     return { results: results.rows, labels };

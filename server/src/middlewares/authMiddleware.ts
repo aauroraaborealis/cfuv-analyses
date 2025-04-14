@@ -18,7 +18,7 @@ const authMiddleware = (req: Request, res: Response, next: NextFunction) => {
   const token = authHeader.split(" ")[1];
 
   try {
-    const secret = process.env.JWT_SECRET;
+    const secret = process.env.ACCESS_SECRET;
     if (!secret) {
       console.error("❌ Ошибка: JWT_SECRET не задан в .env");
       return res.status(500).json({ message: "Ошибка сервера" });

@@ -18,6 +18,7 @@ import "../../styles/UserDashboard.css";
 import { SERVER_LINK } from "../../utils/api";
 import ProgressPieChart from "./ProgressPieChart";
 import { fetchAnalyzes } from "../../utils/fetch";
+import { useAuth } from "../AuthProvider";
 
 // const colors = ["#606C38", "#BC6C25", "#81667A", "#94D1BE", "#BBACC1", "#6f1d1b", "#edafb8", "#f4a261", "#e09f3e", "#0fa3b1"];
 
@@ -28,19 +29,34 @@ import { fetchAnalyzes } from "../../utils/fetch";
 const colors = ["#42552c", "#606c38","#532A09", "#784618", "#915C27", "#AD8042", "#BFAB67", "#BFC882", "#A4B75C", "#647332", "#3E4C22", "#2E401C", "#264653", "#287271", "#2A9D8F", "#8AB17D", "#BAB874", "#E9C46A", "#EFB366", "#F4A261", "#EE8959", "#E76F51"];
 
 // Функция получения результатов по анализу
-const fetchResults = async (analysisId: string) => {
-  const token = localStorage.getItem("token");
-  if (!token) throw new Error("Ошибка: Токен не найден, авторизуйтесь заново.");
+// const fetchResults = async (analysisId: string) => {
+//   // const token = localStorage.getItem("token");
+//   // if (!token) throw new Error("Ошибка: Токен не найден, авторизуйтесь заново.");
 
-  const { data } = await axios.get(
-    `${SERVER_LINK}/stats/user/results/${analysisId}`,
-    { headers: { Authorization: `Bearer ${token}` } }
-  );
+//   const { data } = await axios.get(
+//     `${SERVER_LINK}/stats/user/results/${analysisId}`,
+//     { headers: { Authorization: `Bearer ${accessToken}` } }
+//   );
 
-  return data;
-};
+//   return data;
+// };
 
 export default function UserDashboard() {
+
+  const { accessToken } = useAuth();
+
+  const fetchResults = async (analysisId: string) => {
+    // const token = localStorage.getItem("token");
+    // if (!token) throw new Error("Ошибка: Токен не найден, авторизуйтесь заново.");
+  
+    const { data } = await axios.get(
+      `${SERVER_LINK}/stats/user/results/${analysisId}`,
+      { headers: { Authorization: `Bearer ${accessToken}` } }
+    );
+  
+    return data;
+  };
+
   const { data: analyses, isLoading: loadingAnalyses } = useQuery({
     queryKey: ["userAnalyses"],
     queryFn: fetchAnalyzes,

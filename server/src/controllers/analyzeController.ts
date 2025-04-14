@@ -11,7 +11,7 @@ class AnalyzeController {
         return res.status(401).json({ message: 'Authorization token is required.' });
       }
 
-      const decoded = jwt.verify(token, process.env.JWT_SECRET as string) as { id: string };
+      const decoded = jwt.verify(token, process.env.ACCESS_SECRET as string) as { id: string };
       const student_id = decoded.id;
 
       const analyses = await AnalyzeService.getUserAnalyses(student_id);
@@ -34,7 +34,7 @@ class AnalyzeController {
         return res.status(401).json({ message: 'Unauthorized.' });
       }
 
-      const decodedToken = jwt.verify(token, process.env.JWT_SECRET as string) as { id: string };
+      const decodedToken = jwt.verify(token, process.env.ACCESS_SECRET as string) as { id: string };
       const student_id = decodedToken.id;
 
       const result = await AnalyzeService.submitAnalysis(student_id, assignment_id, analyze_data);

@@ -130,26 +130,26 @@ const RegisterStudent: React.FC = () => {
   // 🚀 Отправка формы
   const onSubmit = async (data: any) => {
     try {
-      const response = await axios.post(`${SERVER_LINK}/register-students`, {
+      await axios.post(`${SERVER_LINK}/register/init`, {
         ...data,
         gender: data.gender.value,
         sport_id: data.sport?.value || null,
         team_id: data.isTeamSport && data.team ? data.team.value : null,
+        role: "student", // 👈 обязательно
       });
-
-      localStorage.setItem("token", response.data.token);
-
-      setShowModal(true);
-
-      setTimeout(() => {
-        setShowModal(false); // ✅ Авто-скрытие через 3 секунды
-        navigate("/my-analysis"); // ✅ Переход после закрытия модалки
-      }, 3000);
-
+  
+      toast.success("Код отправлен на email");
+  
+      // Переход на страницу подтверждения
+      navigate("/verify-code", {
+        state: { email: data.email, role: "student" },
+      });
+  
     } catch (error: any) {
       toast.error(error.response?.data?.message || "Ошибка регистрации");
     }
   };
+  
 
   return (
     <div className="register-form">

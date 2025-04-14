@@ -10,6 +10,7 @@ import statsRouter from './routes/stats.routes.js';
 import profileRouter from './routes/profile.routes.js';
 import assignmentRoutes from './routes/assignment.routes.js';
 import { initializeWebSocketServer } from './socketServer.js';
+import cookieParser from 'cookie-parser';
 import db from './db.js';
 
 (async () => {
@@ -31,7 +32,7 @@ const app: Application = express();
 app.use(
   cors({
     origin: (origin, callback) => {
-      if (!origin || /https:\/\/.*\.netlify\.app$/.test(origin)) {
+      if (!origin || /https:\/\/.*\.netlify\.app$/.test(origin) || /http:\/\/localhost:3000/.test(origin)) {
         callback(null, true);
       } else {
         callback(new Error('Not allowed by CORS'));
@@ -41,7 +42,9 @@ app.use(
   })
 );
 
+// app.use(cors());
 app.use(express.json());
+app.use(cookieParser());
 app.use('/api', userRouter);
 app.use('/api/team', teamRouter);
 app.use('/api/sport', sportRouter);

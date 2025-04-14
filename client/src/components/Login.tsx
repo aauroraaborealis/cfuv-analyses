@@ -4,56 +4,36 @@ import { useMutation } from "@tanstack/react-query";
 import axios from "axios";
 import "../styles/Login.css";
 import { SERVER_LINK } from "../utils/api";
-import {jwtDecode} from "jwt-decode";
-import { getRoleFromToken, isAuthenticated } from "../utils/auth";
-
-interface DecodedToken {
-  id: string;
-  email: string;
-  name: string;
-  role: "student" | "trainer";
-}
+import { isAuthenticated, getRoleFromToken } from "../utils/auth";
 
 const Login: React.FC = () => {
+  console.log('LOGIN');
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
 
-    // Если уже авторизован - редиректим на нужный маршрут
-    useEffect(() => {
-      if (isAuthenticated()) {
-        const role = getRoleFromToken();
-        if (role === "trainer") {
-          navigate("/analysis-results");
-        } else if (role === "student") {
-          navigate("/my-analysis");
-        }
+  useEffect(() => {
+    if (isAuthenticated()) {
+      const role = getRoleFromToken();
+      if (role === "trainer") {
+        navigate("/analysis-results");
+      } else if (role === "student") {
+        navigate("/my-analysis");
       }
-    }, [navigate]);
+    }
+  }, [navigate]);
 
-  // Мутация для входа
   const loginMutation = useMutation({
     mutationFn: async (credentials: { email: string; password: string }) => {
-      const { data } = await axios.post(`${SERVER_LINK}/login`, credentials);
+      const { data } = await axios.post(`${SERVER_LINK}/login/init`, credentials);
       return data;
     },
-    onSuccess: (data) => {
-      localStorage.setItem("token", data.token); // Сохраняем токен
-
-      try {
-        // Декодируем JWT токен, чтобы получить роль
-        const decoded: DecodedToken = jwtDecode(data.token);
-        localStorage.setItem("role", decoded.role); // Сохраняем роль
-
-        if (decoded.role === "student") {
-          navigate("/my-analysis"); // Студенты → my-analysis
-        } else if (decoded.role === "trainer") {
-          navigate("/analysis-results"); // Тренеры → analysis-results
-        } 
-      } catch (error) {
-        console.error("Ошибка декодирования токена:", error);
-      }
+    onSuccess: () => {
+      // Переход к шагу подтверждения
+      navigate("/login-verify", {
+        state: { email }, // передаём email для второго шага
+      });
     },
     onError: (err: any) => {
       setError(err.response?.data?.message || "Ошибка входа");
@@ -63,8 +43,6 @@ const Login: React.FC = () => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
-
-    // Выполняем мутацию для входа
     loginMutation.mutate({ email, password });
   };
 

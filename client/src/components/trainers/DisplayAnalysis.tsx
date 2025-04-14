@@ -154,136 +154,6 @@ export default function DisplayAnalysis() {
       {loading && <p>Загрузка данных...</p>}
       {error && <p style={{ color: "red" }}>{error}</p>}
 
-      {/* {visibleData.length > 0 ? (
-        <table className="res-table">
-          <thead>
-            <tr className="table-header">
-              {Object.keys(visibleData[0]).map((key) => (
-                <th key={key} style={{ padding: "5px" }}>
-                  {key}
-                </th>
-              ))}
-            </tr>
-          </thead>
-          <tbody>
-            {visibleData.map((row, index) => (
-              <tr key={index}>
-
-{Object.entries(row).map(([key, value], cellIndex) => {
-  const isAnalyzed =
-    typeof value === "object" &&
-    value !== null &&
-    "value" in value &&
-    "unit" in value;
-
-  if (isAnalyzed) {
-    const param = value as {
-      value: string;
-      unit: string;
-      is_normal: string;
-      reference?: { lower_bound: number; upper_bound: number };
-    };
-
-    return (
-      <td key={cellIndex}>
-        <div
-          style={{
-            color: param.is_normal === "Не в пределах нормы" ? "#911818" : "inherit",
-          }}
-        >
-          {param.value} {param.unit}
-        </div>
-        <div style={{ fontSize: "0.8em", color: "#999" }}>
-          Норма: {param.reference?.lower_bound}–{param.reference?.upper_bound} {param.unit}
-        </div>
-      </td>
-    );
-  }
-
-  // ✅ Приводим всё остальное к строке
-  return <td key={cellIndex}>{String(value ?? "-")}</td>;
-})}
-
-
-
-                
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      )  */}
-
-{/* {dataRows.length > 0 ? (
-      <table className="res-table">
-        <thead>
-          <tr className="table-header">
-            {Object.keys(dataRows[0]).map((key, index) => (
-              <th key={index} style={{ padding: "5px" }}>
-                {key}
-              </th>
-            ))}
-          </tr>
-          <tr>
-            {Object.keys(dataRows[0]).map((key, index) => {
-              if (norms && norms[key]) {
-                const norm = norms[key];
-                return (
-                  <th key={index} style={{ padding: "5px", fontWeight: "normal", fontSize: "0.9em" }}>
-                    {norm.unit}
-                    <br />
-                    Норма: {norm.lower_bound} – {norm.upper_bound}
-                  </th>
-                );
-              }
-              return <th key={index} style={{ padding: "5px" }} />;
-            })}
-          </tr>
-        </thead>
-        <tbody>
-  {dataRows.map((row, rowIndex) => (
-    <tr key={rowIndex}>
-      {Object.entries(row).map(([key, value], cellIndex) => {
-        if (
-          typeof value === "object" &&
-          value !== null &&
-          "Значение" in value
-        ) {
-          const paramValue = value as {
-            Значение: string;
-            is_normal?: boolean;
-          };
-
-          return (
-            <td key={cellIndex} style={{ padding: "5px" }}>
-              <div
-                style={{
-                  color: paramValue.is_normal === false ? "#911818" : "inherit",
-                }}
-              >
-                {paramValue.Значение}
-              </div>
-            </td>
-          );
-        }
-        return (
-          <td key={cellIndex} style={{ padding: "5px" }}>
-            {String(value ?? "-")}
-          </td>
-        );
-      })}
-    </tr>
-  ))}
-</tbody>
-
-      </table>
-    ) : (
-      !loading &&
-      !error &&
-      selectedAnalyze && (
-        <p className="no-data">Данные для этого анализа отсутствуют</p>
-      )
-    )} */}
-
      {/* Таблица */}
      {dataRows.length > 0 ? (
       <table className="res-table">
@@ -372,7 +242,7 @@ export default function DisplayAnalysis() {
       )
     )}
 
-      {filteredData.length > 0 && (
+      {dataRows.length > 0 && (
         <Pagination
           currentPage={currentPage}
           totalPages={totalPages}

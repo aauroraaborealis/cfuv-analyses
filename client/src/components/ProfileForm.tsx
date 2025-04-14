@@ -12,11 +12,13 @@ import { genders, Option } from "../utils/interfaces";
 import { toast, ToastContainer } from "react-toastify"; // ✅ Импортируем toast
 import "react-toastify/dist/ReactToastify.css"; // ✅ Подключаем стили
 import SuccessModal from "./shared/SuccessModal";
+import { useAuth } from "./AuthProvider";
 
 const formatDateForInput = (dateString: string) => {
   const [day, month, year] = dateString.split(".");
   return `${year}-${month}-${day}`;
 };
+
 
 const ProfileForm: React.FC = () => {
   const [isEditing, setIsEditing] = useState(false); // ✅ Состояние режима редактирования
@@ -26,6 +28,8 @@ const ProfileForm: React.FC = () => {
   const [newTeamName, setNewTeamName] = useState(""); // ✅ Состояние для новой команды
 
   const [showModal, setShowModal] = useState(false); // ✅ Состояние для модалки
+
+  const { accessToken } = useAuth();
 
   const handleAddNewSport = async () => {
     if (!newSportName.trim()) {
@@ -109,11 +113,21 @@ const ProfileForm: React.FC = () => {
 
   const fetchProfile = async () => {
     try {
-      const token = localStorage.getItem("token");
-      if (!token) return;
+      // const token = localStorage.getItem("token");
+      // if (!token) return;
+
+      // const { data } = await axios.get(`${SERVER_LINK}/user/profile`, {
+      //   headers: { Authorization: `Bearer ${token}` },
+      // });
+      console.log(accessToken);
+
+      if (!accessToken) return;
+      console.log(accessToken);
 
       const { data } = await axios.get(`${SERVER_LINK}/user/profile`, {
-        headers: { Authorization: `Bearer ${token}` },
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
       });
 
       console.log("🔹 Профиль пользователя:", data.user);
@@ -187,8 +201,10 @@ const ProfileForm: React.FC = () => {
     console.log("❗Ошибки валидации:", errors);
 
     try {
-      const token = localStorage.getItem("token");
-      if (!token) return toast.error("❌ Ошибка: Токен отсутствует!");
+          
+if (!accessToken) {
+  return toast.error("Ошибка: Токен отсутствует!");
+}
 
       const inTeam = data.isTeamSport; // ✅ Получаем актуальный статус "в команде"
 
@@ -205,7 +221,7 @@ const ProfileForm: React.FC = () => {
           last_name: data.last_name,
           birth_date: data.birth_date,
         },
-        { headers: { Authorization: `Bearer ${token}` } }
+        { headers: { Authorization: `Bearer ${accessToken}` } }
       );
 
       console.log("✅ Сервер ответил:", response.data);

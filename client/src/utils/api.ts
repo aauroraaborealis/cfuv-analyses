@@ -3,6 +3,9 @@ import axios from "axios";
 export const SERVER_LINK = "http://localhost:8080/api";
 export const WS_LINK = "ws://localhost:8080";
 
+// export const SERVER_LINK = "https://test-diploma-1.onrender.com/api";
+// export const WS_LINK = "wss://test-diploma-1.onrender.com";
+
 // export const SERVER_LINK = "https://test3-cupj.onrender.com/api";
 // export const WS_LINK = "wss://test3-cupj.onrender.com";
 
@@ -19,15 +22,22 @@ export const apiRequest = async <T>(
   endpoint: string,
   method: "GET" | "POST" | "PUT" | "DELETE" = "GET",
   data: any = null,
-  token: string | null = null
+  token?: string | null
 ): Promise<T> => {
   try {
+    const accessHeader =
+      token ||
+      (typeof axios.defaults.headers.common["Authorization"] === "string"
+        ? axios.defaults.headers.common["Authorization"]
+        : null);
+
     const response = await apiClient.request<T>({
       url: endpoint,
       method,
       data,
-      headers: token ? { Authorization: `Bearer ${token}` } : undefined,
+      headers: accessHeader ? { Authorization: accessHeader } : undefined,
     });
+
     return response.data;
   } catch (error: any) {
     if (error.response) {
