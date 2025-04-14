@@ -466,10 +466,13 @@ export class userService {
   }
   
   static async loginVerify(email: string, code: string):  Promise<IToken> {
+    console.log('login');
     const payload = await VerificationService.verifyCode(email, code);
+    console.log(payload);
     if (!payload || !payload.role || !payload.id) {
       throw new Error('Invalid or expired code.');
     }
+    console.log(payload);
   
     await VerificationService.delete(email);
 

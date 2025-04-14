@@ -1,4 +1,3 @@
-// AppRoutes.tsx
 import React from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
 import useUserRole from "../hooks/useUserRole";
@@ -16,18 +15,9 @@ import AssignedAnalyses from "./trainers/AssignedAnalyses";
 import ProfileTrainer from "./ProfileTrainer";
 import VerifyCode from "./VerifyCode";
 import LoginVerify from "./LoginVerify";
-import { useAuth } from "./AuthProvider";
-import Loading from "./Loading";
-
 
 const AppRoutes: React.FC = () => {
   const userRole = useUserRole();
-
-  const { accessToken, isInitialized } = useAuth();
-
-  if (!isInitialized) {
-    return <Loading/>; // или свой Loader
-  }
 
   return (
     <Routes>
@@ -55,7 +45,7 @@ const AppRoutes: React.FC = () => {
         }
       />
 
-<Route
+      <Route
         path="/profile"
         element={
           <ProtectedRoute allowedRoles={["student", "trainer"]}>
@@ -72,10 +62,13 @@ const AppRoutes: React.FC = () => {
 
       {/* Student-only */}
       <Route element={<ProtectedRoute allowedRoles={["student"]} />}>
-        <Route path="/submit-analysis/:assignment_id" element={<SubmitAnalysis />} />
+        <Route
+          path="/submit-analysis/:assignment_id"
+          element={<SubmitAnalysis />}
+        />
         <Route path="/my-analysis" element={<UserAnalyses />} />
         <Route path="/dashboard" element={<UserDashboard />} />
-        {/* <Route path="/profile" element={<ProfileForm />} /> */}
+        <Route path="/profile" element={<ProfileForm />} />
       </Route>
 
       {/* Trainer-only */}
@@ -83,7 +76,7 @@ const AppRoutes: React.FC = () => {
         <Route path="/assign-analysis" element={<AssignAnalysis />} />
         <Route path="/assignments" element={<AssignedAnalyses />} />
         <Route path="/analysis-results" element={<DisplayAnalysis />} />
-        {/* <Route path="/profile" element={<ProfileTrainer />} /> */}
+        <Route path="/profile" element={<ProfileTrainer />} />
       </Route>
 
       {/* Fallback */}

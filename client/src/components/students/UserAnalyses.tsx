@@ -39,9 +39,14 @@ const UserAnalyses: React.FC = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const fetchAnalyses = async () => {
+    const fetchAnalyses = async (token:string) => {
       try {
-        const data = await apiRequest<{ analyses: Analysis[] }>("analysis/user", "GET");
+        const data = await apiRequest<{ analyses: Analysis[] }>(
+          "analysis/user",
+          "GET",
+          null,
+          token
+        );
         const sortedAnalyses = data.analyses.sort(
           (a: Analysis, b: Analysis) => {
             if (a.is_submitted === b.is_submitted) {
@@ -63,27 +68,15 @@ const UserAnalyses: React.FC = () => {
       }
     };
 
-    // const token = localStorage.getItem("token");
-    // if (!token) {
-    //   setError("Вы не авторизованы. Выполните вход.");
-    //   return;
-    // } else {
-    //   fetchAnalyses(token);
-    // }
-
-    const header = axios.defaults.headers.common["Authorization"];
-    const accessToken = header && typeof header === "string"
-      ? header.split(" ")[1]
-      : null;
-  
-    if (!accessToken) {
+    const token = localStorage.getItem("token");
+    if (!token) {
       setError("Вы не авторизованы. Выполните вход.");
       return;
+    } else {
+      fetchAnalyses(token);
     }
-  
-    fetchAnalyses();
 
-    const ws = new WebSocket(`${WS_LINK}?token=${encodeURIComponent(accessToken)}`);
+    const ws = new WebSocket(`${WS_LINK}?token=${encodeURIComponent(token)}`);
     ws.onopen = () => {
       console.log("WebSocket соединение установлено.");
     };

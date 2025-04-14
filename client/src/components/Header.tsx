@@ -2,32 +2,34 @@ import React from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { jwtDecode } from "jwt-decode";
 import "../styles/header.css";
-import { logout } from "../utils/logout";
-import useUserRole from "../hooks/useUserRole";
-import { isAuthenticated } from "../utils/auth";
-import { useAuth } from "./AuthProvider";
 
-
+interface DecodedToken {
+  id: string;
+  email: string;
+  name: string;
+  role: "student" | "trainer";
+}
 
 const Header: React.FC = () => {
   const navigate = useNavigate();
-
-  const role = useUserRole();
-
-  // const handleLogout = async () => {
-  //   await logout();  
-  //   navigate("/login");
-  // };
-
-  const { setAccessToken } = useAuth();
-
-  const handleLogout = async () => {
-    await logout(setAccessToken); // ← передаём сюда хук
-    navigate("/login");
-
-  };
-
-  const token = isAuthenticated();
+   const token = localStorage.getItem("token");
+ 
+   let role: "student" | "trainer" | null = null;
+ 
+   if (token) {
+     try {
+       const decoded: DecodedToken = jwtDecode(token);
+       role = decoded.role;
+     } catch (error) {
+       console.error("Ошибка декодирования токена:", error);
+     }
+   }
+ 
+   const handleLogout = () => {
+     localStorage.removeItem("token");
+     localStorage.removeItem("role");
+     navigate("/login");
+   };
 
   return (
     <header>

@@ -22,10 +22,20 @@ const VerifyCode: React.FC = () => {
       { withCredentials: true } // ✅ добавь это
 );
 
-      setAccessToken(response.data.accessToken); // ⬅️ сохраняем токен глобально
-      axios.defaults.headers.common["Authorization"] = `Bearer ${response.data.accessToken}`;
+      // setAccessToken(response.data.accessToken); // ⬅️ сохраняем токен глобально
+      // axios.defaults.headers.common["Authorization"] = `Bearer ${response.data.accessToken}`;
       // localStorage.setItem("token", response.data.token);
       toast.success("Регистрация завершена!");
+
+
+      localStorage.setItem("token", response.data.token);
+ 
+      // setShowModal(true);
+
+      // setTimeout(() => {
+      //   setShowModal(false); // ✅ Авто-скрытие через 3 секунды
+      //   navigate("/analysis-results");
+      // }, 3000);
 
       // переход на анализы или кабинет
       navigate(role === "trainer" ? "/analysis-results" : "/my-analysis");

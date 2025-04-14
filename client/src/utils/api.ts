@@ -22,22 +22,15 @@ export const apiRequest = async <T>(
   endpoint: string,
   method: "GET" | "POST" | "PUT" | "DELETE" = "GET",
   data: any = null,
-  token?: string | null
+  token: string | null = null
 ): Promise<T> => {
   try {
-    const accessHeader =
-      token ||
-      (typeof axios.defaults.headers.common["Authorization"] === "string"
-        ? axios.defaults.headers.common["Authorization"]
-        : null);
-
     const response = await apiClient.request<T>({
       url: endpoint,
       method,
       data,
-      headers: accessHeader ? { Authorization: accessHeader } : undefined,
+      headers: token ? { Authorization: `Bearer ${token}` } : undefined,
     });
-
     return response.data;
   } catch (error: any) {
     if (error.response) {

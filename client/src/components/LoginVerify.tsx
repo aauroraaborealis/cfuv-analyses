@@ -76,12 +76,14 @@ const LoginVerify: React.FC = () => {
         { withCredentials: true } // ⚠️ чтобы получить куки
       );
 
-      setAccessToken(data.accessToken); // сохраняем глобально
+      // setAccessToken(data.accessToken); // сохраняем глобально
 
-      // ⛔ НЕ сохраняем в localStorage
-      axios.defaults.headers.common["Authorization"] = `Bearer ${data.accessToken}`;
+      // // ⛔ НЕ сохраняем в localStorage
+      // axios.defaults.headers.common["Authorization"] = `Bearer ${data.accessToken}`;
 
-      const decoded: any = jwtDecode(data.accessToken);
+      localStorage.setItem("token", data.token);
+
+      const decoded: any = jwtDecode(data.token);
       const role = decoded.role;
 
       if (role === "trainer") {

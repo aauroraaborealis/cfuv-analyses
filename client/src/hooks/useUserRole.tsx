@@ -1,19 +1,24 @@
-import { useAuth } from "../components/AuthProvider";
 import { jwtDecode } from "jwt-decode";
 
+interface DecodedToken {
+  id: string;
+  email: string;
+  name: string;
+  role: "student" | "trainer";
+}
+
 const useUserRole = (): "student" | "trainer" | null => {
-  const { accessToken } = useAuth();
+  const token = localStorage.getItem("token");
 
-  console.log("accessToken | useUserRole", accessToken);
-
-  if (!accessToken) return null;
+  if (!token) {
+    return null;
+  }
 
   try {
-    const decoded: any = jwtDecode(accessToken);
-    console.log(decoded);
-    console.log(decoded?.role);
-    return decoded?.role || null;
-  } catch {
+    const decoded: DecodedToken = jwtDecode(token);
+    return decoded.role;
+  } catch (error) {
+    console.error("Ошибка декодирования токена:", error);
     return null;
   }
 };

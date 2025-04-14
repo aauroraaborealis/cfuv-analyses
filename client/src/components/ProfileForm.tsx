@@ -113,22 +113,22 @@ const ProfileForm: React.FC = () => {
 
   const fetchProfile = async () => {
     try {
-      // const token = localStorage.getItem("token");
-      // if (!token) return;
-
-      // const { data } = await axios.get(`${SERVER_LINK}/user/profile`, {
-      //   headers: { Authorization: `Bearer ${token}` },
-      // });
-      console.log(accessToken);
-
-      if (!accessToken) return;
-      console.log(accessToken);
+      const token = localStorage.getItem("token");
+      if (!token) return;
 
       const { data } = await axios.get(`${SERVER_LINK}/user/profile`, {
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-        },
+        headers: { Authorization: `Bearer ${token}` },
       });
+      // console.log(accessToken);
+
+      // if (!accessToken) return;
+      // console.log(accessToken);
+
+      // const { data } = await axios.get(`${SERVER_LINK}/user/profile`, {
+      //   headers: {
+      //     Authorization: `Bearer ${accessToken}`,
+      //   },
+      // });
 
       console.log("🔹 Профиль пользователя:", data.user);
       setProfileData(data.user);
