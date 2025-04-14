@@ -1,24 +1,10 @@
-import db from '../db.js';
-import { notifyUser } from '../socketServer.js';
+import db from '../db';
+import { notifyUser } from '../socketServer';
 import {
   getTargetTable,
   fieldMapping,
   translateFields,
-} from '../utils/vocabulary.js';
-
-interface Student {
-  first_name: string;
-  last_name: string;
-  middle_name: string;
-  sport_name: string;
-  team_name: string | null;
-  parameters: {
-    parameter_name: string;
-    value: string;
-    unit: string;
-    is_normal: boolean;
-  }[];
-}
+} from '../utils/vocabulary';
 
 export class AnalyzeService {
   static async getUserAnalyses(student_id: string) {

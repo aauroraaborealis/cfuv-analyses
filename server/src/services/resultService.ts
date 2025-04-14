@@ -1,5 +1,4 @@
-import db from '../db.js';
-import { fieldMapping } from '../utils/vocabulary.js';
+import db from '../db';
 
 export class ResultService {
   static async getUserResults(userId: string, analysisId: string) {
@@ -33,8 +32,6 @@ export class ResultService {
     `;
     const results = await db.query(resultsQuery, [analysisId, userId]);
 
-    const labels = Object.fromEntries(Object.entries(fieldMapping).map(([ru, en]) => [en, ru]));
-
-    return { results: results.rows, labels };
+    return { results: results.rows };
   }
 }

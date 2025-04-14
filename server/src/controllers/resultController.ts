@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { ResultService } from '../services/resultService.js';
+import { ResultService } from '../services/resultService';
 
 class ResultController {
   async getUserResults(req: Request, res: Response) {

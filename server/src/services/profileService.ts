@@ -1,4 +1,4 @@
-import db from '../db.js';
+import db from '../db';
 import bcrypt from 'bcrypt';
 
 interface User {

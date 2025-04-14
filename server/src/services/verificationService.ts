@@ -1,5 +1,5 @@
-import db from '../db.js';
-import { transporter } from '../utils/mail.js';
+import db from '../db';
+import { transporter } from '../utils/mail';
 
 export class VerificationService {
   static async sendCode(email: string, payload: any) {

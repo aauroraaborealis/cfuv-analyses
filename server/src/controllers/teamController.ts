@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { TeamService } from '../services/teamService.js';
+import { TeamService } from '../services/teamService';
 
 class TeamController {
   async createTeam(req: Request, res: Response) {

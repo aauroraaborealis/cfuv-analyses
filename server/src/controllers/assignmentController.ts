@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { AssignmentService } from '../services/assignmentService.js';
+import { AssignmentService } from '../services/assignmentService';
 
 class AssignmentController {
   async getAllAssignments(req: Request, res: Response) {

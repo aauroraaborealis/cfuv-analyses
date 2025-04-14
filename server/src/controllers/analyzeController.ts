@@ -1,7 +1,6 @@
 import { Request, Response } from 'express';
-import { AnalyzeService } from '../services/analyzeService.js';
+import { AnalyzeService } from '../services/analyzeService';
 import jwt from 'jsonwebtoken';
-import { validTables } from '../utils/vocabulary.js';
 
 class AnalyzeController {
   async getUserAnalyses(req: Request, res: Response) {

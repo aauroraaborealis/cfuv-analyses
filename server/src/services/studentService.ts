@@ -1,4 +1,4 @@
-import db from '../db.js';
+import db from '../db';
 
 export class StudentService {
   static async getStudentsByTeam(team_id?: string) {

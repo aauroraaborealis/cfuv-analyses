@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { SportService } from '../services/sportService.js';
+import { SportService } from '../services/sportService';
 
 class SportController {
   async createSport(req: Request, res: Response) {

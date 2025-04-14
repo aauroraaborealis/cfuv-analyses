@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { ProfileService } from '../services/profileService.js';
+import { ProfileService } from '../services/profileService';
 
 class ProfileController {
   async getProfile(req: Request, res: Response) {

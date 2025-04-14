@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { userService } from '../services/userService.js';
+import { userService } from '../services/userService';
 
 class userController {
   // async login(req: Request, res: Response) {
