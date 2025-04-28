@@ -33,9 +33,9 @@ const Header: React.FC = () => {
 
   return (
     <header>
-      <h2>{role === "trainer" ? "Панель тренера" : "Анализы"}</h2>
+      {/* <h2>{role === "trainer" ? "Панель тренера" : "Анализы"}</h2> */}
 
-      <nav style={{ display: "flex", alignItems: "center" }}>
+      <nav>
         {!token ? (
           // Для незарегистрированных пользователей
           <>

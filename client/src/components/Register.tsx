@@ -29,7 +29,7 @@ const Register: React.FC = () => {
             checked={role === "student"}
             onChange={() => setRole("student")}
           />
-          Я студент
+          Я спортсмен
         </label>
 
         <label className="role-option">
@@ -40,7 +40,7 @@ const Register: React.FC = () => {
             checked={role === "trainer"}
             onChange={() => setRole("trainer")}
           />
-          Я тренер
+          Я медицинский работник
         </label>
       </div>
 

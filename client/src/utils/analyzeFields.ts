@@ -55,7 +55,7 @@ const analyzeFields: { [key: string]: { label: string; type: string }[] } = {
       { label: "Кистевая динамометрия (сила)", type: "number" },
       { label: "Кистевая динамометрия (выносливость)", type: "number" },
       { label: "Высота прыжка из приседа (SJ)", type: "number" },
-      { label: "Высота прыжка вверх без взмаха руками", type: "number" },
+      { label: "Высота прыжка вверх без взмаха руками (CMJ)", type: "number" },
       { label: "Высота прыжка вверх со взмахом руками", type: "number" },
       { label: "CMJ/SJ", type: "number" },
       { label: "Мощность прыжка", type: "number" },

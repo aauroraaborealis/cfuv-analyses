@@ -43,7 +43,7 @@ export const fieldMapping: Record<string, string> = {
     'Кистевая динамометрия (сила)': 'hand_dynamometry_strength',
     'Кистевая динамометрия (выносливость)': 'hand_dynamometry_endurance',
     'Высота прыжка из приседа (SJ)': 'sj_jump_height',
-    'Высота прыжка вверх без взмаха руками': 'jump_height_no_hands',
+    'Высота прыжка вверх без взмаха руками (CMJ)': 'jump_height_no_hands',
     'Высота прыжка вверх со взмахом руками': 'jump_height_with_hands',
     'CMJ/SJ': 'cmj_sj_ratio',
     'Мощность прыжка': 'jump_power',
