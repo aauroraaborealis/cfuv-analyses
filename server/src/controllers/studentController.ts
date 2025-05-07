@@ -6,7 +6,7 @@ class StudentController {
     try {
       const { team_id } = req.query;
       const students = await StudentService.getStudentsByTeam(team_id as string);
-      res.status(200).json({ message: 'Students retrieved successfully.', students });
+      res.status(200).json(students);
     } catch (error: any) {
       console.error('Ошибка получения студентов:', error);
       res.status(500).json({ message: 'Internal server error.' });

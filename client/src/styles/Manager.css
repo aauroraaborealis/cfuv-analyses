@@ -1,0 +1,30 @@
+.search-pagination-wrapper{
+    display: flex;
+    justify-content: space-between;
+
+}
+
+.teams-sports-manager{
+    display: flex;
+    justify-content: space-between;
+
+}
+
+.right-manager{
+    margin-top: 90px;
+    display: flex;
+    flex-grow: 1;
+}
+
+.search-pagination-wrapper .search-c.search-input{
+    flex-grow: 1;
+    width: 100% !important;
+}
+
+.mt5{
+    margin-top: 10px;
+}
+
+.table-wrapper{
+    margin-top: 10px;
+}

@@ -26,6 +26,7 @@ const authMiddleware = (req: Request, res: Response, next: NextFunction) => {
 
     // Декодируем токен
     const decoded = jwt.verify(token, secret) as JwtPayload;
+    console.log(decoded);
 
     if (!decoded || typeof decoded !== "object" || !decoded.id || !decoded.role) {
       return res.status(403).json({ message: "Недействительный токен" });

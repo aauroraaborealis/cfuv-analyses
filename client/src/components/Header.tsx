@@ -72,10 +72,17 @@ const Header: React.FC = () => {
             </Link>
             <Link
               className="hoverline"
+              to="/edit"
+              style={{ marginLeft: "20px" }}
+            >
+              Редактировать данные
+            </Link>
+            <Link
+              className="hoverline"
               to="/profile"
               style={{ marginLeft: "20px" }}
             >
-              Аккаунт
+              Мой аккаунт
             </Link>
             <button className="logout-btn hoverline" onClick={handleLogout}>
               Выйти

@@ -73,3 +73,9 @@
 .verify-code-form input{
   width: 55%;
 }
+
+.new-code{
+  font-size: 14px;
+  color: darkgray;
+  margin-top: 4px;
+}

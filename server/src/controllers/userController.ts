@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import { userService } from '../services/userService';
+import { VerificationService } from '../services/verificationService';
 
 class userController {
   // async login(req: Request, res: Response) {
@@ -134,6 +135,21 @@ class userController {
       path: '/',
     });
     res.status(200).json({ message: 'Logged out' });
+  }
+
+  async resendCode(req: Request, res: Response) {
+    try {
+      const { email } = req.body;
+      if (!email) {
+        return res.status(400).json({ message: 'Email is required.' });
+      }
+
+      await VerificationService.resendCode(email);
+      res.status(200).json({ message: 'Verification code resent successfully.' });
+    } catch (error: any) {
+      console.error('Ошибка повторной отправки кода:', error);
+      res.status(500).json({ message: error.message || 'Internal server error.' });
+    }
   }
 }
 

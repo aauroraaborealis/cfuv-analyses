@@ -33,4 +33,36 @@ export class VerificationService {
   static async delete(email: string) {
     await db.query('DELETE FROM verification_codes WHERE email = $1', [email]);
   }
+
+  static async resendCode(email: string) {
+    // Ищем запись в таблице верификаций
+    const result = await db.query(
+      'SELECT payload FROM verification WHERE email = $1',
+      [email]
+    );
+    if (result.rowCount === 0) {
+      throw new Error('No pending verification found; please initiate auth first.');
+    }
+
+    // Достаём payload и генерируем новый код
+    const { payload } = result.rows[0];
+    const code = Math.floor(100000 + Math.random() * 900000).toString();
+    const expiresAt = new Date(Date.now() + 10 * 60 * 1000);
+
+    // Обновляем запись новым кодом и сроком
+    await db.query(
+      `UPDATE verification
+       SET code = $1, expires_at = $2
+       WHERE email = $3`,
+      [code, expiresAt, email]
+    );
+
+    // Отправляем письмо
+    await transporter.sendMail({
+      from: 'cfuv.analyses@yandex.ru',
+      to: email,
+      subject: 'Ваш новый код для двухфакторной аутентификации',
+      html: `<p>Ваш код: <strong>${code}</strong>. Он действителен 10 минут.</p>`
+    });
+  }
 }

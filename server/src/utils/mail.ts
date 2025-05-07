@@ -28,18 +28,18 @@ const mailOptions3 = {
 };
 
 
-const send = () => {
-  return new Promise((resolve, reject) => { 
-    transporter.sendMail(mailOptions3, (error, info) => {
-      if (error) {
-        reject(error)
-      }
-      resolve(info)
-    })
-  })
-}
+// const send = () => {
+//   return new Promise((resolve, reject) => { 
+//     transporter.sendMail(mailOptions3, (error, info) => {
+//       if (error) {
+//         reject(error)
+//       }
+//       resolve(info)
+//     })
+//   })
+// }
 
-await send()
+// await send()
 
 export const sendVerificationEmail = async (email: string, code: string) => {
   const html = `

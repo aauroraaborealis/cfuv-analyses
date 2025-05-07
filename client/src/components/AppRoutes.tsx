@@ -15,6 +15,7 @@ import AssignedAnalyses from "./trainers/AssignedAnalyses";
 import ProfileTrainer from "./ProfileTrainer";
 import VerifyCode from "./VerifyCode";
 import LoginVerify from "./LoginVerify";
+import EditTeams from "./trainers/TeamsSportsManager";
 
 const AppRoutes: React.FC = () => {
   const userRole = useUserRole();
@@ -77,6 +78,7 @@ const AppRoutes: React.FC = () => {
         <Route path="/assignments" element={<AssignedAnalyses />} />
         <Route path="/analysis-results" element={<DisplayAnalysis />} />
         <Route path="/profile" element={<ProfileTrainer />} />
+        <Route path="/edit" element={<EditTeams />} />
       </Route>
 
       {/* Fallback */}

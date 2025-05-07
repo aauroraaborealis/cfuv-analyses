@@ -205,4 +205,12 @@ export class userService {
       throw new Error('Invalid refresh token');
     }
   }
+
+  static async resendCode(email: string): Promise<void> {
+    // Валидация email
+    if (!email) throw new Error('Email required to resend code.');
+
+    // Попытка повторной отправки кода
+    await VerificationService.resendCode(email);
+  }
 }
