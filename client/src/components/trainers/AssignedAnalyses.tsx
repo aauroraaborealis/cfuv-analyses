@@ -12,6 +12,7 @@ interface AssignedAnalysis {
   assignment_id: string;
   analyze_name: string;
   scheduled_date: string;
+  sport_name: string;
   assigned_to_team: boolean;
   student_first_name: string | null;
   student_last_name: string | null;
@@ -111,7 +112,8 @@ export default function AssignedAnalyses() {
               <tr className="table-header">
                 <th>Анализ</th>
                 <th>Дата для сдачи</th>
-                <th>Студент</th>
+                <th>Спорт</th>
+                <th>Спортсмен</th>
                 <th>Команда</th>
               </tr>
             </thead>
@@ -127,6 +129,7 @@ export default function AssignedAnalyses() {
                   <td>
                     {new Date(analysis.scheduled_date).toLocaleDateString()}
                   </td>
+                  <td>{analysis.sport_name}</td>
                   <td>
                     {analysis.assigned_to_team
                       ? "—"

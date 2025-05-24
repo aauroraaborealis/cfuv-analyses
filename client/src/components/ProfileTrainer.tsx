@@ -125,7 +125,7 @@ const ProfileTrainer: React.FC = () => {
       setValue("middle_name", data.user.middle_name);
       setValue("last_name", data.user.last_name);
       // setValue("birth_date", data.user.birth_date);
-    //   setValue("birth_date", formatDateForInput(data.user.birth_date));
+      //   setValue("birth_date", formatDateForInput(data.user.birth_date));
 
       // setValue("password", ""); // Пароль не заполняем, но можно ввести новый
 
@@ -203,7 +203,7 @@ const ProfileTrainer: React.FC = () => {
           first_name: data.first_name,
           middle_name: data.middle_name,
           last_name: data.last_name,
-        //   birth_date: data.birth_date,
+          //   birth_date: data.birth_date,
         },
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -240,6 +240,10 @@ const ProfileTrainer: React.FC = () => {
               </div>
 
               <div className="detail-item">
+                <span className="label">Фамилия:</span>
+                <span>{profileData.last_name}</span>
+              </div>
+              <div className="detail-item">
                 <span className="label">Имя:</span>
                 <span>{profileData.first_name}</span>
               </div>
@@ -248,27 +252,16 @@ const ProfileTrainer: React.FC = () => {
                 <span>{profileData.middle_name}</span>
               </div>
               <div className="detail-item">
-                <span className="label">Фамилия:</span>
-                <span>{profileData.last_name}</span>
-              </div>
-              {/* <div className="detail-item">
-                <span className="label">Дата рождения:</span>
-                <span>{profileData.birth_date.split("T")[0]}</span>
-              </div> */}
-              <div className="detail-item">
                 <span className="label">Пол:</span>
                 <span>
                   {profileData.gender === "M" ? "Мужской" : "Женский"}
                 </span>
               </div>
-              {/* <div className="detail-item">
-                <span className="label">Вид спорта:</span>
-                <span>{profileData.sport_name || "Не указан"}</span>
-              </div>
               <div className="detail-item">
-                <span className="label">Команда:</span>
-                <span>{profileData.team_name || "Нет"}</span>
-              </div> */}
+                <span className="label">Пароль:</span>
+                <span style={{ fontSize: "20px" }}>••••••••••••••••</span>
+              </div>
+
               <button
                 onClick={() => setIsEditing(true)}
                 className="edit-button"
@@ -309,6 +302,11 @@ const ProfileTrainer: React.FC = () => {
 
               {/* Личная информация */}
               <div className="column">
+                <label>Фамилия:</label>
+                <input {...register("last_name")} className="input-react" />
+                <p className="error-form">{errors.last_name?.message}</p>
+              </div>
+              <div className="column">
                 <label>Имя:</label>
                 <input {...register("first_name")} className="input-react" />
                 <p className="error-form">{errors.first_name?.message}</p>
@@ -316,20 +314,6 @@ const ProfileTrainer: React.FC = () => {
               <div className="column">
                 <label>Отчество:</label>
                 <input {...register("middle_name")} className="input-react" />
-              </div>
-              <div className="column">
-                <label>Фамилия:</label>
-                <input {...register("last_name")} className="input-react" />
-                <p className="error-form">{errors.last_name?.message}</p>
-              </div>
-              <div className="column">
-                <label>Дата рождения:</label>
-                <input
-                  type="date"
-                  {...register("birth_date")}
-                  className="input-react"
-                />
-                <p className="error-form">{errors.birth_date?.message}</p>
               </div>
 
               {/* Пол */}
@@ -349,120 +333,17 @@ const ProfileTrainer: React.FC = () => {
                 <p className="error-form">{errors.gender?.message}</p>
               </div>
 
-              {/* Вид спорта */}
               <div className="column">
-                <label>Вид спорта:</label>
-                <Controller
-                  name="sport"
-                  control={control}
-                  render={({ field }) => (
-                    <Select
-                      {...field}
-                      options={sports}
-                      isLoading={loadingSports}
-                      placeholder="Выберите вид спорта"
-                      onChange={(selectedOption) => {
-                        field.onChange(selectedOption);
-                        setValue("isTeamSport", false);
-                        setValue("team", null);
-                      }}
-                      isClearable
-                      isSearchable
-                      noOptionsMessage={() => (
-                        <div className="no-options-message">
-                          <span>Такого вида спорта нет в списках</span>
-                          <button
-                            type="button"
-                            className="create-btn"
-                            onClick={handleAddNewSport}
-                          >
-                            Добавить вид спорта "
-                            {newSportName.trim() &&
-                              newSportName.charAt(0).toUpperCase() +
-                                newSportName.slice(1)}
-                            "
-                          </button>
-                        </div>
-                      )}
-                      inputValue={newSportName} // ✅ Принудительно обновляем поле
-                      onInputChange={(value, { action }) => {
-                        if (action === "input-change") {
-                          const formattedValue = value
-                            .split(" ")
-                            .map(
-                              (word) =>
-                                word.charAt(0).toUpperCase() + word.slice(1)
-                            )
-                            .join(" ");
-                          setNewSportName(formattedValue);
-                        }
-                      }}
-                    />
-                  )}
-                />
+                <label>Пароль:</label>
+                <input className="input-react" />
+                <p className="error-form">{errors.first_name?.message}</p>
               </div>
 
-              {/* Чекбокс "Командный спорт" */}
               <div className="column">
-                <label className="team-checkbox">
-                  <input
-                    type="checkbox"
-                    {...register("isTeamSport")}
-                    onChange={(e) => setValue("isTeamSport", e.target.checked)}
-                  />
-                  Командный спорт
-                </label>
+                <label>Новый пароль:</label>
+                <input className="input-react" />
+                <p className="error-form">{errors.first_name?.message}</p>
               </div>
-
-              {/* Команда */}
-              {sport && isTeamSport && (
-                <div className="column">
-                  <label>Команда:</label>
-                  <Controller
-                    name="team"
-                    control={control}
-                    render={({ field }) => (
-                      <Select
-                        {...field}
-                        options={teams}
-                        isLoading={loadingTeams}
-                        placeholder="Выберите команду"
-                        isClearable
-                        isSearchable
-                        noOptionsMessage={() => (
-                          <div className="no-options-message">
-                            <span>Такой команды нет в списках</span>
-                            <button
-                              type="button"
-                              className="create-btn"
-                              onClick={handleAddNewTeam}
-                            >
-                              Создать команду "
-                              {newTeamName.trim() &&
-                                newTeamName.charAt(0).toUpperCase() +
-                                  newTeamName.slice(1)}
-                              "
-                            </button>
-                          </div>
-                        )}
-                        inputValue={newTeamName} // ✅ Принудительно обновляем поле
-                        onInputChange={(value, { action }) => {
-                          if (action === "input-change") {
-                            const formattedValue = value
-                              .split(" ")
-                              .map(
-                                (word) =>
-                                  word.charAt(0).toUpperCase() + word.slice(1)
-                              )
-                              .join(" ");
-                            setNewTeamName(formattedValue);
-                          }
-                        }}
-                      />
-                    )}
-                  />
-                </div>
-              )}
 
               <button type="submit" className="submit-button">
                 Сохранить

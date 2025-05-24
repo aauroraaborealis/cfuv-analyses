@@ -78,9 +78,14 @@ export default function AnalysisModal({
                 </div>
 
                 <div className="detail-item">
+                  <span className="label">Спорт:</span>
+                  <span>{analysis?.sport_name}</span>
+                </div>
+
+                <div className="detail-item">
                   <span className="label">Назначено:</span>
                   <span>
-                    {analysis.assigned_to_team ? "Команде" : "Студенту"}
+                    {analysis.assigned_to_team ? "Команде" : "Спортсмену"}
                   </span>
                 </div>
 
@@ -91,7 +96,7 @@ export default function AnalysisModal({
                   </div>
                 ) : (
                   <div className="detail-item">
-                    <span className="label">Имя студента:</span>
+                    <span className="label">Имя спортсмена:</span>
                     <span className="detailed-label">{`${analysis.student_first_name} ${analysis.student_last_name}`}</span>
                   </div>
                 )}

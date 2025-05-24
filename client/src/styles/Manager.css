@@ -28,3 +28,27 @@
 .table-wrapper{
     margin-top: 10px;
 }
+
+.manage-modal{
+    display: flex;
+    flex-direction: column;
+  }
+
+  .fio{
+    margin: 5px 0;
+  }
+  
+  .manage-modal .column{
+    margin-top: 5px;
+  }
+  
+  .manage-modal .edit-buttons {
+    align-self: center;
+    margin-top: 10px;
+
+  }
+
+  .manage-modal .close-button{
+    align-self: flex-end;
+  }
+  

@@ -8,7 +8,6 @@
     "@testing-library/jest-dom": "^5.17.0",
     "@testing-library/react": "^13.4.0",
     "@testing-library/user-event": "^13.5.0",
-    "@types/jest": "^27.5.2",
     "@types/node": "^16.18.108",
     "@types/react": "^18.3.8",
     "@types/react-dom": "^18.3.0",
@@ -33,7 +32,7 @@
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
-    "test": "react-scripts test",
+    "test": "jest",
     "eject": "react-scripts eject",
     "fix": "prettier --write \"**/*.{js,jsx,ts,tsx,json,css}\""
   },
@@ -56,8 +55,13 @@
     ]
   },
   "devDependencies": {
+    "@types/jest": "^29.5.14",
     "@types/jwt-decode": "^2.2.1",
     "@types/recharts": "^1.8.29",
-    "prettier": "^3.3.3"
+    "identity-obj-proxy": "^3.0.0",
+    "jest-environment-jsdom": "^29.7.0",
+    "jest-fetch-mock": "^3.0.3",
+    "prettier": "^3.3.3",
+    "ts-jest": "^29.3.4"
   }
 }

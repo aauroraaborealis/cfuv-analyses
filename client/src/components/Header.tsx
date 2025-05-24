@@ -89,7 +89,7 @@ const Header: React.FC = () => {
             </button>
           </>
         ) : (
-          // Для студентов
+          // Для спортсменов
           <>
             <Link className="hoverline" to="/dashboard">
               Cтатистика

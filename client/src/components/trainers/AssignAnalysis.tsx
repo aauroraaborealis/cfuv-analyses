@@ -144,7 +144,7 @@ const AssignAnalysis: React.FC = () => {
                 checked={assignTo === "student"}
                 onChange={() => setAssignTo("student")}
               />
-              Студенту
+              Спортсмену
             </label>
           </div>
         </div>
@@ -163,12 +163,12 @@ const AssignAnalysis: React.FC = () => {
         )}
         {assignTo === "student" && (
           <div className="column">
-            <label className="mb">Выберите студента:</label>
+            <label className="mb">Выберите спортсмена:</label>
             <Select
               options={students}
               value={selectedStudent}
               onChange={setSelectedStudent}
-              placeholder={loadingStudents ? "Загрузка..." : "Выберите студента"}
+              placeholder={loadingStudents ? "Загрузка..." : "Выберите спортсмена"}
               isClearable
               isSearchable
             />

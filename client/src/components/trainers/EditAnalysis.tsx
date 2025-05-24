@@ -256,7 +256,7 @@ const EditAnalysis: React.FC<EditAnalysisProps> = ({
                     checked={assignTo === "student"}
                     onChange={() => setAssignTo("student")}
                   />
-                  Студенту
+                  Спортсмену
                 </label>
               </div>
             </div>
@@ -279,13 +279,13 @@ const EditAnalysis: React.FC<EditAnalysisProps> = ({
 
             {assignTo === "student" && (
               <div className="column">
-                <label className="mb">Студент:</label>
+                <label className="mb">Спортсмен:</label>
                 <Select
                   options={students}
                   value={selectedStudent}
                   onChange={setSelectedStudent}
                   placeholder={
-                    loadingStudents ? "Загрузка..." : "Выберите студента"
+                    loadingStudents ? "Загрузка..." : "Выберите спортсмена"
                   }
                   isClearable
                   isSearchable
