@@ -8,7 +8,7 @@ import {
 
 export class AnalyzeService {
   static async getUserAnalyses(student_id: string) {
-    // Запрос для анализов, назначенных конкретному студенту
+    // Запрос для анализов, назначенных конкретному спортсмену
     const userAnalysesQuery = `
     SELECT
       aa.assignment_id,
@@ -23,7 +23,7 @@ export class AnalyzeService {
   `;
     const userAnalyses = await db.query(userAnalysesQuery, [student_id]);
 
-    // Запрос для анализов, назначенных команде студента
+    // Запрос для анализов, назначенных команде спортсмена
     const teamAnalysesQuery = `
     SELECT
       aa.assignment_id,
@@ -281,13 +281,20 @@ export class AnalyzeService {
 
     // Запрос на создание анализа
     const query = `
-      INSERT INTO analyze_assignments (
-        analyze_id, team_id, student_id, scheduled_date, assigned_to_team, created_by
-      ) VALUES ($1, $2, $3, $4, $5, $6)
+    INSERT INTO analyze_assignments (
+      analyze_id,
+      sport_id,
+      team_id,
+      student_id,
+      scheduled_date,
+      assigned_to_team,
+      created_by
+    ) VALUES ($1, $2, $3, $4, $5, $6, $7)
       RETURNING assignment_id;
     `;
     const values = [
       analyze_id,
+      sport_id,         // $2 — не забудьте его добавить!
       team_id || null,
       student_id || null,
       due_date,
@@ -297,7 +304,7 @@ export class AnalyzeService {
     const result = await db.query(query, values);
     const assignment_id = result.rows[0].assignment_id;
 
-    // Отправка уведомлений студентам или команде
+    // Отправка уведомлений спортсменам или команде
     const analyzeNameQuery = await db.query(
       'SELECT analyze_name FROM analyzes WHERE analyze_id = $1',
       [analyze_id]

@@ -54,7 +54,7 @@ export interface Student {
 export class StudentService {
   
   /**
-   * Получить список студентов, при необходимости фильтруя по команде
+   * Получить список спортсменов, при необходимости фильтруя по команде
    */
   static async getStudentsByTeam(team_id?: string): Promise<Student[]> {
     // Базовый запрос с JOIN-ами для получения названий спорта и команды
@@ -82,7 +82,7 @@ export class StudentService {
   }
 
   /**
-   * Получить список студентов по определённому спорту
+   * Получить список спортсменов по определённому спорту
    */
   static async getStudentsBySport(sport_id: string): Promise<Student[]> {
     const query = `

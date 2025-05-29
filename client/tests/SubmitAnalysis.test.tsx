@@ -1,119 +1,94 @@
-// tests/SubmitAnalysis.test.tsx
 import React from 'react';
-import { render, screen, fireEvent, waitFor, cleanup } from '@testing-library/react';
-import { MemoryRouter, Route, Routes } from 'react-router-dom';
-import axios from 'axios';
-import { useMutation } from '@tanstack/react-query';
+import { render, screen, fireEvent, waitFor, act } from '@testing-library/react';
 import SubmitAnalysis from '../src/components/students/SubmitAnalysis';
 import analyzeFields from '../src/utils/analyzeFields';
+import { useMutation } from '@tanstack/react-query';
+import axios from 'axios';
+import { useParams, useLocation, useNavigate } from 'react-router-dom';
 
-jest.mock('axios');
-
-// Мокаем useMutation для контроля состояния
-jest.mock('@tanstack/react-query', () => ({
-  useMutation: jest.fn(),
+// Мокаем analyzeFields как объект
+jest.mock('../src/utils/analyzeFields', () => ({
+  __esModule: true,
+  default: {
+    TestAnalysis: [
+      { label: 'NumField', type: 'number' },
+      { label: 'IntField', type: 'integer' },
+      { label: 'TextField', type: 'text' }
+    ]
+  }
 }));
 
-// Мокаем SuccessModal
-jest.mock('../src/components/shared/SuccessModal', () => ({ message, onClose }: any) => (
-  <div data-testid="success-modal">
-    <span>{message}</span>
-    <button onClick={onClose}>Close</button>
-  </div>
-));
 
-describe('SubmitAnalysis component', () => {
-  const fields = [{ label: 'Field1', type: 'string' }];
-  const originalFields = analyzeFields['testAnalysis'];
-  beforeAll(() => {
-    // временно добавим тестовый анализ
-    analyzeFields['testAnalysis'] = fields;
-  });
-  afterAll(() => {
-    analyzeFields['testAnalysis'] = originalFields;
-  });
+jest.mock('@tanstack/react-query');
+const mockMutate = jest.fn();
+jest.mock('axios');
 
-  let mockMutate: any;
-  let mockStatus: any;
+const mockNavigate = jest.fn();
+jest.mock('react-router-dom', () => ({
+  useParams: jest.fn(),
+  useLocation: jest.fn(),
+  useNavigate: jest.fn(),
+}));
 
+describe('SubmitAnalysis', () => {
   beforeEach(() => {
-    cleanup();
-    mockMutate = jest.fn();
-    mockStatus = { isPending: false };
-    (useMutation as jest.Mock).mockReturnValue({
-      mutate: mockMutate,
-      isPending: mockStatus.isPending,
-    });
-    localStorage.setItem('token', 'abc');
+    jest.resetAllMocks();
+    (useParams as jest.Mock).mockReturnValue({ assignment_id: 'aid' });
+    (useLocation as jest.Mock).mockReturnValue({ state: { analyze_name: 'TestAnalysis' } });
+    (useNavigate as jest.Mock).mockReturnValue(mockNavigate);
+    // 기본 mutation mock
+    (useMutation as jest.Mock).mockReturnValue({ mutate: mockMutate, isPending: false });
   });
 
-  it('renders form fields from analyzeFields and submits', () => {
-    render(
-      <MemoryRouter initialEntries={[{ pathname: '/submit/testAnalysis', state: { analyze_name: 'testAnalysis' } }]}>
-        <Routes>
-          <Route path="/submit/:assignment_id" element={<SubmitAnalysis />} />
-        </Routes>
-      </MemoryRouter>
-    );
-
-    // поле должен отобразиться
-    const input = screen.getByLabelText('Field1:');
-    expect(input).toBeInTheDocument();
-
-    // ввод данных
-    fireEvent.change(input, { target: { value: 'value1' } });
-    // клик по кнопке
-    const submitBtn = screen.getByRole('button', { name: /Отправить/i });
-    fireEvent.click(submitBtn);
+  it('вызывает mutate при сабмите', () => {
+    const { container } = render(<SubmitAnalysis />);
+    const form = container.querySelector('form')!;
+    fireEvent.submit(form);
     expect(mockMutate).toHaveBeenCalled();
   });
 
-  it('shows error message on mutation error', async () => {
-    const errorMessage = 'Ошибка сервера';
-    // замокаем onError
-    (useMutation as jest.Mock).mockImplementationOnce(({ onError }: any) => {
-      // вызвать сразу ошибку
-      onError({ response: { data: { message: errorMessage } } });
-      return { mutate: jest.fn(), isPending: false };
+  it('показывает модалку и навигирует после onSuccess', async () => {
+    jest.useFakeTimers();
+    // Подмена useMutation для onSuccess
+    let onSuccess: () => void = () => {};
+    (useMutation as jest.Mock).mockImplementation((opts) => {
+      onSuccess = opts.onSuccess!;
+      return { mutate: () => onSuccess(), isPending: false };
     });
 
-    render(
-      <MemoryRouter initialEntries={[{ pathname: '/submit/testAnalysis', state: { analyze_name: 'testAnalysis' } }]}>
-        <Routes>
-          <Route path="/submit/:assignment_id" element={<SubmitAnalysis />} />
-        </Routes>
-      </MemoryRouter>
-    );
+    const { container } = render(<SubmitAnalysis />);
+    const form = container.querySelector('form')!;
+    fireEvent.submit(form);
+
+    // Подождать, пока модалка появится
+    await waitFor(() => {
+      expect(screen.getByText(/Анализ успешно отправлен!/i)).toBeInTheDocument();
+    });
+
+    act(() => {
+      jest.advanceTimersByTime(3000);
+    });
 
     await waitFor(() => {
-      expect(screen.getByText(errorMessage)).toBeInTheDocument();
+      expect(mockNavigate).toHaveBeenCalledWith('/my-analysis');
+      expect(screen.queryByText(/Анализ успешно отправлен!/i)).toBeNull();
     });
+    jest.useRealTimers();
   });
 
-  it('displays success modal and navigates after close', async () => {
-    jest.useFakeTimers();
-    // замокаем onSuccess
-    (useMutation as jest.Mock).mockImplementationOnce(({ onSuccess }: any) => {
-      onSuccess();
-      return { mutate: jest.fn(), isPending: false };
+  it('отрисовывает ошибку при onError', async () => {
+    let onError: (err: any) => void = () => {};
+    (useMutation as jest.Mock).mockImplementation((opts) => {
+      onError = opts.onError!;
+      return { mutate: () => onError({ response: { data: { message: 'Server error' } } }), isPending: false };
     });
-    const { container } = render(
-      <MemoryRouter initialEntries={[{ pathname: '/submit/testAnalysis', state: { analyze_name: 'testAnalysis' } }]}>
-        <Routes>
-          <Route path="/submit/:assignment_id" element={<SubmitAnalysis />} />
-        </Routes>
-      </MemoryRouter>
-    );
 
-    // модалка должна появиться
-    expect(screen.getByTestId('success-modal')).toBeInTheDocument();
-    // симулируем клик закрытия
-    fireEvent.click(screen.getByText('Close'));
+    const { container } = render(<SubmitAnalysis />);
+    const form = container.querySelector('form')!;
+    fireEvent.submit(form);
 
-    // переключаем таймеры
-    jest.runAllTimers();
-    // проверяем, что модалка скрылась
-    expect(screen.queryByTestId('success-modal')).toBeNull();
-    jest.useRealTimers();
+    await waitFor(() => {
+      expect(screen.getByText(/Server error/i)).toBeInTheDocument();
+    });
   });
 });

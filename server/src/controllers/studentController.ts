@@ -8,7 +8,7 @@ class StudentController {
       const students = await StudentService.getStudentsByTeam(team_id as string);
       res.status(200).json(students);
     } catch (error: any) {
-      console.error('Ошибка получения студентов:', error);
+      console.error('Ошибка получения спортсменов:', error);
       res.status(500).json({ message: 'Internal server error.' });
     }
   }
@@ -21,7 +21,7 @@ class StudentController {
       const students = await StudentService.getStudentsBySport(sport_id as string);
       res.status(200).json(students);
     } catch (error: any) {
-      console.error('Ошибка получения студентов по виду спорта:', error);
+      console.error('Ошибка получения спортсменов по виду спорта:', error);
       res.status(500).json({ message: error.message || 'Internal server error.' });
     }
   }

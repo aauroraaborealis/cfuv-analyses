@@ -4,18 +4,17 @@ import { TeamService } from '../services/teamService';
 class TeamController {
   async createTeam(req: Request, res: Response) {
     const { sport_id, team_name } = req.body;
-
     if (!sport_id || !team_name) {
       return res.status(400).json({ message: 'Название и вид спорта обязательны' });
     }
-
     try {
       const team = await TeamService.createTeam(team_name, sport_id);
       res.status(201).json(team);
     } catch (error: any) {
       console.error('Ошибка создания команды:', error);
-      const errorMessage = error?.message || 'Внутренняя ошибка сервера';
-      return res.status(500).json({ message: errorMessage });
+      const status = error.status || 500;
+      const message = error.message || 'Внутренняя ошибка сервера';
+      return res.status(status).json({ message });
     }
   }
 

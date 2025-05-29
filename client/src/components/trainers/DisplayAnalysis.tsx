@@ -7,7 +7,7 @@ import Pagination from "../shared/Pagination";
 import RecordsPerPageSelect from "../shared/RecordsPerPageSelect";
 import { SERVER_LINK } from "../../utils/api";
 
-const formatDate = (isoDateStr: string): string => {
+export const formatDate = (isoDateStr: string): string => {
   const date = new Date(isoDateStr);
   // Пример: 21.03.2025 21:25
   return (

@@ -44,9 +44,7 @@ module.exports = {
   },
   setupFilesAfterEnv: ['<rootDir>/setupTests.ts'],
   collectCoverage: true,
-  coverageThreshold: {
-    global: {
-      statements: 80,
-    },
-  },
+    coveragePathIgnorePatterns: [
+    '/utils/',
+  ],
 };

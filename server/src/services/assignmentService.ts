@@ -8,11 +8,13 @@ export class AssignmentService {
         a.analyze_name,
         aa.scheduled_date,
         aa.assigned_to_team,
+        sp.sport_name,
         s.first_name AS student_first_name,
         s.last_name AS student_last_name,
         t.team_name
       FROM analyze_assignments aa
       LEFT JOIN analyzes a ON aa.analyze_id = a.analyze_id
+      LEFT JOIN sports sp ON aa.sport_id = sp.sport_id
       LEFT JOIN students s ON aa.student_id = s.student_id
       LEFT JOIN teams t ON aa.team_id = t.team_id
       ORDER BY aa.scheduled_date DESC;

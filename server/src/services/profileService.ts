@@ -21,7 +21,7 @@ export class ProfileService {
 
     if (user.role === 'student') {
       userId = user.student_id;
-      if (!userId) throw new Error('ID студента не найден');
+      if (!userId) throw new Error('ID спортсмена не найден');
 
       userQuery = `
         SELECT 
@@ -74,7 +74,7 @@ export class ProfileService {
 
     if (user.role === 'student') {
       userId = user.student_id;
-      if (!userId) throw new Error('ID студента не найден');
+      if (!userId) throw new Error('ID спортсмена не найден');
 
       updateQuery = `
         UPDATE students 

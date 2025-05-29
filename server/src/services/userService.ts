@@ -114,7 +114,7 @@ export class userService {
   }
 
   static async loginInit(email: string, password: string): Promise<void> {
-    // Пробуем найти студента
+    // Пробуем найти спортсмена
     let query = `
       SELECT student_id AS id, email, first_name, password_hash, 'student' AS role
       FROM students WHERE email = $1
