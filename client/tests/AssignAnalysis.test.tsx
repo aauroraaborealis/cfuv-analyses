@@ -60,6 +60,7 @@ describe('AssignAnalysis', () => {
     });
     // Stub out mutation
     mockMutate = jest.fn();
+
     (useMutation as jest.Mock).mockReturnValue({
       mutate: mockMutate,
       isPending: false,
@@ -146,5 +147,27 @@ describe('AssignAnalysis', () => {
       onSuccess();
     });
     expect(screen.getByRole('dialog')).toHaveTextContent('Анализ успешно назначен!');
+  });
+
+  it('shows "Загрузка..." placeholder while loading analyzes', () => {
+    // make analyzes query loading
+    (useQuery as jest.Mock).mockImplementationOnce(() => ({
+      data: [],
+      isLoading: true,
+    }));
+    render(<AssignAnalysis />);
+    // placeholder for analysis Select should read "Загрузка..."
+    expect(screen.getByText('Загрузка...')).toBeInTheDocument();
+  });
+
+  it('shows toast.error on mutation error', () => {
+    render(<AssignAnalysis />);
+    // Grab the onError callback from the first useMutation invocation
+    const mutationOpts = (useMutation as jest.Mock).mock.calls[0][0];
+    act(() => {
+      // Simulate a server error
+      mutationOpts.onError({ response: { data: { message: 'Bad' } } });
+    });
+    expect(toast.error).toHaveBeenCalledWith('Ошибка: Bad');
   });
 });

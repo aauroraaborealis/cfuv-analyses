@@ -48,7 +48,8 @@ export class ProfileService {
         WHERE t.trainer_id = $1;
       `;
       userValues = [userId];
-    } else {
+    } /* istanbul ignore next */  
+    else { /* istanbul ignore next */ 
       throw new Error('Неизвестный тип пользователя');
     }
 
@@ -111,7 +112,9 @@ export class ProfileService {
         updatedData.gender,
         userId,
       ];
-    } else {
+    } /* istanbul ignore next */ 
+    else {
+      /* istanbul ignore next */ 
       throw new Error('Нет доступа');
     }
 

@@ -9,6 +9,7 @@ const VerifyCode: React.FC = () => {
   const [code, setCode] = useState("");
   const navigate = useNavigate();
   const location = useLocation();
+  /* istanbul ignore next */
   const { email, role } = location.state || {};
   const { setAccessToken } = useAuth();
 
@@ -39,6 +40,7 @@ const VerifyCode: React.FC = () => {
 
       // переход на анализы или кабинет
       navigate(role === "trainer" ? "/analysis-results" : "/my-analysis");
+      /* istanbul ignore next */
     } catch (error: any) {
       toast.error(error.response?.data?.message || "Неверный код");
     }

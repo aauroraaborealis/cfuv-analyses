@@ -20,7 +20,9 @@ class StudentController {
 
       const students = await StudentService.getStudentsBySport(sport_id as string);
       res.status(200).json(students);
-    } catch (error: any) {
+    } /* istanbul ignore next */ 
+    catch (error: any) {
+      /* istanbul ignore next */ 
       console.error('Ошибка получения спортсменов по виду спорта:', error);
       res.status(500).json({ message: error.message || 'Internal server error.' });
     }

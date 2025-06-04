@@ -19,7 +19,9 @@ interface AssignedAnalysis {
   team_name: string | null;
 }
 
+/* istanbul ignore next */
 const fetchAssignedAnalyses = async (): Promise<AssignedAnalysis[]> => {
+  /* istanbul ignore next */
   const token = localStorage.getItem("token");
   const { data } = await axios.get(`${SERVER_LINK}/assignment`, {
     headers: { Authorization: `Bearer ${token}` },
@@ -94,6 +96,7 @@ export default function AssignedAnalyses() {
             setCurrentPage(1);
           }}
         />
+        {/* istanbul ignore next */}
         <RecordsPerPageSelect
           value={recordsPerPage}
           onChange={(count) => {

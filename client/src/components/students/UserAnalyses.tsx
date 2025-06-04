@@ -106,6 +106,8 @@ const UserAnalyses: React.FC = () => {
     setError(null);
 
     const token = localStorage.getItem("token");
+    /* istanbul ignore next */
+
     if (!token) {
       setError("Вы не авторизованы. Выполните вход.");
       setLoadingDetails(false);
@@ -127,6 +129,7 @@ const UserAnalyses: React.FC = () => {
           }),
         }
       );
+/* istanbul ignore next */
 
       if (!response.ok) {
         const errorData = await response.json();

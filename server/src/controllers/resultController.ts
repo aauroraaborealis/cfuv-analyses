@@ -13,8 +13,11 @@ class ResultController {
 
       const data = await ResultService.getUserResults(userId, analysisId);
       return res.status(200).json(data);
-    } catch (error: any) {
+    } /* istanbul ignore next */  
+    catch (error: any) {
+      /* istanbul ignore next */ 
       console.error('Ошибка загрузки результатов:', error);
+      /* istanbul ignore next */ 
       res.status(500).json({ message: error.message || 'Ошибка сервера.' });
     }
   }

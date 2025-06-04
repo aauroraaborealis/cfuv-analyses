@@ -1,8 +1,14 @@
 // tests/EditAnalysis.test.tsx
 import React from "react";
-import { render, screen, fireEvent, waitFor, act } from "@testing-library/react";
+import {
+  render,
+  screen,
+  fireEvent,
+  waitFor,
+  act,
+} from "@testing-library/react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { toast } from 'react-toastify';
+import { toast } from "react-toastify";
 import EditAnalysis from "../src/components/trainers/EditAnalysis";
 
 jest.mock("@tanstack/react-query");
@@ -63,11 +69,10 @@ describe("EditAnalysis", () => {
   let onClose: jest.Mock;
   let onFullClose: jest.Mock;
 
-
   beforeEach(() => {
     jest.resetAllMocks();
 
-        // Mock useQueryClient to avoid undefined invalidateQueries
+    // Mock useQueryClient to avoid undefined invalidateQueries
     (useQueryClient as jest.Mock).mockReturnValue({
       invalidateQueries: jest.fn(),
     });
@@ -212,30 +217,50 @@ describe("EditAnalysis", () => {
   });
 
   it("validates required fields and shows error toast", async () => {
-    const { container } = render(<EditAnalysis assignmentId="a1" onClose={onClose} onFullClose={onFullClose} />);
+    const { container } = render(
+      <EditAnalysis
+        assignmentId="a1"
+        onClose={onClose}
+        onFullClose={onFullClose}
+      />
+    );
 
     await screen.findByText("Glucose");
 
     // Clear the required date field
-    const dateInput = screen.getByDisplayValue("2025-06-15") as HTMLInputElement;
+    const dateInput = screen.getByDisplayValue(
+      "2025-06-15"
+    ) as HTMLInputElement;
     fireEvent.change(dateInput, { target: { value: "" } });
 
     // Submit with missing fields
     const form = container.querySelector("form")!;
-      fireEvent.submit(form);
+    fireEvent.submit(form);
     expect(toast.error).toHaveBeenCalledWith("Заполните все поля!");
   });
 
-  it('switches to student mode when radio clicked', async () => {
-    render(<EditAnalysis assignmentId="a1" onClose={onClose} onFullClose={onFullClose} />);
-    await screen.findByText('Glucose');
+  it("switches to student mode when radio clicked", async () => {
+    render(
+      <EditAnalysis
+        assignmentId="a1"
+        onClose={onClose}
+        onFullClose={onFullClose}
+      />
+    );
+    await screen.findByText("Glucose");
     fireEvent.click(screen.getByLabelText(/Спортсмену/i));
     // Now the student select should appear
-    expect(screen.getByText('Выберите спортсмена')).toBeInTheDocument();
+    expect(screen.getByText("Выберите спортсмена")).toBeInTheDocument();
   });
 
-   it("submits update and shows success modal on onSuccess", async () => {
-    render(<EditAnalysis assignmentId="a1" onClose={onClose} onFullClose={onFullClose} />);
+  it("submits update and shows success modal on onSuccess", async () => {
+    render(
+      <EditAnalysis
+        assignmentId="a1"
+        onClose={onClose}
+        onFullClose={onFullClose}
+      />
+    );
     await screen.findByText("Glucose");
 
     // Change analyze → pick Cholesterol
@@ -245,11 +270,15 @@ describe("EditAnalysis", () => {
     fireEvent.click(screen.getByText("Cholesterol"));
 
     // Change due date
-    const dateInput = screen.getByDisplayValue("2025-06-15") as HTMLInputElement;
+    const dateInput = screen.getByDisplayValue(
+      "2025-06-15"
+    ) as HTMLInputElement;
     fireEvent.change(dateInput, { target: { value: "2025-07-01" } });
 
     // Submit
-    fireEvent.click(screen.getByRole("button", { name: /Сохранить изменения/i }));
+    fireEvent.click(
+      screen.getByRole("button", { name: /Сохранить изменения/i })
+    );
     expect(mockUpdateMutate).toHaveBeenCalledWith({
       analyze_id: "a2",
       sport_id: "s1",
@@ -260,20 +289,38 @@ describe("EditAnalysis", () => {
 
     // Simulate mutation success
     act(() => updateCallbacks.onSuccess!());
-    expect(await screen.findByRole("dialog")).toHaveTextContent("Анализ успешно обновлён!");
+    expect(await screen.findByRole("dialog")).toHaveTextContent(
+      "Анализ успешно обновлён!"
+    );
   });
 
   it("shows toast.error on update error", async () => {
-    render(<EditAnalysis assignmentId="a1" onClose={onClose} onFullClose={onFullClose} />);
+    render(
+      <EditAnalysis
+        assignmentId="a1"
+        onClose={onClose}
+        onFullClose={onFullClose}
+      />
+    );
     await screen.findByText("Glucose");
 
     // Simulate mutation error
-    act(() => updateCallbacks.onError!({ response: { data: { message: "Fail!" } } }));
-    expect(toast.error).toHaveBeenCalledWith("Ошибка обновления анализа: Fail!");
+    act(() =>
+      updateCallbacks.onError!({ response: { data: { message: "Fail!" } } })
+    );
+    expect(toast.error).toHaveBeenCalledWith(
+      "Ошибка обновления анализа: Fail!"
+    );
   });
 
   it("submits delete and shows delete success modal", async () => {
-    render(<EditAnalysis assignmentId="a1" onClose={onClose} onFullClose={onFullClose} />);
+    render(
+      <EditAnalysis
+        assignmentId="a1"
+        onClose={onClose}
+        onFullClose={onFullClose}
+      />
+    );
     await screen.findByRole("button", { name: /Удалить анализ/i });
 
     // Trigger delete
@@ -282,7 +329,72 @@ describe("EditAnalysis", () => {
 
     // Simulate delete success
     act(() => deleteCallbacks.onSuccess!());
-    expect(await screen.findByRole("dialog")).toHaveTextContent("Анализ успешно удалён!");
+    expect(await screen.findByRole("dialog")).toHaveTextContent(
+      "Анализ успешно удалён!"
+    );
   });
 
+  it("shows loading text when initialData is loading", () => {
+    (useQuery as jest.Mock).mockImplementationOnce(() => ({
+      data: null,
+      isLoading: true,
+    }));
+    render(
+      <EditAnalysis
+        assignmentId="x"
+        onClose={onClose}
+        onFullClose={onFullClose}
+      />
+    );
+    expect(screen.getByText(/Загрузка данных/)).toBeInTheDocument();
+  });
+
+  it("triggers update onSuccess and shows modal", async () => {
+    render(
+      <EditAnalysis
+        assignmentId="a1"
+        onClose={onClose}
+        onFullClose={onFullClose}
+      />
+    );
+    await screen.findByText("Glucose");
+    fireEvent.click(
+      screen.getByRole("button", { name: /Сохранить изменения/ })
+    );
+    act(() => updateCallbacks.onSuccess());
+    expect(await screen.findByRole("dialog")).toHaveTextContent(
+      "Анализ успешно обновлён!"
+    );
+  });
+
+  it("handles update onError branch", async () => {
+    render(
+      <EditAnalysis
+        assignmentId="a1"
+        onClose={onClose}
+        onFullClose={onFullClose}
+      />
+    );
+    await screen.findByText("Glucose");
+    act(() =>
+      updateCallbacks.onError({ response: { data: { message: "Fail" } } })
+    );
+    expect(toast.error).toHaveBeenCalledWith("Ошибка обновления анализа: Fail");
+  });
+
+  it("handles delete onError branch", async () => {
+    render(
+      <EditAnalysis
+        assignmentId="a1"
+        onClose={onClose}
+        onFullClose={onFullClose}
+      />
+    );
+    await waitFor(() => screen.getByRole("button", { name: /Удалить анализ/ }));
+    fireEvent.click(screen.getByRole("button", { name: /Удалить анализ/ }));
+    act(() =>
+      deleteCallbacks.onError({ response: { data: { message: "DelFail" } } })
+    );
+    expect(toast.error).toHaveBeenCalledWith("Ошибка удаления: DelFail");
+  });
 });

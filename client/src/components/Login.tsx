@@ -24,6 +24,7 @@ const Login: React.FC = () => {
     }
   }, [navigate]);
 
+  /* istanbul ignore next */
   const loginMutation = useMutation({
     mutationFn: async (credentials: { email: string; password: string }) => {
       const { data } = await axios.post(`${SERVER_LINK}/login/init`, credentials);

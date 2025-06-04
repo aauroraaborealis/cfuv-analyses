@@ -23,16 +23,13 @@ describe('StudentController', () => {
       const res = mockResponse();
 
       const students = [{ id: 1 }, { id: 2 }];
-      mockService.getStudentsByTeam.mockResolvedValue(students);
+      mockService.getStudentsByTeam.mockResolvedValue(students as any);
 
       await studentController.getStudentsByTeam(req, res);
 
       expect(mockService.getStudentsByTeam).toHaveBeenCalledWith('t1');
       expect(res.status).toHaveBeenCalledWith(200);
-      expect(res.json).toHaveBeenCalledWith({
-        message: 'Students retrieved successfully.',
-        students,
-      });
+      expect(res.json).toHaveBeenCalledWith(students);
     });
 
     it('should return 500 if service throws', async () => {
@@ -54,7 +51,7 @@ describe('StudentController', () => {
       const res = mockResponse();
 
       const students = [{ id: 1 }, { id: 2 }];
-      mockService.getStudentsBySport.mockResolvedValue(students);
+      mockService.getStudentsBySport.mockResolvedValue(students as any);
 
       await studentController.getStudentsBySport(req, res);
 

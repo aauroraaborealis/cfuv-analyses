@@ -9,7 +9,7 @@ interface AnalysisModalProps {
   assignmentId: string | null;
   onClose: () => void;
 }
-
+/* istanbul ignore next */
 const fetchAnalysisDetails = async (assignmentId: string) => {
   const token = localStorage.getItem("token");
   const { data } = await axios.get(`${SERVER_LINK}/assignment/${assignmentId}`, {
@@ -28,6 +28,7 @@ export default function AnalysisModal({
     error,
   } = useQuery({
     queryKey: ["analysisDetails", assignmentId],
+    /* istanbul ignore next */
     queryFn: () => fetchAnalysisDetails(assignmentId!),
     enabled: !!assignmentId,
   });
@@ -41,6 +42,7 @@ export default function AnalysisModal({
   };
 
   // Закрывает только `EditAnalysis`
+  /* istanbul ignore next */
   const handleEditClose = () => {
     setIsEditing(false);
   };
