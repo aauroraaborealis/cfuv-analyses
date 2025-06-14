@@ -37,7 +37,7 @@ export class VerificationService {
   static async resendCode(email: string) {
     // Ищем запись в таблице верификаций
     const result = await db.query(
-      'SELECT payload FROM verification WHERE email = $1',
+      'SELECT payload FROM verification_codes WHERE email = $1',
       [email]
     );
     if (result.rowCount === 0) {
@@ -51,7 +51,7 @@ export class VerificationService {
 
     // Обновляем запись новым кодом и сроком
     await db.query(
-      `UPDATE verification
+      `UPDATE verification_codes
        SET code = $1, expires_at = $2
        WHERE email = $3`,
       [code, expiresAt, email]

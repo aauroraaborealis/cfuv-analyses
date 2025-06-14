@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { jwtDecode } from "jwt-decode";
 import "../styles/header.css";
@@ -11,111 +11,88 @@ interface DecodedToken {
 }
 
 const Header: React.FC = () => {
+  const [isOpen, setIsOpen] = useState(false);
   const navigate = useNavigate();
-   const token = localStorage.getItem("token");
- 
-   let role: "student" | "trainer" | null = null;
- 
-   if (token) {
-     try {
-       const decoded: DecodedToken = jwtDecode(token);
-       role = decoded.role;
-     } catch (error) {
-       console.error("Ошибка декодирования токена:", error);
-     }
-   }
- 
-   const handleLogout = () => {
-     localStorage.removeItem("token");
-     localStorage.removeItem("role");
-     navigate("/login");
-   };
+  const token = localStorage.getItem("token");
+
+  let role: "student" | "trainer" | null = null;
+
+  if (token) {
+    try {
+      const decoded: DecodedToken = jwtDecode(token);
+      role = decoded.role;
+    } catch (error) {
+      console.error("Ошибка декодирования токена:", error);
+    }
+  }
+
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("role");
+    navigate("/login");
+  };
 
   return (
-    <header>
-      {/* <h2>{role === "trainer" ? "Панель тренера" : "Анализы"}</h2> */}
+    <header className="header">
+      <div className="header-container">
+        <button
+          className={`burger ${isOpen ? "open" : ""}`}
+          onClick={() => setIsOpen(!isOpen)}
+        >
+          <span></span>
+          <span></span>
+          <span></span>
+        </button>
 
-      <nav>
-        {!token ? (
-          // Для незарегистрированных пользователей
-          <>
-            <Link className="hoverline" to="/login">
-              Вход
-            </Link>
-            <Link
-              className="hoverline"
-              to="/register"
-              style={{ marginLeft: "20px" }}
-            >
-              Регистрация
-            </Link>
-          </>
-        ) : role === "trainer" ? (
-          // Для тренеров
-          <>
-            <Link className="hoverline" to="/assign-analysis">
-              Назначение анализа
-            </Link>
-            <Link
-              className="hoverline"
-              to="/analysis-results"
-              style={{ marginLeft: "20px" }}
-            >
-              Результаты анализов
-            </Link>
-            <Link
-              className="hoverline"
-              to="/assignments"
-              style={{ marginLeft: "20px" }}
-            >
-              Назначенные анализы
-            </Link>
-            <Link
-              className="hoverline"
-              to="/edit"
-              style={{ marginLeft: "20px" }}
-            >
-              Редактировать данные
-            </Link>
-            <Link
-              className="hoverline"
-              to="/profile"
-              style={{ marginLeft: "20px" }}
-            >
-              Мой аккаунт
-            </Link>
-            <button className="logout-btn hoverline" onClick={handleLogout}>
-              Выйти
-            </button>
-          </>
-        ) : (
-          // Для спортсменов
-          <>
-            <Link className="hoverline" to="/dashboard">
-              Cтатистика
-            </Link>
-            <Link
-              className="hoverline"
-              to="/my-analysis"
-              style={{ marginLeft: "20px" }}
-            >
-              Анализы
-            </Link>
-
-            <Link
-              className="hoverline"
-              to="/profile"
-              style={{ marginLeft: "20px" }}
-            >
-              Профиль
-            </Link>
-
-            <button className="logout-btn hoverline" onClick={handleLogout}>
-              Выйти
-            </button>
-          </>
-        )}
-      </nav>
+        <nav className={`nav ${isOpen ? "show" : ""}`}>
+          {!token ? (
+            <>
+              <Link to="/login" className="hoverline" onClick={() => setIsOpen(false)}>
+                Вход
+              </Link>
+              <Link to="/register" className="hoverline" onClick={() => setIsOpen(false)}>
+                Регистрация
+              </Link>
+            </>
+          ) : role === "trainer" ? (
+            <>
+              <Link to="/assign-analysis" className="hoverline" onClick={() => setIsOpen(false)}>
+                Назначение анализа
+              </Link>
+              <Link to="/analysis-results" className="hoverline" onClick={() => setIsOpen(false)}>
+                Результаты анализов
+              </Link>
+              <Link to="/assignments" className="hoverline" onClick={() => setIsOpen(false)}>
+                Назначенные анализы
+              </Link>
+              <Link to="/edit" className="hoverline" onClick={() => setIsOpen(false)}>
+                Редактировать данные
+              </Link>
+              <Link to="/profile" className="hoverline" onClick={() => setIsOpen(false)}>
+                Мой аккаунт
+              </Link>
+              <button className="logout-btn hoverline" onClick={handleLogout}>
+                Выйти
+              </button>
+            </>
+          ) : (
+            <>
+              <Link to="/dashboard" className="hoverline" onClick={() => setIsOpen(false)}>
+                Статистика
+              </Link>
+              <Link to="/my-analysis" className="hoverline" onClick={() => setIsOpen(false)}>
+                Анализы
+              </Link>
+              <Link to="/profile" className="hoverline" onClick={() => setIsOpen(false)}>
+                Профиль
+              </Link>
+              <button className="logout-btn hoverline" onClick={handleLogout}>
+                Выйти
+              </button>
+            </>
+          )}
+        </nav>
+      </div>
     </header>
   );
 };

@@ -11,17 +11,49 @@ import { toast, ToastContainer } from "react-toastify";
 import SuccessModal from "./shared/SuccessModal";
 
 // ✅ Схема валидации для тренеров
+
+const cyrillicOnly = /^[А-Яа-яЁёІіЇїЄєҐґ]+$/;
+
 const schema = yup.object().shape({
-  email: yup.string().email("Некорректный email").required("Введите email"),
+  email: yup
+    .string()
+    .email("Введите корректный email")
+    .max(100, "Максимум 100 символов")
+    .required("Введите email"),
+
   password: yup
     .string()
     .min(6, "Минимум 6 символов")
+    .max(32, "Максимум 32 символа")
     .required("Введите пароль"),
-  first_name: yup.string().required("Введите имя"),
-  middle_name: yup.string().nullable(),
-  last_name: yup.string().required("Введите фамилию"),
-  gender: yup.object().nullable().required("Выберите пол"),
+
+  first_name: yup
+    .string()
+    .min(2, "Минимум 2 буквы")
+    .max(24, "Слишком длинное имя")
+    .matches(cyrillicOnly, "Имя должно содержать только буквы кириллицы")
+    .required("Введите имя"),
+
+  middle_name: yup
+    .string()
+    .min(2, "Минимум 2 буквы")
+    .max(25, "Слишком длинное отчество")
+    .matches(cyrillicOnly, "Отчество должно содержать только буквы кириллицы")
+    .nullable(),
+
+  last_name: yup
+    .string()
+    .min(2, "Минимум 2 буквы")
+    .max(24, "Слишком длинная фамилия")
+    .matches(cyrillicOnly, "Фамилия должна содержать только буквы кириллицы")
+    .required("Введите фамилию"),
+
+  gender: yup
+    .object()
+    .nullable()
+    .required("Выберите пол"),
 });
+
 
 const RegisterTrainer: React.FC = () => {
   const navigate = useNavigate();

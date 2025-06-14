@@ -1,7 +1,7 @@
 // __tests__/EditStudentModal.test.tsx
 import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
-import EditStudentModal from '../src/components/trainers/EditStudentModal';
+import EditStudentModal from '../src/components/trainers/EditAthleteModal';
 import { useQuery } from '@tanstack/react-query';
 import { fetchSports, fetchTeams } from '../src/utils/fetch';
 

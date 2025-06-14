@@ -1,5 +1,5 @@
 import { render, screen, waitFor, fireEvent } from '@testing-library/react';
-import UserDashboard from '../src/components/students/UserDashboard';
+import UserDashboard from '../src/components/athletes/UserDashboard';
 import { useQuery } from '@tanstack/react-query';
 import axios from 'axios';
 import { fetchAnalyzes } from '../src/utils/fetch';

@@ -1,5 +1,5 @@
 import React from 'react';
-import UserAnalyses from './students/UserAnalyses';
+import UserAnalyses from './athletes/UserAnalyses';
 
 const MainRoute: React.FC = () => {
 

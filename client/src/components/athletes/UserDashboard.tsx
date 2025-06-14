@@ -97,6 +97,7 @@ export default function UserDashboard() {
       prev.length ? prev.filter((k) => keys.includes(k)) : keys
     );
 
+
     // Build chartData: each entry { date: "YYYY-MM-DDTHH:mm", [param]: value }
     const data = sortedDateTimes.map((dt) => {
       const entry: any = { date: dt };
@@ -138,7 +139,7 @@ export default function UserDashboard() {
           <p className="no-data">Недостаточно данных для графика</p>
         ) : (
           <>
-            <div className="checkbox-container">
+            {/* <div className="checkbox-container">
               {Object.keys(bounds).map((key) => (
                 <label key={key} className="checkbox-label">
                   <input
@@ -149,7 +150,43 @@ export default function UserDashboard() {
                   {key}
                 </label>
               ))}
-            </div>
+            </div> */}
+
+            <div className="checkbox-container">
+  {["__all__", ...Object.keys(bounds)].map((key) => {
+    if (key === "__all__") {
+      const allKeys = Object.keys(bounds);
+      const isAllSelected = allKeys.every((k) => visibleKeys.includes(k));
+
+      return (
+        <label key="__all__" className="checkbox-label">
+          <input
+            type="checkbox"
+            checked={isAllSelected}
+            onChange={() => {
+              setVisibleKeys(isAllSelected ? [] : allKeys);
+            }}
+          />
+          {isAllSelected ? "Снять все" : "Выбрать все"}
+        </label>
+      );
+    }
+
+    return (
+      <label key={key} className="checkbox-label">
+        <input
+          type="checkbox"
+          checked={visibleKeys.includes(key)}
+          onChange={() => toggleKey(key)}
+        />
+        {key}
+      </label>
+    );
+  })}
+</div>
+
+
+
             <div className="charts">
               <h3>Динамика показателей</h3>
               <ResponsiveContainer width="100%" height={400}>

@@ -34,3 +34,9 @@
     width: 100px;
   }
   
+
+  @media (max-width: 768px){
+    .pagination-container{
+      font-size: small;
+    }
+  }

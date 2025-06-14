@@ -6,7 +6,7 @@ import { isAuthenticated, getRoleFromToken } from '../src/utils/auth';
 import { useNavigate } from 'react-router-dom';
 
 // Моки для дочерних компонентов
-jest.mock('../src/components/RegisterStudent', () => () => <div>RegisterStudent Component</div>);
+jest.mock('../src/components/RegisterAthlete', () => () => <div>RegisterStudent Component</div>);
 jest.mock('../src/components/RegisterTrainer', () => () => <div>RegisterTrainer Component</div>);
 
 // Моки для auth и роутинга

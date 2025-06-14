@@ -1,6 +1,6 @@
 import React from 'react';
 import { render, screen, fireEvent, waitFor, act } from '@testing-library/react';
-import SubmitAnalysis from '../src/components/students/SubmitAnalysis';
+import SubmitAnalysis from '../src/components/athletes/SubmitAnalysis';
 import analyzeFields from '../src/utils/analyzeFields';
 import { useMutation } from '@tanstack/react-query';
 import axios from 'axios';

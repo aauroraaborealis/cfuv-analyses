@@ -1,16 +1,16 @@
 import request from 'supertest';
 import express, { Request, Response } from 'express';
-import studentRoutes from '../src/routes/students.routes';
-import studentController from '../src/controllers/studentController';
+import studentRoutes from '../src/routes/athletes.routes';
+import athleteController from '../src/controllers/athleteController';
 
-jest.mock('../src/controllers/studentController');
-const mockController = studentController as jest.Mocked<typeof studentController>;
+jest.mock('../src/controllers/athleteController');
+const mockController = athleteController as jest.Mocked<typeof athleteController>;
 
 const app = express();
 app.use(express.json());
 app.use('/api/students', studentRoutes);
 
-describe('student.routes', () => {
+describe('athletes.routes', () => {
   beforeEach(() => jest.clearAllMocks());
 
   it('GET /api/students → getStudentsByTeam', async () => {

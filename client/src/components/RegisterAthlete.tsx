@@ -16,63 +16,7 @@ import SuccessModal from "./shared/SuccessModal";
 const RegisterStudent: React.FC = () => {
   const navigate = useNavigate();
 
-  const [newSportName, setNewSportName] = useState(""); // ✅ Состояние для нового вида спорта
-  const [newTeamName, setNewTeamName] = useState(""); // ✅ Состояние для новой команды
-
   const [showModal, setShowModal] = useState(false); // ✅ Состояние для модалки
-
-  const handleAddNewSport = async () => {
-    if (!newSportName.trim()) {
-      toast.error("Введите название вида спорта!");
-      return;
-    }
-
-    try {
-      const response = await axios.post(`${SERVER_LINK}/sport/create`, {
-        sport_name: newSportName.trim(),
-      });
-
-      const result = response.data;
-      const newSport = { value: result.sport_id, label: result.sport_name };
-
-      setValue("sport", newSport); // ✅ Устанавливаем новый вид спорта
-      setNewSportName(""); // ✅ Очищаем поле ввода
-      refetchSports(); // ✅ Обновляем список видов спорта
-
-      toast.success("Вид спорта успешно добавлен!");
-    } catch (error: any) {
-      console.error("Ошибка добавления вида спорта:", error);
-      toast.error(
-        error.response?.data?.message || "Ошибка добавления вида спорта"
-      );
-    }
-  };
-
-  const handleAddNewTeam = async () => {
-    if (!newTeamName.trim() || !selectedSport) {
-      toast.error("Введите название команды и выберите вид спорта!");
-      return;
-    }
-
-    try {
-      const response = await axios.post(`${SERVER_LINK}/team/create`, {
-        sport_id: selectedSport,
-        team_name: newTeamName.trim(),
-      });
-
-      const result = response.data;
-      const newTeam = { value: result.team_id, label: result.team_name };
-
-      setValue("team", newTeam); // ✅ Устанавливаем новую команду
-      setNewTeamName(""); // ✅ Очищаем поле ввода
-      refetchTeams(); // ✅ Обновляем список команд
-
-      toast.success("Команда успешно добавлена!");
-    } catch (error: any) {
-      console.error("Ошибка добавления команды:", error);
-      toast.error(error.response?.data?.message || "Ошибка добавления команды");
-    }
-  };
 
   // 🎯 React Hook Form
   const {
@@ -241,6 +185,7 @@ const RegisterStudent: React.FC = () => {
           <label className="team-checkbox">
             <input
               type="checkbox"
+              className="team-check"
               {...register("isTeamSport")}
               onChange={(e) => setValue("isTeamSport", e.target.checked)}
             />

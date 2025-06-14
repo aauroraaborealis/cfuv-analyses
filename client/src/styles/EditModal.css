@@ -88,3 +88,12 @@
 .delete-analysis-btn{
   background-color: darkred;
 }
+
+@media (max-width: 768px) {
+
+  .modal-content{
+    font-size: smaller;
+    padding: 10px;
+  }
+
+}

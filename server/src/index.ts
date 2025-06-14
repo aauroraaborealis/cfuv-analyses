@@ -5,7 +5,7 @@ import userRouter from './routes/user.routes.js';
 import teamRouter from './routes/team.routes.js';
 import sportRouter from './routes/sport.routes.js';
 import analysisRouter from './routes/analysis.routes.js';
-import studentsRouter from './routes/students.routes.js';
+import studentsRouter from './routes/athletes.routes.js';
 import statsRouter from './routes/stats.routes.js';
 import profileRouter from './routes/profile.routes.js';
 import assignmentRoutes from './routes/assignment.routes.js';

@@ -94,3 +94,19 @@ input[type="checkbox"] {
 .my-data-cont .detail-item{
   width: 100%;
 }
+
+/* .css-b62m3t-container{
+  width: 100%;
+} */
+
+.reg-form input{
+  width: 100%;
+}
+
+.team-checkbox checkbox{
+  width: fit-content;
+}
+
+.team-check{
+  width: fit-content !important;
+}

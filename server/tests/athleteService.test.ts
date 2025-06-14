@@ -1,10 +1,10 @@
-import { StudentService } from '../src/services/studentService';
+import { AthleteService } from '../src/services/athleteService';
 import db from '../src/db';
 
 jest.mock('../src/db');
 const mockDb = db as unknown as { query: jest.Mock };
 
-describe('StudentService', () => {
+describe('AthleteService', () => {
   beforeEach(() => {
     jest.clearAllMocks();
   });
@@ -16,7 +16,7 @@ describe('StudentService', () => {
       ];
       mockDb.query.mockResolvedValueOnce({ rowCount: 1, rows: mockStudents });
 
-      const result = await StudentService.getStudentsByTeam('team1');
+      const result = await AthleteService.getStudentsByTeam('team1');
       expect(result).toEqual(mockStudents);
       expect(mockDb.query).toHaveBeenCalledWith(expect.any(String), ['team1']);
     });
@@ -28,7 +28,7 @@ describe('StudentService', () => {
       ];
       mockDb.query.mockResolvedValueOnce({ rowCount: 2, rows: mockStudents });
 
-      const result = await StudentService.getStudentsByTeam();
+      const result = await AthleteService.getStudentsByTeam();
       expect(result).toEqual(mockStudents);
       expect(mockDb.query).toHaveBeenCalledWith(expect.any(String), []);
     });
@@ -41,7 +41,7 @@ describe('StudentService', () => {
       ];
       mockDb.query.mockResolvedValueOnce({ rowCount: 1, rows: mockStudents });
 
-      const result = await StudentService.getStudentsBySport('sport1');
+      const result = await AthleteService.getStudentsBySport('sport1');
       expect(result).toEqual(mockStudents);
       expect(mockDb.query).toHaveBeenCalledWith(expect.any(String), ['sport1']);
     });
@@ -49,7 +49,7 @@ describe('StudentService', () => {
     it('should throw an error if no students found', async () => {
       mockDb.query.mockResolvedValueOnce({ rowCount: 0, rows: [] });
 
-      await expect(StudentService.getStudentsBySport('sportX')).rejects.toThrow(
+      await expect(AthleteService.getStudentsBySport('sportX')).rejects.toThrow(
         'No students found for this sport.'
       );
     });

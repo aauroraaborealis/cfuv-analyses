@@ -1,9 +1,9 @@
 import { Request, Response } from 'express';
-import studentController from '../src/controllers/studentController';
-import { StudentService } from '../src/services/studentService';
+import athleteController from '../src/controllers/athleteController';
+import { AthleteService } from '../src/services/athleteService';
 
-jest.mock('../src/services/studentService');
-const mockService = StudentService as jest.Mocked<typeof StudentService>;
+jest.mock('../src/services/athleteService');
+const mockService = AthleteService as jest.Mocked<typeof AthleteService>;
 
 const mockResponse = () => {
   const res = {} as Response;
@@ -12,7 +12,7 @@ const mockResponse = () => {
   return res;
 };
 
-describe('StudentController', () => {
+describe('athleteController', () => {
   beforeEach(() => {
     jest.clearAllMocks();
   });
@@ -25,7 +25,7 @@ describe('StudentController', () => {
       const students = [{ id: 1 }, { id: 2 }];
       mockService.getStudentsByTeam.mockResolvedValue(students as any);
 
-      await studentController.getStudentsByTeam(req, res);
+      await athleteController.getStudentsByTeam(req, res);
 
       expect(mockService.getStudentsByTeam).toHaveBeenCalledWith('t1');
       expect(res.status).toHaveBeenCalledWith(200);
@@ -38,7 +38,7 @@ describe('StudentController', () => {
 
       mockService.getStudentsByTeam.mockRejectedValue(new Error('DB error'));
 
-      await studentController.getStudentsByTeam(req, res);
+      await athleteController.getStudentsByTeam(req, res);
 
       expect(res.status).toHaveBeenCalledWith(500);
       expect(res.json).toHaveBeenCalledWith({ message: 'Internal server error.' });
@@ -53,7 +53,7 @@ describe('StudentController', () => {
       const students = [{ id: 1 }, { id: 2 }];
       mockService.getStudentsBySport.mockResolvedValue(students as any);
 
-      await studentController.getStudentsBySport(req, res);
+      await athleteController.getStudentsBySport(req, res);
 
       expect(mockService.getStudentsBySport).toHaveBeenCalledWith('s1');
       expect(res.status).toHaveBeenCalledWith(200);
@@ -64,7 +64,7 @@ describe('StudentController', () => {
       const req = { query: {} } as Request;
       const res = mockResponse();
 
-      await studentController.getStudentsBySport(req, res);
+      await athleteController.getStudentsBySport(req, res);
 
       expect(res.status).toHaveBeenCalledWith(400);
       expect(res.json).toHaveBeenCalledWith({ message: 'Sport ID is required.' });
@@ -76,7 +76,7 @@ describe('StudentController', () => {
 
       mockService.getStudentsBySport.mockRejectedValue(new Error('Unexpected error'));
 
-      await studentController.getStudentsBySport(req, res);
+      await athleteController.getStudentsBySport(req, res);
 
       expect(res.status).toHaveBeenCalledWith(500);
       expect(res.json).toHaveBeenCalledWith({ message: 'Unexpected error' });

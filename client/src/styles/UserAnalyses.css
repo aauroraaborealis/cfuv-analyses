@@ -40,27 +40,27 @@
   color: var(--black);
 }
 
-.analysis-res-div{
-    height: 50px;
-    background: white;
-    border-radius: 14px;
-    color: var(--green-main);
-    border: var(--green-main) 1px solid;
-    padding: 0px 40px;
-    font-family: "Montserrat", sans-serif;
-    font-size: larger;
+.analysis-res-div {
+  height: 50px;
+  background: white;
+  border-radius: 14px;
+  color: var(--green-main);
+  border: var(--green-main) 1px solid;
+  padding: 0px 40px;
+  font-family: "Montserrat", sans-serif;
+  font-size: larger;
 }
 
-.analysis-res-div p{
-    text-align: center;
+.analysis-res-div p {
+  text-align: center;
 }
 
-.analysis-assigned{
-    font-style: normal;
-    font-weight: 500;
-    font-size: 12px;
-    color: var(--black);
-    margin-top: 6px;
+.analysis-assigned {
+  font-style: normal;
+  font-weight: 500;
+  font-size: 12px;
+  color: var(--black);
+  margin-top: 6px;
 }
 
 .analysis-details {
@@ -73,11 +73,11 @@
   margin-bottom: 10px;
 }
 
-.details-more{
-    padding: 5px;
-    padding-left: 20px;
-    margin-top: -30px;
-    padding-top: 30px;
+.details-more {
+  padding: 5px;
+  padding-left: 20px;
+  margin-top: -30px;
+  padding-top: 30px;
 }
 
 /* .analysis-list:active{
@@ -85,12 +85,78 @@
 } */
 
 .analysis-list:has(.analysis-res-div.active) {
-    background-color: #AFB59B;
-    transition: background-color 0.5s ease; /* Плавный переход цвета фона */
+  background-color: #afb59b;
+  transition: background-color 0.5s ease; /* Плавный переход цвета фона */
 }
 
 .analysis-res-div.active {
-    background-color: #AFB59B; /* Цвет кнопки */
-    color: white;
-    border-color: white;
+  background-color: #afb59b; /* Цвет кнопки */
+  color: white;
+  border-color: white;
+}
+
+@media (max-width: 768px) {
+  .controls,
+  .search-input,
+  .search-bar,
+  .assigned-table {
+    font-size: small !important;
   }
+
+  .controls {
+    flex-wrap: wrap;
+  }
+
+  .assigned-table th,
+  .assigned-table td {
+    padding: 2px !important;
+  }
+}
+
+@media (max-width: 533px) {
+  .analisys-name {
+    font-size: 20px;
+    padding-bottom: 6px;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    word-break: break-word;
+  }
+}
+
+@media (max-width: 495px) {
+  .analisys-name {
+    font-size: 18px;
+  }
+
+  .analisys-date {
+    font-size: 14px;
+  }
+}
+
+
+@media (max-width: 400px) {
+  .analysis-list{
+    flex-direction: column;
+  }
+  .analisys-name {
+    font-size: 18px;
+  }
+
+  .analisys-date {
+    font-size: 14px;
+  }
+
+  .analysis-list {
+    padding: 5px;
+  }
+  
+  .submit-analysis-button, .analysis-res-div{
+    width: 60%;
+    margin-top: 10px;
+  }
+
+  .analysis-text{
+    text-align: center;
+  }
+  
+}

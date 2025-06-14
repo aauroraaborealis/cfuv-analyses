@@ -9,7 +9,7 @@ import Pagination from "../shared/Pagination";
 import SearchBar from "../shared/SearchBar";
 import RecordsPerPageSelect from "../shared/RecordsPerPageSelect";
 import "../../styles/Manager.css";
-import EditStudentModal from "./EditStudentModal";
+import EditStudentModal from "./EditAthleteModal";
 
 interface OptionType {
   value: string;
@@ -269,7 +269,7 @@ const TeamsSportsManager: React.FC = () => {
         )}
       </div>
 
-      <div className="column right-manager container">
+      <div className="column right-manager">
         <div className="search-pagination-wrapper">
           <SearchBar value={searchQuery} onChange={setSearchQuery} />
           <RecordsPerPageSelect

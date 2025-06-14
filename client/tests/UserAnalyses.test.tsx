@@ -1,7 +1,7 @@
 // __tests__/UserAnalyses.test.tsx
 import React from 'react';
 import { render, screen, waitFor, fireEvent, act } from '@testing-library/react';
-import UserAnalyses from '../src/components/students/UserAnalyses';
+import UserAnalyses from '../src/components/athletes/UserAnalyses';
 import { apiRequest, SERVER_LINK, WS_LINK } from '../src/utils/api';
 import axios from 'axios';
 import { BrowserRouter } from 'react-router-dom';

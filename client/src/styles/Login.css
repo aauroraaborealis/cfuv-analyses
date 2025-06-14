@@ -79,3 +79,17 @@
   color: darkgray;
   margin-top: 4px;
 }
+
+.resend-button{
+  color: #2D6C30;
+  font-size: medium;
+  background: none;
+  border: none;
+  height: fit-content;
+}
+
+@media screen and (max-width: 899px){
+  .verify-code-form{
+  max-width:none;
+}
+}

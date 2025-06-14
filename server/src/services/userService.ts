@@ -59,7 +59,7 @@ export class userService {
     /* istanbul ignore next */
     if (!payload || payload.role !== role) {
       /* istanbul ignore next */
-      throw new Error('Invalid or expired code.');
+      throw new Error('Код неверен или его срок действия истёк');
     }
 
     const hashedPassword = payload.password;
@@ -166,7 +166,7 @@ export class userService {
     console.log(payload);
     /* istanbul ignore next */
     if (!payload || !payload.role || !payload.id) {
-      throw new Error('Invalid or expired code.');
+      throw new Error('Код неверен или его срок действия истёк');
     }
     console.log(payload);
 

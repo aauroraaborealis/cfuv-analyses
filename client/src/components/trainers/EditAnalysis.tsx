@@ -323,7 +323,7 @@ const EditAnalysis: React.FC<EditAnalysisProps> = ({
                   ? "Обновление..."
                   : "Сохранить изменения"}
               </button>
-/* istanbul ignore next */
+{/* istanbul ignore next */}
               <button
                 className="delete-analysis-btn"
                 onClick={(e) => {

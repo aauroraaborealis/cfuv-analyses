@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import "../styles/Register.css";
-import RegisterStudent from "./RegisterStudent";
+import RegisterStudent from "./RegisterAthlete";
 import RegisterTrainer from "./RegisterTrainer";
 import { getRoleFromToken, isAuthenticated } from "../utils/auth";
 import { useNavigate } from "react-router-dom";

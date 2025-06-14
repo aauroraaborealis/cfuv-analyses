@@ -44,7 +44,6 @@ button:hover {
 }
 
 input {
-  max-width: 50vw;
   border-radius: 25px;
   border: #2d6c30 1px solid;
   padding: 10px;
