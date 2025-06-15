@@ -4,7 +4,7 @@ import dayjs from "dayjs";
 const cyrillicOnly = /^[А-Яа-яЁёІіЇїЄєҐґ]+$/;
 
 export const studentsSchema = yup.object().shape({
-email: yup
+  email: yup
     .string()
     .email("Некорректный email")
     .max(100, "Максимум 100 символов")
@@ -25,10 +25,11 @@ email: yup
 
   middle_name: yup
     .string()
-    .min(2, "Минимум 2 буквы")
     .max(25, "Слишком длинное отчество")
     .matches(cyrillicOnly, "Отчество должно содержать только буквы кириллицы")
-    .nullable(),
+    .transform((value) => (value === "" ? null : value))
+    .nullable()
+    .notRequired(),
 
   last_name: yup
     .string()
@@ -36,31 +37,38 @@ email: yup
     .max(24, "Слишком длинная фамилия")
     .matches(cyrillicOnly, "Фамилия должна содержать только буквы кириллицы")
     .required("Введите фамилию"),
-    birth_date: yup
+  birth_date: yup
     .string()
     .required("Введите дату рождения")
-    .test("is-valid-age", `Возраст должен быть не менее 14 лет`, function (value) {
-      if (!value) return false;
-      const birthDate = dayjs(value);
-      const today = dayjs();
-      const age = today.diff(birthDate, "year");
-      return age >= 14;
-    })
-    .test("not-today", "Дата рождения не может быть сегодняшней", function (value) {
-      if (!value) return false;
-      const birthDate = dayjs(value).startOf("day");
-      const today = dayjs().startOf("day");
-      return !birthDate.isSame(today);
-    }),
-    gender: yup.object().nullable().required("Выберите пол"),
-    sport: yup.object().nullable(),
-    team: yup.object().nullable(),
-    isTeamSport: yup.boolean(),
-  });
-  
+    .test(
+      "is-valid-age",
+      `Возраст должен быть не менее 14 лет`,
+      function (value) {
+        if (!value) return false;
+        const birthDate = dayjs(value);
+        const today = dayjs();
+        const age = today.diff(birthDate, "year");
+        return age >= 14;
+      }
+    )
+    .test(
+      "not-today",
+      "Дата рождения не может быть сегодняшней",
+      function (value) {
+        if (!value) return false;
+        const birthDate = dayjs(value).startOf("day");
+        const today = dayjs().startOf("day");
+        return !birthDate.isSame(today);
+      }
+    ),
+  gender: yup.object().nullable().required("Выберите пол"),
+  sport: yup.object().nullable(),
+  team: yup.object().nullable(),
+  isTeamSport: yup.boolean(),
+});
 
-  export const editStudentsSchema = yup.object().shape({
-email: yup
+export const editStudentsSchema = yup.object().shape({
+  email: yup
     .string()
     .email("Некорректный email")
     .max(100, "Максимум 100 символов")
@@ -81,10 +89,11 @@ email: yup
 
   middle_name: yup
     .string()
-    .min(2, "Минимум 2 буквы")
     .max(25, "Слишком длинное отчество")
     .matches(cyrillicOnly, "Отчество должно содержать только буквы кириллицы")
-    .nullable(),
+    .transform((value) => (value === "" ? null : value))
+    .nullable()
+    .notRequired(),
 
   last_name: yup
     .string()
@@ -92,25 +101,32 @@ email: yup
     .max(24, "Слишком длинная фамилия")
     .matches(cyrillicOnly, "Фамилия должна содержать только буквы кириллицы")
     .required("Введите фамилию"),
-        birth_date: yup
+  birth_date: yup
     .string()
     .required("Введите дату рождения")
-    .test("is-valid-age", `Возраст должен быть не менее 14 лет`, function (value) {
-      if (!value) return false;
-      const birthDate = dayjs(value);
-      const today = dayjs();
-      const age = today.diff(birthDate, "year");
-      return age >= 14;
-    })
-    .test("not-today", "Дата рождения не может быть сегодняшней", function (value) {
-      if (!value) return false;
-      const birthDate = dayjs(value).startOf("day");
-      const today = dayjs().startOf("day");
-      return !birthDate.isSame(today);
-    }),
-    gender: yup.object().nullable().required("Выберите пол"),
-    sport: yup.object().nullable(),
-    team: yup.object().nullable(),
-    isTeamSport: yup.boolean(),
-  });
-  
+    .test(
+      "is-valid-age",
+      `Возраст должен быть не менее 14 лет`,
+      function (value) {
+        if (!value) return false;
+        const birthDate = dayjs(value);
+        const today = dayjs();
+        const age = today.diff(birthDate, "year");
+        return age >= 14;
+      }
+    )
+    .test(
+      "not-today",
+      "Дата рождения не может быть сегодняшней",
+      function (value) {
+        if (!value) return false;
+        const birthDate = dayjs(value).startOf("day");
+        const today = dayjs().startOf("day");
+        return !birthDate.isSame(today);
+      }
+    ),
+  gender: yup.object().nullable().required("Выберите пол"),
+  sport: yup.object().nullable(),
+  team: yup.object().nullable(),
+  isTeamSport: yup.boolean(),
+});

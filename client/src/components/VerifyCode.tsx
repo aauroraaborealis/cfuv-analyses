@@ -1,94 +1,3 @@
-// import React, { useEffect, useState } from "react";
-// import { useLocation, useNavigate } from "react-router-dom";
-// import axios from "axios";
-// import { SERVER_LINK } from "../utils/api";
-// import { toast } from "react-toastify";
-// import { useAuth } from "./AuthProvider";
-
-// const VerifyCode: React.FC = () => {
-//   const [code, setCode] = useState("");
-//   const navigate = useNavigate();
-//   const location = useLocation();
-//   /* istanbul ignore next */
-//   const { email, role } = location.state || {};
-//   const { setAccessToken } = useAuth();
-
-//   const [resendCooldown, setResendCooldown] = useState(() => {
-//     const saved = localStorage.getItem(`resendTimestamp`);
-//     if (saved) {
-//       const secondsSince = Math.floor((Date.now() - Number(saved)) / 1000);
-//       const remaining = 60 - secondsSince;
-//       return remaining > 0 ? remaining : 0;
-//     }
-//     return 0;
-//   });
-
-  
-//     useEffect(() => {
-//       const savedTimestamp = localStorage.getItem("resendTimestamp");
-//       if (savedTimestamp) {
-//         const secondsSince = Math.floor(
-//           (Date.now() - Number(savedTimestamp)) / 1000
-//         );
-//         const remaining = 60 - secondsSince;
-//         if (remaining > 0) {
-//           setResendCooldown(remaining);
-//         }
-//       }
-//     }, []);
-
-//       useEffect(() => {
-//         if (resendCooldown > 0) {
-//           const timer = setTimeout(
-//             () => setResendCooldown((prev) => prev - 1),
-//             1000
-//           );
-//           return () => clearTimeout(timer);
-//         }
-//       }, [resendCooldown]);
-  
-
-//   const handleVerify = async () => {
-//     try {
-//       const response = await axios.post(`${SERVER_LINK}/register/verify`, {
-//         email,
-//         code,
-//         role,
-//       },
-//       { withCredentials: true } // ✅ добавь это
-// );
-
-//       toast.success("Регистрация завершена!");
-//       localStorage.setItem("token", response.data.token);
-
-//       // переход на анализы или кабинет
-//       navigate(role === "trainer" ? "/analysis-results" : "/my-analysis");
-//       /* istanbul ignore next */
-//     } catch (error: any) {
-//       toast.error(error.response?.data?.message || "Неверный код");
-//     }
-//   };
-
-//   return (
-//     <div className="verify-code-form">
-//       <h2>Подтверждение</h2>
-//       <p>На <strong>{email}</strong> был отправлен код</p>
-//       <input
-//         value={code}
-//         onChange={(e) => setCode(e.target.value)}
-//         placeholder="Введите код из письма"
-//         className="input-react"
-//       />
-//       <button onClick={handleVerify} className="submit-button">
-//         Подтвердить
-//       </button>
-//     </div>
-//   );
-// };
-
-// export default VerifyCode;
-
-
 import React, { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import axios from "axios";
@@ -102,14 +11,23 @@ const VerifyCode: React.FC = () => {
   const [errorMessage, setErrorMessage] = useState("");
 
   const [resendCooldown, setResendCooldown] = useState(() => {
-    const saved = localStorage.getItem(`resendTimestamp`);
+    const saved = localStorage.getItem("resendTimestamp");
     if (saved) {
       const secondsSince = Math.floor((Date.now() - Number(saved)) / 1000);
       const remaining = 60 - secondsSince;
       return remaining > 0 ? remaining : 0;
+    } else {
+      const now = Date.now();
+      localStorage.setItem("resendTimestamp", now.toString());
+      return 60;
     }
-    return 0;
   });
+
+  useEffect(() => {
+    return () => {
+      localStorage.removeItem("resendTimestamp");
+    };
+  }, []);
 
   const location = useLocation();
   const navigate = useNavigate();
@@ -156,7 +74,9 @@ const VerifyCode: React.FC = () => {
 
       navigate(role === "trainer" ? "/analysis-results" : "/my-analysis");
     } catch (error: any) {
-      const msg = error.response?.data?.message || "Введённый код неверен или истёк срок его действия";
+      const msg =
+        error.response?.data?.message ||
+        "Введённый код неверен или истёк срок его действия";
       setErrorMessage(msg);
       console.error("Verification error:", msg);
       setError(true);

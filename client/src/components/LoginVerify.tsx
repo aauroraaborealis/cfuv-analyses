@@ -11,14 +11,23 @@ const LoginVerify: React.FC = () => {
   const [errorMessage, setErrorMessage] = useState("");
 
   const [resendCooldown, setResendCooldown] = useState(() => {
-    const saved = localStorage.getItem(`resendTimestamp`);
+    const saved = localStorage.getItem("resendTimestamp");
     if (saved) {
       const secondsSince = Math.floor((Date.now() - Number(saved)) / 1000);
       const remaining = 60 - secondsSince;
       return remaining > 0 ? remaining : 0;
+    } else {
+      const now = Date.now();
+      localStorage.setItem("resendTimestamp", now.toString());
+      return 60;
     }
-    return 0;
   });
+
+  useEffect(() => {
+    return () => {
+      localStorage.removeItem("resendTimestamp");
+    };
+  }, []);
 
   const location = useLocation();
   const navigate = useNavigate();
@@ -65,7 +74,9 @@ const LoginVerify: React.FC = () => {
 
       navigate(role === "trainer" ? "/analysis-results" : "/my-analysis");
     } catch (error: any) {
-      const msg = error.response?.data?.message || "Введённый код неверен или истёк срок его действия";
+      const msg =
+        error.response?.data?.message ||
+        "Введённый код неверен или истёк срок его действия";
       setErrorMessage(msg);
       console.error("Verification error:", msg);
       setError(true);

@@ -36,10 +36,11 @@ const schema = yup.object().shape({
 
   middle_name: yup
     .string()
-    .min(2, "Минимум 2 буквы")
     .max(25, "Слишком длинное отчество")
     .matches(cyrillicOnly, "Отчество должно содержать только буквы кириллицы")
-    .nullable(),
+    .transform((value) => (value === "" ? null : value))
+    .nullable()
+    .notRequired(),
 
   last_name: yup
     .string()
@@ -48,12 +49,8 @@ const schema = yup.object().shape({
     .matches(cyrillicOnly, "Фамилия должна содержать только буквы кириллицы")
     .required("Введите фамилию"),
 
-  gender: yup
-    .object()
-    .nullable()
-    .required("Выберите пол"),
+  gender: yup.object().nullable().required("Выберите пол"),
 });
-
 
 const RegisterTrainer: React.FC = () => {
   const navigate = useNavigate();
@@ -83,18 +80,18 @@ const RegisterTrainer: React.FC = () => {
         gender: data.gender.value,
         role: "trainer", // 👈 новый ключ
       });
-  
+
       toast.success("Код отправлен на email");
       navigate("/verify-code", {
         state: { email: data.email, role: "trainer" }, // 👈 передадим для второго шага
       });
     } catch (error: any) {
       toast.error(
-        error.response?.data?.message || "Ошибка при отправке кода подтверждения"
+        error.response?.data?.message ||
+          "Ошибка при отправке кода подтверждения"
       );
     }
   };
-  
 
   return (
     <div className="register-form">

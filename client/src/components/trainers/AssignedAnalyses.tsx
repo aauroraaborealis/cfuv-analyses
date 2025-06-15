@@ -16,6 +16,7 @@ interface AssignedAnalysis {
   assigned_to_team: boolean;
   student_first_name: string | null;
   student_last_name: string | null;
+  student_middle_name: string | null;
   team_name: string | null;
 }
 
@@ -136,7 +137,7 @@ export default function AssignedAnalyses() {
                   <td>
                     {analysis.assigned_to_team
                       ? "—"
-                      : `${analysis.student_first_name} ${analysis.student_last_name}`}
+                      : `${analysis.student_last_name} ${analysis.student_first_name} ${analysis.student_middle_name}`}
                   </td>
                   <td>
                     {analysis.assigned_to_team

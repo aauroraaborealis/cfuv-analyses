@@ -10,6 +10,7 @@ export class AssignmentService {
         aa.assigned_to_team,
         sp.sport_name,
         s.first_name AS student_first_name,
+        s.middle_name AS student_middle_name,
         s.last_name AS student_last_name,
         t.team_name
       FROM analyze_assignments aa

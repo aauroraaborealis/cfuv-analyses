@@ -72,6 +72,9 @@ const Login: React.FC = () => {
             className="css-13cymwt-control"
           />
         </div>
+        <div className="no-acc">
+          <p>Нет аккаунта?</p><a href="/register">Зарегестрироваться</a>
+        </div>
         <button
           type="submit"
           className="submit-button"
