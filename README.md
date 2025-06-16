@@ -76,7 +76,7 @@
 
 ## 🚀 Деплой
 
-Ссылка: https://coffee-house-resource.netlify.app/
+Ссылка: https://cfuv-analyses.netlify.app/
 
 ## 👩‍💻 Моя роль в проекте
 
