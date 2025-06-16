@@ -1,0 +1,106 @@
+.search-pagination-wrapper {
+  display: flex;
+  justify-content: space-between;
+}
+
+.teams-sports-manager {
+  display: flex;
+  justify-content: space-between;
+}
+
+.right-manager {
+  margin: 0 20px;
+  margin-top: 90px;
+  display: flex;
+  flex-grow: 1;
+}
+
+.search-pagination-wrapper .search-c.search-input {
+  flex-grow: 1;
+  width: 100% !important;
+}
+
+.mt5 {
+  margin-top: 10px;
+}
+
+.table-wrapper {
+  margin-top: 10px;
+}
+
+.manage-modal {
+  display: flex;
+  flex-direction: column;
+}
+
+.fio {
+  margin: 5px 0;
+}
+
+.manage-modal .column {
+  margin-top: 5px;
+}
+
+.manage-modal .edit-buttons {
+  align-self: center;
+  margin-top: 10px;
+}
+
+.manage-modal .close-button {
+  align-self: flex-end;
+}
+
+
+
+@media (max-width: 1277px) {
+  .records-per-page-select span{
+    margin-left: 5px;
+  }
+
+  .records-per-page-select{
+    gap: 0;
+  }
+}
+
+@media (max-width: 920px) {
+  .teams-sports-manager {
+    flex-direction: column;
+  }
+
+  .right-manager {
+    margin: 0;
+    margin-top: 20px;
+  }
+
+  .table-wrapper,
+  .search-pagination-wrapper,
+  .column .column {
+    font-size: small;
+    flex-wrap: wrap;
+  }
+
+  .res-table th,
+  .res-table td {
+    padding: 2px !important;
+  }
+
+  .teams-sports-manager .records-per-page-select span {
+    margin-right: 10px;
+  }
+
+  .teams-sports-manager .records-per-page-select {
+    gap: 0;
+  }
+}
+
+@media (max-width: 648px) {
+  .teams-sports-manager .records-per-page-select span {
+    margin-left: 0;
+    margin-right: 10px;
+
+  }
+
+  .teams-sports-manager .records-per-page-select {
+    margin-top: 15px;
+  }
+}

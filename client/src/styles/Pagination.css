@@ -1,0 +1,42 @@
+.pagination-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 20px;
+    gap: 10px;
+  }
+  
+  .pagination-controls {
+    display: flex;
+    align-items: center;
+    background-color: #adb399;
+    color: #fff;
+    border: none;
+    cursor: pointer;
+    border-radius: 14px;
+    height: fit-content;
+    width: fit-content;
+    padding: 5px 10px;
+  }
+  
+  .pagination-controls:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+  }
+  
+  .records-per-page {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  
+  .records-select {
+    width: 100px;
+  }
+  
+
+  @media (max-width: 768px){
+    .pagination-container{
+      font-size: small;
+    }
+  }
