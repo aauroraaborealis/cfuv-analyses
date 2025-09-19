@@ -1,5 +1,5 @@
 import db from '../db';
-import { transporter } from '../utils/mail';
+import { sendEmail } from '../utils/mail';
 
 export class VerificationService {
   static async sendCode(email: string, payload: any) {
@@ -15,12 +15,11 @@ export class VerificationService {
       [email, code, expiresAt, JSON.stringify(payload)]
     );
 
-    await transporter.sendMail({
-      from: 'cfuv.analyses@yandex.ru',
-      to: email,
-      subject: 'Ваш код подтверждения',
-      html: `<p>Ваш код: <strong>${code}</strong>. Он действителен 10 минут.</p>`,
-    });
+    await sendEmail(
+      email,
+      'Ваш код подтверждения',
+      `<p>Ваш код: <strong>${code}</strong>. Он действителен 10 минут.</p>`
+    );
   }
 
   static async verifyCode(email: string, inputCode: string) {
@@ -62,11 +61,10 @@ export class VerificationService {
       [code, expiresAt, email]
     );
 
-    await transporter.sendMail({
-      from: 'cfuv.analyses@yandex.ru',
-      to: email,
-      subject: 'Ваш новый код для двухфакторной аутентификации',
-      html: `<p>Ваш код: <strong>${code}</strong>. Он действителен 10 минут.</p>`,
-    });
+    await sendEmail(
+      email,
+      'Ваш новый код для двухфакторной аутентификации',
+      `<p>Ваш код: <strong>${code}</strong>. Он действителен 10 минут.</p>`
+    );
   }
 }
