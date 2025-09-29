@@ -1,3 +1,4 @@
+// RegisterStudent.tsx - упрощенная версия
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useForm, Controller } from "react-hook-form";
@@ -15,8 +16,6 @@ import SuccessModal from "./shared/SuccessModal";
 
 const RegisterStudent: React.FC = () => {
   const navigate = useNavigate();
-
-  const [showModal, setShowModal] = useState(false);
 
   const {
     register,
@@ -71,21 +70,21 @@ const RegisterStudent: React.FC = () => {
 
   const onSubmit = async (data: any) => {
     try {
-      await axios.post(`${SERVER_LINK}/register/init`, {
+      const response = await axios.post(`${SERVER_LINK}/register`, {
         ...data,
         gender: data.gender.value,
         sport_id: data.sport?.value || null,
         team_id: data.isTeamSport && data.team ? data.team.value : null,
         role: "student",
-      });
+      }, { withCredentials: true });
 
-      sessionStorage.setItem(
-        "register",
-        JSON.stringify({ email: data.email, role: "student" })
-      );
+      localStorage.setItem("token", response.data.token);
 
-      toast.success("Код отправлен на email");
-      navigate("/verify-code");
+      toast.success("Регистрация успешна!");
+      
+      setTimeout(() => {
+        navigate("/my-analysis");
+      }, 2000);
     } catch (error: any) {
       toast.error(error.response?.data?.message || "Ошибка регистрации");
     }
@@ -218,13 +217,6 @@ const RegisterStudent: React.FC = () => {
           Зарегистрироваться
         </button>
       </form>
-
-      {showModal && (
-        <SuccessModal
-          message="Регистрация успешна!"
-          onClose={() => setShowModal(false)}
-        />
-      )}
 
       <ToastContainer
         position="top-center"

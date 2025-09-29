@@ -25,7 +25,6 @@ const AppRoutes: React.FC = () => {
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
       <Route path="/not-found" element={<Page404 />} />
-      <Route path="/register" element={<Register />} />
       <Route path="/verify-code" element={<VerifyCode />} />
       <Route path="/login-verify" element={<LoginVerify />} />
 

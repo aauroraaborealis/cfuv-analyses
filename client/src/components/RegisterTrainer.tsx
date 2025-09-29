@@ -30,27 +30,29 @@ const RegisterTrainer: React.FC = () => {
     },
   });
 
-  const [showModal, setShowModal] = useState(false); 
+  const [showModal, setShowModal] = useState(false);
 
   const onSubmit = async (data: any) => {
     try {
-      await axios.post(`${SERVER_LINK}/register/init`, {
-        ...data,
-        gender: data.gender.value,
-        role: "trainer", 
-      });
+      const response = await axios.post(
+        `${SERVER_LINK}/register`,
+        {
+          ...data,
+          gender: data.gender.value,
+          role: "trainer",
+        },
+        { withCredentials: true }
+      );
 
-      toast.success("Код отправлен на email");
-      sessionStorage.setItem(
-        "register",
-        JSON.stringify({ email: data.email, role: "trainer" })
-      );
-      navigate("/verify-code");
+      localStorage.setItem("token", response.data.token);
+
+      toast.success("Регистрация успешна!");
+
+      setTimeout(() => {
+        navigate("/analysis-results");
+      }, 2000);
     } catch (error: any) {
-      toast.error(
-        error.response?.data?.message ||
-          "Ошибка при отправке кода подтверждения"
-      );
+      toast.error(error.response?.data?.message || "Ошибка регистрации");
     }
   };
 

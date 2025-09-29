@@ -1,9 +1,11 @@
+// Login.tsx - упрощенная версия
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useMutation } from "@tanstack/react-query";
 import axios from "axios";
 import "../styles/Login.css";
 import { SERVER_LINK } from "../utils/api";
+import { jwtDecode } from "jwt-decode";
 
 const Login: React.FC = () => {
   const [email, setEmail] = useState<string>("");
@@ -14,15 +16,19 @@ const Login: React.FC = () => {
   const loginMutation = useMutation({
     mutationFn: async (credentials: { email: string; password: string }) => {
       const { data } = await axios.post(
-        `${SERVER_LINK}/login/init`,
-        credentials
+        `${SERVER_LINK}/login`,
+        credentials,
+        { withCredentials: true }
       );
       return data;
     },
-    onSuccess: () => {
-      navigate("/login-verify", {
-        state: { email },
-      });
+    onSuccess: (data) => {
+      localStorage.setItem("token", data.token);
+      
+      const decoded: any = jwtDecode(data.token);
+      const role = decoded.role;
+
+      navigate(role === "trainer" ? "/analysis-results" : "/my-analysis");
     },
     onError: (err: any) => {
       setError(err.response?.data?.message || "Ошибка входа");
@@ -62,7 +68,7 @@ const Login: React.FC = () => {
         </div>
         <div className="no-acc">
           <p>Нет аккаунта?</p>
-          <a href="/register">Зарегестрироваться</a>
+          <a href="/register">Зарегистрироваться</a>
         </div>
         <button
           type="submit"

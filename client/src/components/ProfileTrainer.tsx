@@ -1,17 +1,15 @@
 import React, { useEffect, useState } from "react";
 import { useForm, Controller } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { useQuery } from "@tanstack/react-query";
 import Select from "react-select";
 import axios from "axios";
 import "../styles/Register.css";
 import { SERVER_LINK } from "../utils/api";
-import { editStudentsSchema } from "../utils/validationSchemas";
-import { fetchSports, fetchTeams } from "../utils/fetch";
-import { genders, Option } from "../utils/interfaces";
+import { genders } from "../utils/interfaces";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import SuccessModal from "./shared/SuccessModal";
+import { editTrainerSchema } from "../utils/validationSchemas";
 
 const ProfileTrainer: React.FC = () => {
   const [isEditing, setIsEditing] = useState(false);
@@ -22,26 +20,18 @@ const ProfileTrainer: React.FC = () => {
     register,
     handleSubmit,
     control,
-    watch,
     setValue,
-    formState: { errors },
+    formState: { errors, isSubmitting },
   } = useForm({
-    resolver: yupResolver(editStudentsSchema),
+    resolver: yupResolver(editTrainerSchema),
     defaultValues: {
       email: "",
-
       first_name: "",
       middle_name: "",
       last_name: "",
-      birth_date: "",
       gender: undefined,
-      sport: null,
-      isTeamSport: false,
-      team: null,
     },
   });
-
-  const sport = watch("sport");
 
   const fetchProfile = async () => {
     try {
@@ -54,86 +44,52 @@ const ProfileTrainer: React.FC = () => {
 
       setProfileData(data.user);
 
-      setValue("email", data.user.email);
-      setValue("first_name", data.user.first_name);
-      setValue("middle_name", data.user.middle_name);
-      setValue("last_name", data.user.last_name);
+      setValue("email", data.user.email || "");
+      setValue("first_name", data.user.first_name || "");
+      setValue("middle_name", data.user.middle_name || "");
+      setValue("last_name", data.user.last_name || "");
 
       const genderOption = genders.find((g) => g.value === data.user.gender);
       if (genderOption) setValue("gender", genderOption);
-
-      const userSport =
-        sports.find((s: Option) => s.value === data.user.sport_id) || null;
-      setValue("sport", userSport);
-
-      if (userSport) {
-        const teamsRes = await fetchTeams(userSport.value);
-        setValue(
-          "team",
-          teamsRes.find((t: Option) => t.value === data.user.team_id) || null
-        );
-        setValue("isTeamSport", !!data.user.team_id);
-      }
     } catch (err) {
       console.error("❌ Ошибка загрузки профиля", err);
+      toast.error("Ошибка загрузки профиля");
     }
   };
 
-  const {
-    data: sports = [],
-    isLoading: loadingSports,
-    refetch: refetchSports,
-  } = useQuery({
-    queryKey: ["sports"],
-    queryFn: fetchSports,
-  });
-
-  const selectedSport =
-    sport && "value" in sport ? (sport.value as string) : null;
-
-  const {
-    data: teams = [],
-    isFetching: loadingTeams,
-    refetch: refetchTeams,
-  } = useQuery({
-    queryKey: selectedSport ? ["teams", selectedSport] : ["teams"],
-    queryFn: async () => {
-      if (!selectedSport) return [];
-      return await fetchTeams(selectedSport);
-    },
-    enabled: !!selectedSport,
-  });
-
   useEffect(() => {
     fetchProfile();
-  }, [setValue]);
+  }, []);
 
   const onSubmit = async (data: any) => {
-
     try {
       const token = localStorage.getItem("token");
-      if (!token) return toast.error("❌ Ошибка: Токен отсутствует!");
+      if (!token) {
+        toast.error("Ошибка: Токен отсутствует!");
+        return;
+      }
 
-      const inTeam = data.isTeamSport;
+      const submitData = {
+        gender: data.gender?.value || null,
+        email: data.email.trim(),
+        first_name: data.first_name.trim(),
+        middle_name: data.middle_name?.trim() || "",
+        last_name: data.last_name.trim(),
+      };
 
       const response = await axios.put(
         `${SERVER_LINK}/user/profile`,
-        {
-          gender: data.gender?.value || null,
-          sport_id: data.sport?.value || null,
-          team_id: inTeam ? data.team?.value || null : null,
-          in_team: inTeam,
-          email: data.email.trim(),
-          first_name: data.first_name.trim(),
-          middle_name: data.middle_name.trim(),
-          last_name: data.last_name,
-        },
-        { headers: { Authorization: `Bearer ${token}` } }
+        submitData,
+        { 
+          headers: { 
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json"
+          } 
+        }
       );
 
       setIsEditing(false);
       await fetchProfile();
-
       setShowModal(true);
 
       setTimeout(() => {
@@ -145,6 +101,10 @@ const ProfileTrainer: React.FC = () => {
         error.response?.data?.message || "Ошибка редактирования профиля"
       );
     }
+  };
+
+  const handleFormSubmit = (data: any) => {
+    onSubmit(data);
   };
 
   return (
@@ -170,7 +130,7 @@ const ProfileTrainer: React.FC = () => {
               </div>
               <div className="detail-item">
                 <span className="label">Отчество:</span>
-                <span>{profileData.middle_name}</span>
+                <span>{profileData.middle_name || "Не указано"}</span>
               </div>
               <div className="detail-item">
                 <span className="label">Пол:</span>
@@ -198,9 +158,7 @@ const ProfileTrainer: React.FC = () => {
         <>
           <div className="register-form">
             <form
-              onSubmit={handleSubmit((data) => {
-                onSubmit(data);
-              })}
+              onSubmit={handleSubmit(handleFormSubmit)}
               className="reg-form"
             >
               <button
@@ -210,7 +168,8 @@ const ProfileTrainer: React.FC = () => {
               >
                 <img src="/close.svg" alt="Отменить" />
               </button>
-              <h2>Мои данные</h2>
+              <h2>Редактирование профиля</h2>
+              
               <div className="column">
                 <label>Email:</label>
                 <input {...register("email")} className="input-react" />
@@ -222,15 +181,19 @@ const ProfileTrainer: React.FC = () => {
                 <input {...register("last_name")} className="input-react" />
                 <p className="error-form">{errors.last_name?.message}</p>
               </div>
+              
               <div className="column">
                 <label>Имя:</label>
                 <input {...register("first_name")} className="input-react" />
                 <p className="error-form">{errors.first_name?.message}</p>
               </div>
+              
               <div className="column">
                 <label>Отчество:</label>
                 <input {...register("middle_name")} className="input-react" />
+                <p className="error-form">{errors.middle_name?.message}</p>
               </div>
+              
               <div className="column">
                 <label>Пол:</label>
                 <Controller
@@ -248,19 +211,29 @@ const ProfileTrainer: React.FC = () => {
               </div>
 
               <div className="column">
-                <label>Пароль:</label>
-                <input className="input-react" />
-                <p className="error-form">{errors.first_name?.message}</p>
+                <label>Текущий пароль:</label>
+                <input 
+                  type="password" 
+                  className="input-react" 
+                  placeholder="Введите для смены пароля"
+                />
               </div>
 
               <div className="column">
                 <label>Новый пароль:</label>
-                <input className="input-react" />
-                <p className="error-form">{errors.first_name?.message}</p>
+                <input 
+                  type="password" 
+                  className="input-react" 
+                  placeholder="Введите новый пароль"
+                />
               </div>
 
-              <button type="submit" className="submit-button">
-                Сохранить
+              <button 
+                type="submit" 
+                className="submit-button"
+                disabled={isSubmitting}
+              >
+                {isSubmitting ? "Сохранение..." : "Сохранить"}
               </button>
             </form>
           </div>

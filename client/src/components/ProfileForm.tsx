@@ -65,7 +65,6 @@ const ProfileForm: React.FC = () => {
       setValue("first_name", data.user.first_name);
       setValue("middle_name", data.user.middle_name);
       setValue("last_name", data.user.last_name);
-
       setValue("birth_date", formatDateForInput(data.user.birth_date));
 
       const genderOption = genders.find((g) => g.value === data.user.gender);
@@ -124,7 +123,7 @@ const ProfileForm: React.FC = () => {
       if (!accessToken) {
         return toast.error("Ошибка: Токен отсутствует!");
       }
-
+      
       const inTeam = data.isTeamSport;
       const response = await axios.put(
         `${SERVER_LINK}/user/profile`,

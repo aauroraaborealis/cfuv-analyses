@@ -1,9 +1,8 @@
 import { Request, Response } from 'express';
 import { userService } from '../services/userService';
-import { VerificationService } from '../services/verificationService';
 
 class userController {
-  async registerInit(req: Request, res: Response) {
+  async register(req: Request, res: Response) {
     try {
       const { role } = req.body;
       if (role !== 'student' && role !== 'trainer') {
@@ -12,25 +11,7 @@ class userController {
           .json({ message: 'Invalid role. Must be "student" or "trainer".' });
       }
 
-      await userService.registerInit(role, req.body);
-      res.status(200).json({ message: 'Verification code sent to email.' });
-    } catch (error: any) {
-      res.status(400).json({ message: error.message });
-    }
-  }
-
-  async registerVerify(req: Request, res: Response) {
-    try {
-      const { email, code, role } = req.body;
-      console.log(req.body);
-
-      if (role !== 'student' && role !== 'trainer') {
-        return res
-          .status(400)
-          .json({ message: 'Invalid role. Must be "student" or "trainer".' });
-      }
-
-      const result = await userService.registerVerify(role, email, code);
+      const result = await userService.register(role, req.body);
 
       res.cookie('refreshToken', result.refreshToken, {
         httpOnly: true,
@@ -48,27 +29,10 @@ class userController {
     }
   }
 
-  async loginInit(req: Request, res: Response) {
+  async login(req: Request, res: Response) {
     try {
       const { email, password } = req.body;
-      await userService.loginInit(email, password);
-      res.status(200).json({ message: 'Verification code sent to email.' });
-    } catch (error: any) {
-      res
-        .status(
-          error.message === 'User not found.' ||
-            error.message === 'Invalid email or password.'
-            ? 401
-            : 400
-        )
-        .json({ message: error.message });
-    }
-  }
-
-  async loginVerify(req: Request, res: Response) {
-    try {
-      const { email, code } = req.body;
-      const result = await userService.loginVerify(email, code);
+      const result = await userService.login(email, password);
 
       res.cookie('refreshToken', result.refreshToken, {
         httpOnly: true,
@@ -78,11 +42,18 @@ class userController {
       });
 
       res.status(200).json({
-        message: 'Logined successfully.',
+        message: 'Logged in successfully.',
         token: result.accessToken,
       });
     } catch (error: any) {
-      res.status(400).json({ message: error.message });
+      res
+        .status(
+          error.message === 'User not found.' ||
+            error.message === 'Invalid email or password.'
+            ? 401
+            : 400
+        )
+        .json({ message: error.message });
     }
   }
 
@@ -110,25 +81,6 @@ class userController {
       path: '/',
     });
     res.status(200).json({ message: 'Logged out' });
-  }
-
-  async resendCode(req: Request, res: Response) {
-    try {
-      const { email } = req.body;
-      if (!email) {
-        return res.status(400).json({ message: 'Email is required.' });
-      }
-
-      await VerificationService.resendCode(email);
-      res
-        .status(200)
-        .json({ message: 'Verification code resent successfully.' });
-    } catch (error: any) {
-      console.error('Ошибка повторной отправки кода:', error);
-      res
-        .status(500)
-        .json({ message: error.message || 'Internal server error.' });
-    }
   }
 }
 

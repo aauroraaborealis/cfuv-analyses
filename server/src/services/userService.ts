@@ -2,7 +2,6 @@ import db from '../db';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import dotenv from 'dotenv';
-import { VerificationService } from './verificationService';
 
 dotenv.config();
 
@@ -23,10 +22,10 @@ interface IToken {
 }
 
 export class userService {
-  static async registerInit(
+  static async register(
     role: 'student' | 'trainer',
     data: any
-  ): Promise<void> {
+  ): Promise<IToken> {
     const { email, password } = data;
 
     const emailCheck = await db.query(
@@ -40,28 +39,6 @@ export class userService {
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    const payload = {
-      ...data,
-      password: hashedPassword,
-      role,
-    };
-
-    await VerificationService.sendCode(email, payload);
-  }
-
-  static async registerVerify(
-    role: 'student' | 'trainer',
-    email: string,
-    code: string
-  ): Promise<IToken> {
-    const payload = await VerificationService.verifyCode(email, code);
-
-    if (!payload || payload.role !== role) {
-      throw new Error('Код неверен или его срок действия истёк');
-    }
-
-    const hashedPassword = payload.password;
-
     let query: string;
     let values: any[];
     let idField: string;
@@ -73,16 +50,16 @@ export class userService {
         RETURNING student_id, email, first_name;
       `;
       values = [
-        payload.first_name,
-        payload.middle_name || null,
-        payload.last_name,
-        payload.email,
+        data.first_name,
+        data.middle_name || null,
+        data.last_name,
+        data.email,
         hashedPassword,
-        payload.birth_date,
-        payload.gender,
-        payload.sport_id,
-        payload.in_team || false,
-        payload.team_id || null,
+        data.birth_date,
+        data.gender,
+        data.sport_id,
+        data.in_team || false,
+        data.team_id || null,
       ];
       idField = 'student_id';
     } else {
@@ -91,32 +68,31 @@ export class userService {
         VALUES (uuid_generate_v4(), $1, $2, $3, $4, $5, $6)
         RETURNING trainer_id, email, first_name;
       `;
-
       values = [
-        payload.email,
+        data.email,
         hashedPassword,
-        payload.first_name,
-        payload.last_name,
-        payload.middle_name || null,
-        payload.gender,
+        data.first_name,
+        data.last_name,
+        data.middle_name || null,
+        data.gender,
       ];
-
       idField = 'trainer_id';
     }
 
     const result = await db.query(query, values);
-    await VerificationService.delete(email);
-
     const user = result.rows[0];
-    return generateTokens({
-      id: user.id,
+    
+    const tokens = generateTokens({
+      id: user[idField], 
       email: user.email,
       first_name: user.first_name,
-      role: user.role,
+      role: role, 
     });
+    
+    return tokens;
   }
 
-  static async loginInit(email: string, password: string): Promise<void> {
+  static async login(email: string, password: string): Promise<IToken> {
     let query = `
       SELECT student_id AS id, email, first_name, password_hash, 'student' AS role
       FROM students WHERE email = $1
@@ -142,31 +118,14 @@ export class userService {
       throw new Error('Invalid email or password.');
     }
 
-    const payload = {
+    const tokens = generateTokens({
       id: user.id,
       email: user.email,
       first_name: user.first_name,
-      role: user.role,
-    };
-
-    await VerificationService.sendCode(email, payload);
-  }
-
-  static async loginVerify(email: string, code: string): Promise<IToken> {
-    const payload = await VerificationService.verifyCode(email, code);
-
-    if (!payload || !payload.role || !payload.id) {
-      throw new Error('Код неверен или его срок действия истёк');
-    }
-
-    await VerificationService.delete(email);
-
-    return generateTokens({
-      id: payload.id,
-      email: payload.email,
-      first_name: payload.first_name,
-      role: payload.role,
+      role: user.role, 
     });
+
+    return tokens;
   }
 
   static async refreshToken(
@@ -194,11 +153,5 @@ export class userService {
     } catch {
       throw new Error('Invalid refresh token');
     }
-  }
-
-  static async resendCode(email: string): Promise<void> {
-    if (!email) throw new Error('Email required to resend code.');
-
-    await VerificationService.resendCode(email);
   }
 }

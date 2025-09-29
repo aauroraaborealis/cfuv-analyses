@@ -77,8 +77,7 @@ export const editStudentsSchema = yup.object().shape({
   password: yup
     .string()
     .min(6, "Минимум 6 символов")
-    .max(32, "Максимум 32 символа")
-    .required("Введите пароль"),
+    .max(32, "Максимум 32 символа"),
 
   first_name: yup
     .string()
@@ -143,6 +142,38 @@ export const trainerSchema = yup.object().shape({
     .min(6, "Минимум 6 символов")
     .max(32, "Максимум 32 символа")
     .required("Введите пароль"),
+
+  first_name: yup
+    .string()
+    .min(2, "Минимум 2 буквы")
+    .max(24, "Слишком длинное имя")
+    .matches(cyrillicOnly, "Имя должно содержать только буквы кириллицы")
+    .required("Введите имя"),
+
+  middle_name: yup
+    .string()
+    .max(25, "Слишком длинное отчество")
+    .matches(cyrillicOnly, "Отчество должно содержать только буквы кириллицы")
+    .transform((value) => (value === "" ? null : value))
+    .nullable()
+    .notRequired(),
+
+  last_name: yup
+    .string()
+    .min(2, "Минимум 2 буквы")
+    .max(24, "Слишком длинная фамилия")
+    .matches(cyrillicOnly, "Фамилия должна содержать только буквы кириллицы")
+    .required("Введите фамилию"),
+
+  gender: yup.object().nullable().required("Выберите пол"),
+});
+
+export const editTrainerSchema = yup.object().shape({
+  email: yup
+    .string()
+    .email("Некорректный email")
+    .max(100, "Максимум 100 символов")
+    .required("Введите email"),
 
   first_name: yup
     .string()
